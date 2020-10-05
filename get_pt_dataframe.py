@@ -86,17 +86,17 @@ def mnist_pt_objective(config):
 
 if __name__=="__main__":
 	results = []
-for section in tqdm(space):
-    # create a skopt gp minimize object
-    optimizer = Optimizer(section)
-    search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
-                              metric='test_loss', mode='min')
-    # not using a gpu because running on local
-    analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20)
-    results.append(analysis)
+	for section in tqdm(space):
+	    # create a skopt gp minimize object
+	    optimizer = Optimizer(section)
+	    search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
+	                              metric='test_loss', mode='min')
+	    # not using a gpu because running on local
+	    analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20)
+	    results.append(analysis)
 
     all_pt_results = results[0].results_df
 	for i in range(1, len(results)):
     	all_pt_results = all_pt_results.append(results[i].results_df)
 
-   all_pt_results.to_csv('pytorch_mnist_results.csv')
+    all_pt_results.to_csv('pytorch_mnist_results.csv')
