@@ -12,6 +12,7 @@ import torch
 import torchvision
 import statistics
 import pandas as pd
+import foolbox as fb
 
 
 ### Defining the hyperspace
@@ -81,8 +82,30 @@ def mnist_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpu=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
-    tune.report(test_loss=model.test_loss)
-    return model.test_loss
+    fmodel = fb.PytorchModel(model, bounds=(0, 1))
+    images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
+    clean_accuracy = fb.utils.accuracy(fmodel, images, labels)
+    attack = fb.attacks.GaussianBlurAttack()
+    epsilons = [
+        0.0,
+        0.0002,
+        0.0005,
+        0.0008,
+        0.001,
+        0.0015,
+        0.002,
+        0.003,
+        0.01,
+        0.1,
+        0.3,
+        0.5,
+        1.0,
+    ]
+    raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
+    robust_accuracy = 1 - success.float32().mean(axis=-1)
+    # res test[0] reports the loss from the evaluation, res_test[1] reports the accuracy
+    tune.report(robust_acc = robust_accuracy)
+    return robust_accuracy
 
 if __name__=="__main__":
 	results = []
