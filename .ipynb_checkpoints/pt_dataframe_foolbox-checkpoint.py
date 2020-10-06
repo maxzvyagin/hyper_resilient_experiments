@@ -1,6 +1,6 @@
 from hyperspace import create_hyperspace
 from ray import tune
-import tensorflow as tf
+#import tensorflow as tf
 from torch import nn
 import pytorch_lightning as pl
 from pytorch_lightning import loggers as pl_loggers
