@@ -79,13 +79,14 @@ class NumberNet(pl.LightningModule):
 
 def mnist_pt_objective(config):
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'])
     trainer.fit(model)
     trainer.test(model)
-    fmodel = fb.PytorchModel(model, bounds=(0, 1))
+    tune.report(test_loss=model.test_loss)
+    fmodel = fb.PyTorchModel(model, bounds=(0, 1))
     images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     clean_accuracy = fb.utils.accuracy(fmodel, images, labels)
-    attack = fb.attacks.GaussianBlurAttack()
+    attack = fb.attacks.L2AdditiveUniformNoiseAttack()
     epsilons = [
         0.0,
         0.0002,
@@ -102,7 +103,7 @@ def mnist_pt_objective(config):
         1.0,
     ]
     raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
-    robust_accuracy = 1 - success.float32().mean(axis=-1)
+    robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
     # res test[0] reports the loss from the evaluation, res_test[1] reports the accuracy
     tune.report(robust_acc = robust_accuracy)
     return robust_accuracy
@@ -113,9 +114,9 @@ if __name__=="__main__":
             # create a skopt gp minimize object
             optimizer = Optimizer(section)
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
-                                      metric='test_loss', mode='min')
+                                      metric='robust_acc', mode='max')
             # not using a gpu because running on local
-            analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20, resources_per_trial={'gpu': 1})
+            analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20)
             results.append(analysis)
 
         all_pt_results = results[0].results_df

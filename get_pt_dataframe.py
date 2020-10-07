@@ -1,6 +1,6 @@
 from hyperspace import create_hyperspace
 from ray import tune
-import tensorflow as tf
+#import tensorflow as tf
 from torch import nn
 import pytorch_lightning as pl
 from pytorch_lightning import loggers as pl_loggers
@@ -78,25 +78,24 @@ class NumberNet(pl.LightningModule):
 
 def mnist_pt_objective(config):
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpu=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
     tune.report(test_loss=model.test_loss)
     return model.test_loss
 
 if __name__=="__main__":
-	results = []
-	for section in tqdm(space):
-	    # create a skopt gp minimize object
-	    optimizer = Optimizer(section)
-	    search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
-	                              metric='test_loss', mode='min')
-	    # not using a gpu because running on local
-	    analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20)
-	    results.append(analysis)
+        results = []
+        for section in tqdm(space):
+            # create a skopt gp minimize object
+            optimizer = Optimizer(section)
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
+                                      metric='test_loss', mode='min')
+            # not using a gpu because running on local
+            analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20, resources_per_trial={'gpu': 1})
+            results.append(analysis)
+        all_pt_results = results[0].results_df
+        for i in range(1, len(results)):
+            all_pt_results = all_pt_results.append(results[i].results_df)
 
-    all_pt_results = results[0].results_df
-	for i in range(1, len(results)):
-    	all_pt_results = all_pt_results.append(results[i].results_df)
-
-    all_pt_results.to_csv('pytorch_mnist_results.csv')
+        all_pt_results.to_csv('pytorch_mnist_results.csv')
