@@ -86,7 +86,7 @@ def mnist_pt_objective(config):
     fmodel = fb.PyTorchModel(model, bounds=(0, 1))
     images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     clean_accuracy = fb.utils.accuracy(fmodel, images, labels)
-    attack = fb.attacks.L2AdditiveUniformNoiseAttack()
+    attack = fb.attacks.SaltAndPepperNoiseAttack()
     epsilons = [
         0.0,
         0.0002,
@@ -123,4 +123,4 @@ if __name__=="__main__":
         for i in range(1, len(results)):
             all_pt_results = all_pt_results.append(results[i].results_df)
 
-        all_pt_results.to_csv('pytorch_mnist_results.csv')
+        all_pt_results.to_csv('pt_fool_saltandpepper.csv')
