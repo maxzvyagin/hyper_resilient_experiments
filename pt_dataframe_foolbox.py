@@ -79,7 +79,7 @@ class NumberNet(pl.LightningModule):
 
 def mnist_pt_objective(config):
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'])
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
     tune.report(test_loss=model.test_loss)
@@ -116,8 +116,10 @@ if __name__=="__main__":
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                       metric='robust_acc', mode='max')
             # not using a gpu because running on local
-            analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20)
+            analysis = tune.run(mnist_pt_objective, search_alg=search_algo, num_samples=20, resources_per_trial={'gpu':1})
             results.append(analysis)
+
+        print(type(results[0]))
 
         all_pt_results = results[0].results_df
         for i in range(1, len(results)):
