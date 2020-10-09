@@ -163,8 +163,8 @@ def multi_train(config):
             else:
                 acc = model_attack(tf_model, model_type, attack_type, config)
             search_results[model_type + "_" + attack_type + "_" + "accuracy"] = acc
-    all_results = search_results.values()
-    average_res = statistics.mean(all_results)
+    all_results = list(search_results.values())
+    average_res = float(statistics.mean(all_results))
     search_results['average_res': average_res]
     tune.report(search_results)
     return search_results
