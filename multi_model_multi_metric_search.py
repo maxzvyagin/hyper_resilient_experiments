@@ -116,7 +116,7 @@ def mnist_tf_objective(config):
     return (res_test[1], model)
 
 
-def model_attack(model, model_type, attack_type):
+def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
         fmodel = fb.PyTorchModel(model, bounds=(0, 1))
     else:
@@ -159,9 +159,9 @@ def multi_train(config):
     for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
         for model_type in ['pt', 'tf']:
             if model_type == 'pt':
-                acc = model_attack(pt_model, model_type, attack_type)
+                acc = model_attack(pt_model, model_type, attack_type, config)
             else:
-                acc = model_attack(tf_model, model_type, attack_type)
+                acc = model_attack(tf_model, model_type, attack_type, config)
             search_results[model_type + "_" + attack_type + "_" + "accuracy"] = acc
     all_results = search_results.values()
     average_res = statistics.mean(all_results)
