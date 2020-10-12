@@ -169,10 +169,10 @@ if __name__ == "__main__":
     tf_workers = []
     with ProcessPoolExecutor(max_workers=50) as e:
         for config in high_config_list:
-            pt = e.submit(mnist_pt_objective, config)
-            pt_workers.append(pt)
-            tf = e.submit(mnist_tf_objective, config)
-            tf_workers.append(tf)
+            w = e.submit(mnist_pt_objective, config)
+            pt_workers.append(w)
+            w = e.submit(mnist_tf_objective, config)
+            tf_workers.append(w)
 
     for result in concurrent.futures.as_completed(tf_workers):
         weights, config = result.result()
@@ -199,10 +199,10 @@ if __name__ == "__main__":
     tf_workers = []
     with ProcessPoolExecutor(max_workers=50) as e:
         for config in low_config_list:
-            pt = e.submit(mnist_pt_objective, config)
-            pt_workers.append(pt)
-            tf = e.submit(mnist_tf_objective, config)
-            tf_workers.append(tf)
+            w = e.submit(mnist_pt_objective, config)
+            pt_workers.append(w)
+            w = e.submit(mnist_tf_objective, config)
+            tf_workers.append(w)
 
     for result in concurrent.futures.as_completed(tf_workers):
         weights, config = result.result()
