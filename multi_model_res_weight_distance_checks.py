@@ -16,6 +16,7 @@ import foolbox as fb
 import tensorflow as tf
 import scipy
 import pickle
+from concurrent.futures import ThreadPoolExecutor
 
 
 class NumberNet(pl.LightningModule):
@@ -90,7 +91,11 @@ def mnist_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
-    return (model.test_accuracy, model)
+    pt_model_weights = list(model.parameters())
+    just_pt_weights = list()
+    for w in pt_model_weights:
+        just_pt_weights.extend(w.cpu().detach().numpy().flatten())
+    return just_pt_weights, config
 
 
 def mnist_tf_objective(config):
@@ -114,42 +119,11 @@ def mnist_tf_objective(config):
 
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
-    return (res_test[1], model)
-
-def model_attack(model, model_type, attack_type, config):
-    if model_type == "pt":
-        fmodel = fb.PyTorchModel(model, bounds=(0, 1))
-    else:
-        fmodel = fb.TensorFlowModel(model, bounds=(0, 1))
-    images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
-    if attack_type == "uniform":
-        attack = fb.attacks.L2AdditiveUniformNoiseAttack()
-    elif attack_type == "gaussian":
-        attack = fb.attacks.L2AdditiveGaussianNoiseAttack()
-    elif attack_type == "saltandpepper":
-        attack = fb.attacks.SaltAndPepperNoiseAttack()
-    epsilons = [
-        0.0,
-        0.0002,
-        0.0005,
-        0.0008,
-        0.001,
-        0.0015,
-        0.002,
-        0.003,
-        0.01,
-        0.1,
-        0.3,
-        0.5,
-        1.0,
-    ]
-    raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
-    if model_type == "pt":
-        robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
-    else:
-        robust_accuracy = 1 - success.numpy().astype(float).flatten().mean(axis=-1)
-    return robust_accuracy
-
+    just_tf_weights = list()
+    # get weights
+    for w in model.weights:
+        just_tf_weights.extend(w.numpy().flatten())
+    return just_tf_weights, config
 
 if __name__ == "__main__":
     low_config_list = [{'learning_rate': 0.09949307671494452,
@@ -194,43 +168,51 @@ if __name__ == "__main__":
                               'epochs': 64,
                               'batch_size': 950}]
     ### high models
-    high_pt_models = []
-    high_tf_models = []
-    for config in tqdm(high_config_list):
-        pt_test_acc, pt_model = mnist_pt_objective(config)
-        tf_test_acc, tf_model = mnist_tf_objective(config)
-        ### now perform distance comparison on weight distributions of models
-        just_tf_weights = list()
-        # get weights
-        for w in tf_model.weights:
-            just_tf_weights.extend(w.numpy().flatten())
-        high_tf_models.append(just_tf_weights)
-        pt_model_weights = list(pt_model.parameters())
-        just_pt_weights = list()
-        for w in pt_model_weights:
-            just_pt_weights.extend(w.detach().numpy().flatten())
-        high_pt_models.append(just_pt_weights)
+    high_pt_models = {}
+    high_tf_models = {}
+    pt_workers = []
+    tf_workers = []
+    with ThreadPoolExecutor(max_workers=50) as e:
+        for config in tqdm(high_config_list):
+            pt = e.submit(mnist_pt_objective, config)
+            pt_workers.append(pt)
+            tf = e.submit(mnist_tf_objective, config)
+            tf_workers.append(tf)
+
+    for worker in tf_workers:
+        weights, config = worker.result()
+        high_tf_models[config] = weights
+
+    for worker in pt_workers:
+        weights, config = worker.result()
+        high_pt_models[config] = weights
+
     with open("top_5_config_pt_model_weights.pkl", "wb") as f:
         pickle.dump(high_pt_models, f)
     with open("top_5_config_tf_model_weights.pkl", "wb") as f:
         pickle.dump(high_tf_models, f)
+
+
     ### low models
-    low_pt_models = []
-    low_tf_models = []
-    for config in tqdm(low_config_list):
-        pt_test_acc, pt_model = mnist_pt_objective(config)
-        tf_test_acc, tf_model = mnist_tf_objective(config)
-        ### now perform distance comparison on weight distributions of models
-        just_tf_weights = list()
-        # get weights
-        for w in tf_model.weights:
-            just_tf_weights.extend(w.numpy().flatten())
-        low_tf_models.append(just_tf_weights)
-        pt_model_weights = list(pt_model.parameters())
-        just_pt_weights = list()
-        for w in pt_model_weights:
-            just_pt_weights.extend(w.detach().numpy().flatten())
-        low_pt_models.append(just_pt_weights)
+    low_pt_models = {}
+    low_tf_models = {}
+    pt_workers = []
+    tf_workers = []
+    with ThreadPoolExecutor(max_workers=50) as e:
+        for config in tqdm(low_config_list):
+            pt = e.submit(mnist_pt_objective, config)
+            pt_workers.append(pt)
+            tf = e.submit(mnist_tf_objective, config)
+            tf_workers.append(tf)
+
+    for worker in tf_workers:
+        weights, config = worker.result()
+        low_tf_models[config] = weights
+
+    for worker in pt_workers:
+        weights, config = worker.result()
+        low_pt_models[config] = weights
+
     with open("bottom_5_config_pt_model_weights.pkl", "wb") as f:
         pickle.dump(low_pt_models, f)
     with open("bottom_5_config_tf_model_weights.pkl", "wb") as f:
