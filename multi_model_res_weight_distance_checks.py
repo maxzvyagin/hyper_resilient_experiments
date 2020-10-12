@@ -1,12 +1,6 @@
-from hyperspace import create_hyperspace
-from ray import tune
 # import tensorflow as tf
 from torch import nn
 import pytorch_lightning as pl
-from pytorch_lightning import loggers as pl_loggers
-from ray.tune.suggest.skopt import SkOptSearch
-from skopt import Optimizer
-import ray
 from tqdm import tqdm
 import torch
 import torchvision
@@ -16,7 +10,7 @@ import foolbox as fb
 import tensorflow as tf
 import scipy
 import pickle
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 
 class NumberNet(pl.LightningModule):
@@ -172,8 +166,8 @@ if __name__ == "__main__":
     high_tf_models = {}
     pt_workers = []
     tf_workers = []
-    with ThreadPoolExecutor(max_workers=50) as e:
-        for config in tqdm(high_config_list):
+    with ProcessPoolExecutor(max_workers=50) as e:
+        for config in high_config_list:
             pt = e.submit(mnist_pt_objective, config)
             pt_workers.append(pt)
             tf = e.submit(mnist_tf_objective, config)
@@ -198,8 +192,8 @@ if __name__ == "__main__":
     low_tf_models = {}
     pt_workers = []
     tf_workers = []
-    with ThreadPoolExecutor(max_workers=50) as e:
-        for config in tqdm(low_config_list):
+    with ProcessPoolExecutor(max_workers=50) as e:
+        for config in low_config_list:
             pt = e.submit(mnist_pt_objective, config)
             pt_workers.append(pt)
             tf = e.submit(mnist_tf_objective, config)
