@@ -175,13 +175,13 @@ if __name__ == "__main__":
             tf_workers.append(tf)
 
     for result in concurrent.futures.as_completed(tf_workers):
-        weights, config = result
+        weights, config = result.result()
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         high_tf_models[config_name] = weights
 
     for result in concurrent.futures.as_completed(pt_workers):
-        weights, config = result
+        weights, config = result.result()
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         high_pt_models[config_name] = weights
@@ -205,14 +205,14 @@ if __name__ == "__main__":
             tf_workers.append(tf)
 
     for result in concurrent.futures.as_completed(tf_workers):
-        weights, config = result
+        weights, config = result.result()
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
 
         low_tf_models[config_name] = weights
 
     for result in concurrent.futures.as_completed(pt_workers):
-        weights, config = result
+        weights, config = result.result()
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         low_pt_models[config_name] = weights
