@@ -196,7 +196,7 @@ if __name__ == "__main__":
     ### high models
     high_pt_models = []
     high_tf_models = []
-    for config in high_config_list:
+    for config in tqdm(high_config_list):
         pt_test_acc, pt_model = mnist_pt_objective(config)
         tf_test_acc, tf_model = mnist_tf_objective(config)
         ### now perform distance comparison on weight distributions of models
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     ### low models
     low_pt_models = []
     low_tf_models = []
-    for config in low_config_list:
+    for config in tqdm(low_config_list):
         pt_test_acc, pt_model = mnist_pt_objective(config)
         tf_test_acc, tf_model = mnist_tf_objective(config)
         ### now perform distance comparison on weight distributions of models
