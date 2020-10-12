@@ -11,6 +11,7 @@ import tensorflow as tf
 import scipy
 import pickle
 from concurrent.futures import ProcessPoolExecutor
+import concurrent
 
 
 class NumberNet(pl.LightningModule):
@@ -173,14 +174,14 @@ if __name__ == "__main__":
             tf = e.submit(mnist_tf_objective, config)
             tf_workers.append(tf)
 
-    for worker in tf_workers:
-        weights, config = worker.result()
+    for result in concurrent.futures.as_completed(tf_workers):
+        weights, config = result
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         high_tf_models[config_name] = weights
 
-    for worker in pt_workers:
-        weights, config = worker.result()
+    for result in concurrent.futures.as_completed(pt_workers):
+        weights, config = result
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         high_pt_models[config_name] = weights
@@ -203,15 +204,15 @@ if __name__ == "__main__":
             tf = e.submit(mnist_tf_objective, config)
             tf_workers.append(tf)
 
-    for worker in tf_workers:
-        weights, config = worker.result()
+    for result in concurrent.futures.as_completed(tf_workers):
+        weights, config = result
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
 
         low_tf_models[config_name] = weights
 
-    for worker in pt_workers:
-        weights, config = worker.result()
+    for result in concurrent.futures.as_completed(pt_workers):
+        weights, config = result
         config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
                                                             config['epochs'], config['batch_size'])
         low_pt_models[config_name] = weights
