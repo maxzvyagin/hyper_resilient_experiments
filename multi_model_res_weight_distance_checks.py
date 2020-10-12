@@ -175,11 +175,15 @@ if __name__ == "__main__":
 
     for worker in tf_workers:
         weights, config = worker.result()
-        high_tf_models[config] = weights
+        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+                                                            config['epochs'], config['batch_size'])
+        high_tf_models[config_name] = weights
 
     for worker in pt_workers:
         weights, config = worker.result()
-        high_pt_models[config] = weights
+        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+                                                            config['epochs'], config['batch_size'])
+        high_pt_models[config_name] = weights
 
     with open("top_5_config_pt_model_weights.pkl", "wb") as f:
         pickle.dump(high_pt_models, f)
@@ -201,11 +205,16 @@ if __name__ == "__main__":
 
     for worker in tf_workers:
         weights, config = worker.result()
-        low_tf_models[config] = weights
+        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+                                                            config['epochs'], config['batch_size'])
+
+        low_tf_models[config_name] = weights
 
     for worker in pt_workers:
         weights, config = worker.result()
-        low_pt_models[config] = weights
+        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+                                                            config['epochs'], config['batch_size'])
+        low_pt_models[config_name] = weights
 
     with open("bottom_5_config_pt_model_weights.pkl", "wb") as f:
         pickle.dump(low_pt_models, f)
