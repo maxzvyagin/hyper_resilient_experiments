@@ -169,8 +169,8 @@ if __name__ == "__main__":
     tf_workers = []
     with ProcessPoolExecutor(max_workers=50) as e:
         for config in high_config_list:
-            w = e.submit(mnist_pt_objective, config)
-            pt_workers.append(w)
+            # w = e.submit(mnist_pt_objective, config)
+            # pt_workers.append(w)
             w = e.submit(mnist_tf_objective, config)
             tf_workers.append(w)
 
@@ -180,44 +180,44 @@ if __name__ == "__main__":
                                                             config['epochs'], config['batch_size'])
         high_tf_models[config_name] = weights
 
-    for result in concurrent.futures.as_completed(pt_workers):
-        weights, config = result.result()
-        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
-                                                            config['epochs'], config['batch_size'])
-        high_pt_models[config_name] = weights
-
-    with open("top_5_config_pt_model_weights.pkl", "wb") as f:
-        pickle.dump(high_pt_models, f)
+    # for result in concurrent.futures.as_completed(pt_workers):
+    #     weights, config = result.result()
+    #     config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+    #                                                         config['epochs'], config['batch_size'])
+    #     high_pt_models[config_name] = weights
+    #
+    # with open("top_5_config_pt_model_weights.pkl", "wb") as f:
+    #     pickle.dump(high_pt_models, f)
     with open("top_5_config_tf_model_weights.pkl", "wb") as f:
         pickle.dump(high_tf_models, f)
 
 
-    ### low models
-    low_pt_models = {}
-    low_tf_models = {}
-    pt_workers = []
-    tf_workers = []
-    with ProcessPoolExecutor(max_workers=50) as e:
-        for config in low_config_list:
-            w = e.submit(mnist_pt_objective, config)
-            pt_workers.append(w)
-            w = e.submit(mnist_tf_objective, config)
-            tf_workers.append(w)
-
-    for result in concurrent.futures.as_completed(tf_workers):
-        weights, config = result.result()
-        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
-                                                            config['epochs'], config['batch_size'])
-
-        low_tf_models[config_name] = weights
-
-    for result in concurrent.futures.as_completed(pt_workers):
-        weights, config = result.result()
-        config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
-                                                            config['epochs'], config['batch_size'])
-        low_pt_models[config_name] = weights
-
-    with open("bottom_5_config_pt_model_weights.pkl", "wb") as f:
-        pickle.dump(low_pt_models, f)
-    with open("bottom_5_config_tf_model_weights.pkl", "wb") as f:
-        pickle.dump(low_tf_models, f)
+    # ### low models
+    # low_pt_models = {}
+    # low_tf_models = {}
+    # pt_workers = []
+    # tf_workers = []
+    # with ProcessPoolExecutor(max_workers=50) as e:
+    #     for config in low_config_list:
+    #         w = e.submit(mnist_pt_objective, config)
+    #         pt_workers.append(w)
+    #         w = e.submit(mnist_tf_objective, config)
+    #         tf_workers.append(w)
+    #
+    # for result in concurrent.futures.as_completed(tf_workers):
+    #     weights, config = result.result()
+    #     config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+    #                                                         config['epochs'], config['batch_size'])
+    #
+    #     low_tf_models[config_name] = weights
+    #
+    # for result in concurrent.futures.as_completed(pt_workers):
+    #     weights, config = result.result()
+    #     config_name = "{}lr_{}drop_{}epochs_{}batch".format(config['learning_rate'], config['dropout'],
+    #                                                         config['epochs'], config['batch_size'])
+    #     low_pt_models[config_name] = weights
+    #
+    # with open("bottom_5_config_pt_model_weights.pkl", "wb") as f:
+    #     pickle.dump(low_pt_models, f)
+    # with open("bottom_5_config_tf_model_weights.pkl", "wb") as f:
+    #     pickle.dump(low_tf_models, f)
