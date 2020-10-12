@@ -80,7 +80,7 @@ class NumberNet(pl.LightningModule):
         accuracy = []
         for x in outputs:
             accuracy.append(float(x['test_accuracy']))
-        avg_accuracy = statistics.mean(loss)
+        avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
@@ -194,4 +194,4 @@ if __name__ == "__main__":
     for i in range(1, len(results)):
         all_pt_results = all_pt_results.append(results[i].results_df)
 
-    all_pt_results.to_csv('multi_model_multi_metric_results3.csv')
+    all_pt_results.to_csv('multi_model_multi_metric_results_50samples.csv')
