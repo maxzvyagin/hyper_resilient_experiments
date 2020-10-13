@@ -194,4 +194,4 @@ if __name__ == "__main__":
     for i in range(1, len(results)):
         all_pt_results = all_pt_results.append(results[i].results_df)
 
-    all_pt_results.to_csv('multi_model_multi_metric_results_50samples.csv')
+    all_pt_results.to_csv('multi_model_multi_metric_results_50samples_gpu.csv')
