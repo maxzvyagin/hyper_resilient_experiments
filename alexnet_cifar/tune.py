@@ -3,7 +3,7 @@ from ray import tune
 from ray.tune.suggest.skopt import SkOptSearch
 from skopt import Optimizer
 import foolbox as fb
-import pytorch_lighting as pl
+import pytorch_lightning as pl
 from tensorflow_alexnet import TensorFlow_AlexNet
 from pytorch_alexnet import PyTorch_AlexNet
 import statistics
