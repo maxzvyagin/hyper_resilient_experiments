@@ -43,7 +43,7 @@ class NumberNet(pl.LightningModule):
                                            batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=True,
+        return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=False,
                                                                       transform=torchvision.transforms.ToTensor(),
                                                                       target_transform=None, download=True),
                                            batch_size=int(self.config['batch_size']))

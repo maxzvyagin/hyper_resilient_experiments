@@ -7,8 +7,25 @@ class TensorFlow_AlexNet:
     def __init__(self, config):
         # get dataset
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
-        # define the model using alexnet
-
+        # define the model using alexnet architecture
+        # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
+        # updated to match existing pytorch model
+        self.model = keras.models.Sequential([
+            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(227,227,3)),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
+            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=2),
+            keras.layers.Flatten(),
+            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dropout(config['dropout']),
+            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dropout(config['dropout']),
+            keras.layers.Dense(100, activation='softmax')
+        ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         self.model.compile(optimizer=opt,
@@ -23,4 +40,4 @@ class TensorFlow_AlexNet:
 
     def test(self):
         res_test = self.model.evaluate(self.x_test, self.y_test)
-        return res_test[1], self.model
+        return res_test[1]
