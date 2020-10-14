@@ -79,7 +79,7 @@ def multi_train(config):
 
 if __name__ == "__main__":
     parser = ArgumentParser("Run AlexNet cross framework tuning on PyTorch and AlexNet.")
-    parser.add_argument("out", help="Specify the out csv filename.", required=True)
+    parser.add_argument("--out","-o", help="Specify the out csv filename.", required=True)
     args = parser.parse_args()
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
