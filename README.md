@@ -4,4 +4,4 @@ An implementation of automated hyperparameter tuning which results in model cons
 
 Subproblems:
 - MNIST, simple classification perceptron
-- ImageNet, AlexNet architecture
+- CIFAR100, AlexNet architecture
