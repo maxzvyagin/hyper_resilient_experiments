@@ -1,3 +1,10 @@
+import torch
+from torch import nn
+import torchvision
+import pytorch_lightning as pl
+from  torch.utils.data import DataLoader
+import statistics
+
 class PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=100):
         super(PyTorch_AlexNet, self).__init__()
