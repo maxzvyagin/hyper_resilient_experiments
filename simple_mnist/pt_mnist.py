@@ -2,6 +2,7 @@ from torch import nn
 import pytorch_lightning as pl
 import torchvision
 import torch
+import statistics
 
 class NumberNet(pl.LightningModule):
     def __init__(self, config):
