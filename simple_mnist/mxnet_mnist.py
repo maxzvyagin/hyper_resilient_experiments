@@ -5,7 +5,7 @@ from mxnet.gluon import nn
 from mxnet import optimizer
 from mxnet import autograd as ag
 
-def mx_objective(config):
+def mnist_mx_objective(config):
     # Fixing the random seed
     # mx.random.seed(42)
     mnist = mx.test_utils.get_mnist()
