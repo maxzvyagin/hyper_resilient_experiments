@@ -8,11 +8,13 @@ from skopt import Optimizer
 from tqdm import tqdm
 import statistics
 import foolbox as fb
-from pt_mnist import mnist_pt_objective
-from tf_mnist import mnist_tf_objective
-from mxnet_mnist import mnist_mx_objective
+# from pt_mnist import mnist_pt_objective
+# from tf_mnist import mnist_tf_objective
+# from mxnet_mnist import mnist_mx_objective
+import pt_mnist
+import tf_mnist
+import mxnet_mnist
 import argparse
-
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -54,9 +56,9 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    pt_test_acc, pt_model = mnist_pt_objective(config)
-    tf_test_acc, tf_model = mnist_tf_objective(config)
-    mx_test_acc, mx_model = mnist_mx_objective(config)
+    pt_test_acc, pt_model = pt_mnist.mnist_pt_objective(config)
+    tf_test_acc, tf_model = tf_mnist.mnist_tf_objective(config)
+    mx_test_acc, mx_model = mxnet_mnist.mnist_mx_objective(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc, 'mx_test_acc': mx_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
