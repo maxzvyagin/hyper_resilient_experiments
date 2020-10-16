@@ -1,11 +1,11 @@
 ### From the mxnet mnist tutorial
 import mxnet as mx
 from mxnet import gluon
-from mxnet import nn
+from mxnet.gluon import nn
 from mxnet import optimizer
 from mxnet import autograd as ag
 
-def mnist_mx_objective(config):
+def mx_objective(config):
     # Fixing the random seed
     # mx.random.seed(42)
     mnist = mx.test_utils.get_mnist()
@@ -20,9 +20,9 @@ def mnist_mx_objective(config):
 
     gpus = mx.test_utils.list_gpus()
     ctx = [mx.gpu()] if gpus else [mx.cpu(0), mx.cpu(1)]
-    net.initialize(mx.init.Uniform(magnitude=1), ctx=ctx)
+    net.initialize(mx.init.Uniform(scale=1), ctx=ctx)
     optim = optimizer.Adam(learning_rate=config['learning_rate'])
-    trainer = gluon.Trainer(net.collect_params(net.collect_params(), optim)
+    trainer = gluon.Trainer(net.collect_params(), optim)
 
     epoch = config['epochs']
     # Use Accuracy as the evaluation metric.
@@ -42,24 +42,23 @@ def mnist_mx_objective(config):
         outputs = []
         # Inside training scope
         with ag.record():
-            for
-        x, y in zip(data, label):
-        z = net(x)
-        # Computes softmax cross entropy loss.
-        loss = softmax_cross_entropy_loss(z, y)
-        # Backpropagate the error for one iteration.
-        loss.backward()
-        outputs.append(z)
-        # Updates internal evaluation
-        metric.update(label, outputs)
-        # Make one step of parameter update. Trainer needs to know the
-        # batch size of data to normalize the gradient by 1/batch_size.
-        trainer.step(batch.data[0].shape[0])
-    # Gets the evaluation result.
-    name, acc = metric.get()
-    # Reset evaluation result to initial state.
-    metric.reset()
-    print('training acc at epoch %d: %s=%f' % (i, name, acc))
+            for x, y in zip(data, label):
+                z = net(x)
+                # Computes softmax cross entropy loss.
+                loss = softmax_cross_entropy_loss(z, y)
+                # Backpropagate the error for one iteration.
+                loss.backward()
+                outputs.append(z)
+            # Updates internal evaluation
+            metric.update(label, outputs)
+            # Make one step of parameter update. Trainer needs to know the
+            # batch size of data to normalize the gradient by 1/batch_size.
+            trainer.step(batch.data[0].shape[0])
+        # Gets the evaluation result.
+        name, acc = metric.get()
+        # Reset evaluation result to initial state.
+        metric.reset()
+        print('training acc at epoch %d: %s=%f' % (i, name, acc))
 
     # Use Accuracy as the evaluation metric.
     metric = mx.metric.Accuracy()
