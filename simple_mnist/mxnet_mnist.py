@@ -77,5 +77,5 @@ def mnist_mx_objective(config):
             outputs.append(net(x))
         # Updates internal evaluation
         metric.update(label, outputs)
-    return metric.get(), net
+    return (metric.get(), net)
     #print('validation acc: %s=%f' % metric.get())
