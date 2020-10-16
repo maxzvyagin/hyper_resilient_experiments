@@ -80,7 +80,7 @@ def multi_train(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out")
-    args = parse.parse_args()
+    args = parser.parse_args()
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
                        (0.2, 0.9),  # dropout
