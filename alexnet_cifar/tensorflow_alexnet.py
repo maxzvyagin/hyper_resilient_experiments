@@ -41,3 +41,9 @@ class TensorFlow_AlexNet:
     def test(self):
         res_test = self.model.evaluate(self.x_test, self.y_test)
         return res_test[1]
+
+def cifar_tf_objective(config):
+    model = TensorFlow_AlexNet(config)
+    model.fit()
+    accuracy = model.test()
+    return accuracy, model

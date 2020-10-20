@@ -6,6 +6,7 @@ import foolbox as fb
 import pytorch_lightning as pl
 from tensorflow_alexnet import TensorFlow_AlexNet
 from pytorch_alexnet import PyTorch_AlexNet
+from mxnet_alexnet import mxnet_objective,
 import statistics
 from tqdm import tqdm
 from argparse import ArgumentParser
@@ -22,6 +23,9 @@ def pt_objective(config):
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model
+
+def mx_objective(config):
+    return mxnet_objective(config)
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":

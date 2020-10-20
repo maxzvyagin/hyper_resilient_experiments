@@ -1,6 +1,8 @@
-### Script in order to run MNIST Training on Pytorch and Tensorflow models in the same search, utilizing average of
-### their test accuracy and robust accuracy metrics as a measure to guide the GP search
+### General tuning script to combine all submodules ###
 
+from simple_mnist import mxnet_mnist, pt_mnist, tf_mnist
+from alexnet_cifar import mxnet_alexnet, pytorch_alexnet, tensorflow_alexnet
+import argparse
 from hyperspace import create_hyperspace
 from ray import tune
 from ray.tune.suggest.skopt import SkOptSearch
@@ -8,13 +10,11 @@ from skopt import Optimizer
 from tqdm import tqdm
 import statistics
 import foolbox as fb
-# from pt_mnist import mnist_pt_objective
-# from tf_mnist import mnist_tf_objective
-# from mxnet_mnist import mnist_mx_objective
-import pt_mnist
-import tf_mnist
-import mxnet_mnist
-import argparse
+
+# Default function definitions
+PT_MODEL = pt_mnist.mnist_pt_objective
+TF_MODEL = tf_mnist.mnist_tf_objective
+MX_MODEL = mxnet_mnist.mnist_mx_objective
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -56,9 +56,9 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    pt_test_acc, pt_model = pt_mnist.mnist_pt_objective(config)
-    tf_test_acc, tf_model = tf_mnist.mnist_tf_objective(config)
-    mx_test_acc, mx_model = mxnet_mnist.mnist_mx_objective(config)
+    pt_test_acc, pt_model = PT_MODEL(config)
+    tf_test_acc, tf_model = TF_MODEL(config)
+    mx_test_acc, mx_model = MX_MODEL(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc, 'mx_test_acc': mx_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
@@ -76,11 +76,20 @@ def multi_train(config):
     tune.report(**search_results)
     return search_results
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
-    parser.add_argument("-o", "--out")
+    parser.add_argument("-o", "--out", required=True)
+    parser.add_argument("-m", "--model", required=True)
     args = parser.parse_args()
+    if args.model == "alexnet_cifar100":
+        PT_MODEL = pytorch_alexnet.cifar_pt_objective
+        TF_MODEL = tensorflow_alexnet.cifar_tf_objective
+        MX_MODEL = mxnet_alexnet.cifar_mxnet_objective
+    ## definition of gans as the model type
+    elif args.model == "gan":
+        pass
+    else:
+        pass
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
                        (0.2, 0.9),  # dropout

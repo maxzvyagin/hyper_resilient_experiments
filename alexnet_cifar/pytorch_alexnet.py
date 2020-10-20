@@ -86,3 +86,10 @@ class PyTorch_AlexNet(pl.LightningModule):
         avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
+
+def cifar_pt_objective(config):
+    model = PyTorch_AlexNet(config)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer.fit(model)
+    trainer.test(model)
+    return model.test_accuracy, model
