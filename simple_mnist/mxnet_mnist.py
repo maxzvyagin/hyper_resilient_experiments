@@ -19,7 +19,7 @@ def mnist_mx_objective(config):
         net.add(nn.Dense(10))
 
     gpus = mx.test_utils.list_gpus()
-    ctx = [mx.gpu()] if gpus else [mx.cpu(0)]
+    ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
     net.initialize(mx.init.Uniform(scale=1), ctx=ctx)
     optim = optimizer.Adam(learning_rate=config['learning_rate'])
     trainer = gluon.Trainer(net.collect_params(), optim)
