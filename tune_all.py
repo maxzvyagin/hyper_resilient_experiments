@@ -79,17 +79,20 @@ def multi_train(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
-    parser.add_argument("-m", "--model", required=True)
+    parser.add_argument("-m", "--model")
     args = parser.parse_args()
-    if args.model == "alexnet_cifar100":
-        PT_MODEL = pytorch_alexnet.cifar_pt_objective
-        TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-        MX_MODEL = mxnet_alexnet.cifar_mxnet_objective
-    ## definition of gans as the model type
-    elif args.model == "gan":
-        pass
+    if not args.model:
+        print("NOTE: Defaulting to MNIST model training...")
     else:
-        pass
+        if args.model == "alexnet_cifar100":
+            PT_MODEL = pytorch_alexnet.cifar_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar_tf_objective
+            MX_MODEL = mxnet_alexnet.cifar_mxnet_objective
+        ## definition of gans as the model type
+        elif args.model == "gan":
+            pass
+        else:
+            pass
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
                        (0.2, 0.9),  # dropout
