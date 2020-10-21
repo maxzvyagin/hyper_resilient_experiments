@@ -12,10 +12,7 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import sys
-import mxnet as mx
-import tensorflow as tf
 from tensorflow import keras
-import numpy as np
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -33,9 +30,13 @@ def model_attack(model, model_type, attack_type, config):
         sys.exit()
         pass
     if NUM_CLASSES == 10:
-        images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
+        #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
+        train, test = keras.datasets.mnist.load_data()
+        images, labels = test
     else:
-        images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
+        #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
+        train, test = keras.datasets.cifar100.load_data()
+        images, labels = test
     # perform the attacks
     if attack_type == "uniform":
         attack = fb.attacks.L2AdditiveUniformNoiseAttack()
