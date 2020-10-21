@@ -25,9 +25,9 @@ NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
-        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1), num_classes=NUM_CLASSES)
+        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
     elif model_type == "tf":
-        fmodel = fb.models.TensorFlowEagerModel(model, bounds=(0, 1), num_classes=NUM_CLASSES)
+        fmodel = fb.models.TensorFlowEagerModel(model, bounds=(0, 1))
     else:
         print("Incorrect model type. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
