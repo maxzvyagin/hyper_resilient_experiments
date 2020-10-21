@@ -84,7 +84,7 @@ def model_attack(model, model_type, attack_type, config):
         1.0,
     ]
     accuracy_list = []
-    for i in len(images):
+    for i in range(len(images)):
         raw_advs, clipped_advs, success = attack(fmodel, images[i], labels[i], epsilons=epsilons)
         if model_type == "pt":
             robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
