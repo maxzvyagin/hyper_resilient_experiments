@@ -22,27 +22,28 @@ TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
-    if NUM_CLASSES == 10:
-        # images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
-        train, test = keras.datasets.mnist.load_data()
-        images, labels = test
-        images = images/255.0
-        images, labels = (images.astype(float), labels.astype(float))
-    else:
-        # images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
-        train, test = keras.datasets.cifar100.load_data()
-        images, labels = test
-        images = images/255.0
     if model_type == "pt":
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
+        # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
     else:
-        print("Incorrect model type. Please try again. Must be either PyTorch or TensorFlow.")
+        print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
-        pass
+        
+    if NUM_CLASSES == 10:
+        images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
+        # train, test = keras.datasets.mnist.load_data()
+        # images, labels = test
+        # images = images/255.0
+        # images, labels = (images.astype(float), labels.astype(float))
+    else:
+        images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
+        # train, test = keras.datasets.cifar100.load_data()
+        # images, labels = test
+        # images = images/255.0
+
     # perform the attacks
     if attack_type == "uniform":
         attack = fb.attacks.L2AdditiveUniformNoiseAttack()
