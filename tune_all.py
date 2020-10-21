@@ -64,8 +64,8 @@ def model_attack(model, model_type, attack_type, config):
         0.5,
         1.0,
     ]
-   adv = attack(images, labels, epsilons=epsilons)
-   print(type(adv))
+    adv = attack(images, labels, epsilons=epsilons)
+    print(type(adv))
     if model_type == "pt":
         robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
     elif model_type == "tf":
