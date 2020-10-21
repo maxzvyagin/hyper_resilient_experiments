@@ -34,8 +34,8 @@ def model_attack(model, model_type, attack_type, config):
     if NUM_CLASSES == 10:
         train, test = keras.datasets.cifar100.load_data()
         images, labels = test
-        images = np.array(images)
-        labels = np.array(labels)
+        images = np.ndarray(images)
+        labels = np.ndarray(labels)
         #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     else:
         train, test = keras.datasets.mnist.load_data()
@@ -73,6 +73,7 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
+    config = {'epochs':1, 'batch_size': 64, 'learning_rate':.001, 'dropout':.5}
     pt_test_acc, pt_model = PT_MODEL(config)
     tf_test_acc, tf_model = TF_MODEL(config)
     mx_test_acc, mx_model = MX_MODEL(config)
