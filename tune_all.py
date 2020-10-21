@@ -32,12 +32,16 @@ def model_attack(model, model_type, attack_type, config):
         ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
         fmodel = fb.models.MXNetGluonModel(model, bounds=(0,1), num_classes=NUM_CLASSES, ctx=ctx)
     if NUM_CLASSES == 10:
-        train, test = keras.datasets.cifar100.load_data()
-        images, labels = test
+        # train, test = keras.datasets.cifar100.load_data()
+        # images, labels = test
+        images, labels = fb.utils.samples(dataset='mnist', batchsize=config['batch_size'], data_format='channels_last',
+                                               bounds=(0, 1))
         #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     else:
-        train, test = keras.datasets.mnist.load_data()
-        images, labels = test
+        # train, test = keras.datasets.mnist.load_data()
+        # images, labels = test
+        images, labels = fb.utils.samples(dataset='cifar100', batchsize=config['batch_size'],
+                                          data_format='channels_last', bounds=(0, 1))
         #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'])
     if attack_type == "uniform":
         attack = fb.attacks.AdditiveUniformNoiseAttack()
