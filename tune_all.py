@@ -21,9 +21,9 @@ NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
-        fmodel = fb.PyTorchModel(model, bounds=(0, 1))
+        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
     elif model_type == "tf":
-        fmodel = fb.TensorFlowModel(model, bounds=(0, 1))
+        fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
     else:
         gpus = mx.test_utils.list_gpus()
         ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
