@@ -63,7 +63,7 @@ def cifar_mxnet_objective(config):
     net = MXNet_AlexNet(config)
     # net = gluoncv.model_zoo.get_model('alexnet', classes=1000, pretrained=False)
     gpus = mx.test_utils.list_gpus()
-    ctx = [mx.gpu()] if gpus else [mx.cpu()]
+    ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
     net.initialize(mx.init.Uniform(scale=1), ctx=ctx)
     optim = optimizer.Adam(learning_rate=config['learning_rate'])
     trainer = gluon.Trainer(net.collect_params(), optim)

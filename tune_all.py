@@ -10,11 +10,14 @@ from skopt import Optimizer
 from tqdm import tqdm
 import statistics
 import foolbox as fb
+import mxnet as mx
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
 MX_MODEL = mxnet_mnist.mnist_mx_objective
+
+NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -22,7 +25,9 @@ def model_attack(model, model_type, attack_type, config):
     elif model_type == "tf":
         fmodel = fb.TensorFlowModel(model, bounds=(0, 1))
     else:
-        fmodel = fb.models.MXNetModel(model, bounds=(0,1))
+        gpus = mx.test_utils.list_gpus()
+        ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
+        fmodel = fb.models.MXNetGluonModel(model, bounds=(0,1), num_classes=NUM_CLASSES, ctx=ctx)
     images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     if attack_type == "uniform":
         attack = fb.attacks.L2AdditiveUniformNoiseAttack()
@@ -88,6 +93,7 @@ if __name__ == "__main__":
             PT_MODEL = pytorch_alexnet.cifar_pt_objective
             TF_MODEL = tensorflow_alexnet.cifar_tf_objective
             MX_MODEL = mxnet_alexnet.cifar_mxnet_objective
+            NUM_CLASSES = 1000
         ## definition of gans as the model type
         elif args.model == "gan":
             pass
