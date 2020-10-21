@@ -11,6 +11,8 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import mxnet as mx
+import tensorflow as tf
+from tensorflow import keras
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -21,14 +23,21 @@ NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
-        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
+        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1), num_classes=NUM_CLASSES)
     elif model_type == "tf":
-        fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
+        fmodel = fb.models.TensorFlowEagerModel(model, bounds=(0, 1), num_classes=NUM_CLASSES)
     else:
         gpus = mx.test_utils.list_gpus()
         ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
         fmodel = fb.models.MXNetGluonModel(model, bounds=(0,1), num_classes=NUM_CLASSES, ctx=ctx)
-    images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
+    if NUM_CLASSES == 10:
+        train, test = keras.datasets.cifar100.load_data()
+        images, labels = test
+        #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
+    else:
+        train, test = keras.datasets.mnist.load_data()
+        images, labels = test
+        #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'])
     if attack_type == "uniform":
         attack = fb.attacks.L2AdditiveUniformNoiseAttack()
     elif attack_type == "gaussian":
