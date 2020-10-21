@@ -39,9 +39,9 @@ def model_attack(model, model_type, attack_type, config):
         images, labels = test
         #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'])
     if attack_type == "uniform":
-        attack = fb.attacks.L2AdditiveUniformNoiseAttack()
+        attack = fb.attacks.AdditiveUniformNoiseAttack()
     elif attack_type == "gaussian":
-        attack = fb.attacks.L2AdditiveGaussianNoiseAttack()
+        attack = fb.attacks.AdditiveGaussianNoiseAttack()
     elif attack_type == "saltandpepper":
         attack = fb.attacks.SaltAndPepperNoiseAttack()
     epsilons = [
