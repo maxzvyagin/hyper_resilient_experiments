@@ -49,11 +49,11 @@ def mnist_mx_objective(config):
                 # Backpropagate the error for one iteration.
                 loss.backward()
                 outputs.append(z)
-            # Updates internal evaluation
-            metric.update(label, outputs)
-            # Make one step of parameter update. Trainer needs to know the
-            # batch size of data to normalize the gradient by 1/batch_size.
-            trainer.step(batch.data[0].shape[0])
+        # Updates internal evaluation
+        metric.update(label, outputs)
+        # Make one step of parameter update. Trainer needs to know the
+        # batch size of data to normalize the gradient by 1/batch_size.
+        trainer.step(batch.data[0].shape[0])
         # Gets the evaluation result.
         name, acc = metric.get()
         # Reset evaluation result to initial state.
