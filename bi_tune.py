@@ -33,8 +33,9 @@ def model_attack(model, model_type, attack_type, config):
         images, labels = test
         images = images/255.0
     if model_type == "pt":
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        images, labels = (torch.from_numpy(images), torch.from_numpy(labels))
+        images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
     else:
