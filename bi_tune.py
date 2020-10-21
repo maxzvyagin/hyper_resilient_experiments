@@ -26,10 +26,12 @@ def model_attack(model, model_type, attack_type, config):
         # images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
         train, test = keras.datasets.mnist.load_data()
         images, labels = test
+        images = images/255.0
     else:
         # images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
         train, test = keras.datasets.cifar100.load_data()
         images, labels = test
+        images = images/255.0
     if model_type == "pt":
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
         images, labels = (torch.from_numpy(images), torch.from_numpy(labels))
