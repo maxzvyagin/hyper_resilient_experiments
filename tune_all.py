@@ -64,7 +64,8 @@ def model_attack(model, model_type, attack_type, config):
         0.5,
         1.0,
     ]
-    raw_advs, clipped_advs, success = attack(images, labels, epsilons=epsilons)
+   adv = attack(images, labels, epsilons=epsilons)
+   print(type(adv))
     if model_type == "pt":
         robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
     elif model_type == "tf":
@@ -76,8 +77,11 @@ def model_attack(model, model_type, attack_type, config):
 
 def multi_train(config):
     config = {'epochs':1, 'batch_size': 64, 'learning_rate':.001, 'dropout':.5}
+    print("PyTorch\n\n")
     pt_test_acc, pt_model = PT_MODEL(config)
+    print("TensorFlow\n\n")
     tf_test_acc, tf_model = TF_MODEL(config)
+    print("MXNet\n\n")
     mx_test_acc, mx_model = MX_MODEL(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc, 'mx_test_acc': mx_test_acc}
