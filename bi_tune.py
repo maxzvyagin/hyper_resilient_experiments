@@ -27,6 +27,7 @@ def model_attack(model, model_type, attack_type, config):
         train, test = keras.datasets.mnist.load_data()
         images, labels = test
         images = images/255.0
+        images, labels = (images.astype(float), labels.astype(float))
     else:
         # images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
         train, test = keras.datasets.cifar100.load_data()
