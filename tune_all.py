@@ -34,8 +34,6 @@ def model_attack(model, model_type, attack_type, config):
     if NUM_CLASSES == 10:
         train, test = keras.datasets.cifar100.load_data()
         images, labels = test
-        images = np.ndarray(images)
-        labels = np.ndarray(labels)
         #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'])
     else:
         train, test = keras.datasets.mnist.load_data()
