@@ -13,6 +13,7 @@ import statistics
 import foolbox as fb
 import sys
 from tensorflow import keras
+import torch
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -21,22 +22,23 @@ TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
+    if NUM_CLASSES == 10:
+        # images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
+        train, test = keras.datasets.mnist.load_data()
+        images, labels = test
+    else:
+        # images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
+        train, test = keras.datasets.cifar100.load_data()
+        images, labels = test
     if model_type == "pt":
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
+        images, labels = (torch.from_numpy(images), torch.from_numpy(labels))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
     else:
         print("Incorrect model type. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
         pass
-    if NUM_CLASSES == 10:
-        #images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
-        train, test = keras.datasets.mnist.load_data()
-        images, labels = test
-    else:
-        #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
-        train, test = keras.datasets.cifar100.load_data()
-        images, labels = test
     # perform the attacks
     if attack_type == "uniform":
         attack = fb.attacks.L2AdditiveUniformNoiseAttack()
