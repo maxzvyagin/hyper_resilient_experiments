@@ -83,12 +83,15 @@ def model_attack(model, model_type, attack_type, config):
         0.5,
         1.0,
     ]
-    raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
-    if model_type == "pt":
-        robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
-    else:
-        robust_accuracy = 1 - success.numpy().astype(float).flatten().mean(axis=-1)
-    return robust_accuracy
+    accuracy_list = []
+    for i in len(images):
+        raw_advs, clipped_advs, success = attack(fmodel, images[i], labels[i], epsilons=epsilons)
+        if model_type == "pt":
+            robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
+        else:
+            robust_accuracy = 1 - success.numpy().astype(float).flatten().mean(axis=-1)
+        accuracy_list.append(robust_accuracy)
+    return np.array(accuracy_list).mean()
 
 def multi_train(config):
     config = {'epochs':1, 'batch_size': 64, 'learning_rate':.001, 'dropout':.5}
