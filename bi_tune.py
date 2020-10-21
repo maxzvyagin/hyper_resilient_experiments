@@ -27,7 +27,7 @@ NUM_CLASSES = 10
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
-        # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
         if NUM_CLASSES==100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
@@ -41,8 +41,8 @@ def model_attack(model, model_type, attack_type, config):
                        batch_size=int(config['batch_size']))
         images, labels = [], []
         for sample in data:
-            images.append(sample[0])
-            labels.append(sample[1])
+            images.append(sample[0].to(device))
+            labels.append(sample[1].to(device))
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
