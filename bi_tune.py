@@ -14,6 +14,10 @@ import foolbox as fb
 import sys
 from tensorflow import keras
 import torch
+import torchvision
+from torch.utils.data import DataLoader
+import tensorflow_datasets as tfds
+import numpy as np
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -25,24 +29,37 @@ def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
         # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
+        if NUM_CLASSES==100:
+            data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
+                                                     transform=torchvision.transforms.ToTensor(),
+                                                     target_transform=None, download=True),
+                       batch_size=int(config['batch_size']))
+        else:
+            data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
+                                                     transform=torchvision.transforms.ToTensor(),
+                                                     target_transform=None, download=True),
+                       batch_size=int(config['batch_size']))
+        images, labels = [], []
+        for sample in data:
+            images.append(sample[0])
+            labels.append(sample[1])
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
+        if NUM_CLASSES==100:
+            train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
+            data = list(test.batch(config['batch_size']))
+        else:
+            train, test = tfds.load('mnist', split=['train', 'test'], shuffle_files=False, as_supervised=True)
+            data = list(test.batch(config['batch_size']))
+        images, labels = [], []
+        for sample in data:
+            i = np.array(sample[0]).astype(float)/255.0
+            images.append(i)
+            labels.append(sample[1])
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
-        
-    if NUM_CLASSES == 10:
-        images, labels = fb.utils.samples(fmodel, dataset='mnist', batchsize=config['batch_size'], bounds=(0, 1))
-        # train, test = keras.datasets.mnist.load_data()
-        # images, labels = test
-        # images = images/255.0
-        # images, labels = (images.astype(float), labels.astype(float))
-    else:
-        images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'], bounds=(0, 1))
-        # train, test = keras.datasets.cifar100.load_data()
-        # images, labels = test
-        # images = images/255.0
 
     # perform the attacks
     if attack_type == "uniform":

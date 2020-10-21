@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torchvision
 import pytorch_lightning as pl
-from  torch.utils.data import DataLoader
+from torch.utils.data import DataLoader
 import statistics
 
 class PyTorch_AlexNet(pl.LightningModule):
@@ -40,7 +40,7 @@ class PyTorch_AlexNet(pl.LightningModule):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
                                                                transform=torchvision.transforms.ToTensor(),
                                                                target_transform=None, download=True),
-                                    batch_size=int(self.config['batch_size']))
+                                    batch_size=64)
 
     def test_dataloader(self):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
