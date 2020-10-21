@@ -52,6 +52,7 @@ def test(ctx, val_data, net):
             metric.update(label, output)
         ### Need to figure out why on earth this happens and why this except block is needed, I'm at a loss ###
         except:
+            print("Exception")
             metric.update(label, output)
     return metric.get()
 
@@ -60,8 +61,8 @@ def transform(data, label):
     return data, label
 
 def cifar_mxnet_objective(config):
-    net = MXNet_AlexNet(config)
-    # net = gluoncv.model_zoo.get_model('alexnet', classes=1000, pretrained=False)
+    #net = MXNet_AlexNet(config)
+    net = gluoncv.model_zoo.get_model('alexnet', classes=1000, pretrained=False)
     gpus = mx.test_utils.list_gpus()
     ctx = [mx.gpu(0)] if gpus else [mx.cpu(0)]
     net.initialize(mx.init.Uniform(scale=1), ctx=ctx)

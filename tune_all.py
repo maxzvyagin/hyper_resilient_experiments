@@ -44,11 +44,11 @@ def model_attack(model, model_type, attack_type, config):
                                           data_format='channels_last', bounds=(0, 1))
         #images, labels = fb.utils.samples(fmodel, dataset='cifar100', batchsize=config['batch_size'])
     if attack_type == "uniform":
-        attack = fb.attacks.AdditiveUniformNoiseAttack()
+        attack = fb.attacks.AdditiveUniformNoiseAttack(model=fmodel)
     elif attack_type == "gaussian":
-        attack = fb.attacks.AdditiveGaussianNoiseAttack()
+        attack = fb.attacks.AdditiveGaussianNoiseAttack(model=fmodel)
     elif attack_type == "saltandpepper":
-        attack = fb.attacks.SaltAndPepperNoiseAttack()
+        attack = fb.attacks.SaltAndPepperNoiseAttack(model=fmodel)
     epsilons = [
         0.0,
         0.0002,
@@ -64,7 +64,8 @@ def model_attack(model, model_type, attack_type, config):
         0.5,
         1.0,
     ]
-    raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
+    adv =
+    raw_advs, clipped_advs, success = attack(images, labels, epsilons=epsilons)
     if model_type == "pt":
         robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
     elif model_type == "tf":
