@@ -18,6 +18,7 @@ import torchvision
 from torch.utils.data import DataLoader
 import tensorflow_datasets as tfds
 import numpy as np
+from tqdm import tqdm
 
 # Default function definitions
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -84,7 +85,8 @@ def model_attack(model, model_type, attack_type, config):
         1.0,
     ]
     accuracy_list = []
-    for i in range(len(images)):
+    print("Performing FoolBox Attacks...")
+    for i in tqdm(range(len(images))):
         raw_advs, clipped_advs, success = attack(fmodel, images[i], labels[i], epsilons=epsilons)
         if model_type == "pt":
             robust_accuracy = 1 - success.cpu().numpy().astype(float).flatten().mean(axis=-1)
