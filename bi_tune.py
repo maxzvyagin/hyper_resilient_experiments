@@ -58,7 +58,7 @@ def model_attack(model, model_type, attack_type, config):
         for sample in data:
             fixed_image = (np.array(sample[0]) / 255.0).astype('float32')
             images.append(tf.convert_to_tensor(fixed_image))
-            
+
             labels.append(sample[1])
             #labels.append(tf.cast(sample[1], 'double'))
     else:
@@ -110,7 +110,7 @@ def multi_train(config):
     tf_test_acc, tf_model = TF_MODEL(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
-    for attack_type in ['uniform', 'gaussian', 'spatial']:
+    for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
     # for attack_type in ['saltandpepper']:
         #for model_type in ['pt', 'tf']:
         for model_type in ['tf']:
