@@ -26,20 +26,21 @@ TF_MODEL = tf_mnist.mnist_tf_objective
 
 NUM_CLASSES = 10
 
+
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        if NUM_CLASSES==100:
+        if NUM_CLASSES == 100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
-                                                     transform=torchvision.transforms.ToTensor(),
-                                                     target_transform=None, download=True),
-                       batch_size=int(config['batch_size']))
+                                                            transform=torchvision.transforms.ToTensor(),
+                                                            target_transform=None, download=True),
+                              batch_size=int(config['batch_size']))
         else:
             data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
-                                                     transform=torchvision.transforms.ToTensor(),
-                                                     target_transform=None, download=True),
-                       batch_size=int(config['batch_size']))
+                                                         transform=torchvision.transforms.ToTensor(),
+                                                         target_transform=None, download=True),
+                              batch_size=int(config['batch_size']))
         images, labels = [], []
         for sample in data:
             images.append(sample[0].to(device))
@@ -47,7 +48,7 @@ def model_attack(model, model_type, attack_type, config):
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
-        if NUM_CLASSES==100:
+        if NUM_CLASSES == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(config['batch_size']))
         else:
@@ -55,9 +56,9 @@ def model_attack(model, model_type, attack_type, config):
             data = list(test.batch(config['batch_size']))
         images, labels = [], []
         for sample in data:
-            i = (np.array(sample[0]).astype('float64')/255.0).astype('double')
-            images.append(tf.convert_to_tensor(i))
-            labels.append(tf.convert_to_tensor(sample[1].astype('double')))
+            fixed_image = (np.array(sample[0]) / 255.0)
+            images.append(tf.convert_to_tensor(fixed_image))
+            labels.append(sample[1])
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
@@ -85,7 +86,7 @@ def model_attack(model, model_type, attack_type, config):
         1.0,
     ]
     accuracy_list = []
-    print("Performing FoolBox Attacks for "+model_type+" with attack type "+attack_type)
+    print("Performing FoolBox Attacks for " + model_type + " with attack type " + attack_type)
     for i in tqdm(range(len(images))):
         raw_advs, clipped_advs, success = attack(fmodel, images[i], labels[i], epsilons=epsilons)
         if model_type == "pt":
@@ -95,16 +96,17 @@ def model_attack(model, model_type, attack_type, config):
         accuracy_list.append(robust_accuracy)
     return np.array(accuracy_list).mean()
 
+
 def multi_train(config):
     config = {'epochs': 1, 'batch_size': 64, 'learning_rate': .001, 'dropout': .5}
-    #pt_test_acc, pt_model = PT_MODEL(config)
-    #pt_model.eval()
+    # pt_test_acc, pt_model = PT_MODEL(config)
+    # pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
     # now run attacks
-    #search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
-    #for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
+    # search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
+    # for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
     for attack_type in ['saltandpepper']:
-        #for model_type in ['pt', 'tf']:
+        # for model_type in ['pt', 'tf']:
         for model_type in ['tf']:
             if model_type == 'pt':
                 acc = model_attack(pt_model, model_type, attack_type, config)
@@ -117,6 +119,7 @@ def multi_train(config):
     search_results['average_res'] = average_res
     tune.report(**search_results)
     return search_results
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
