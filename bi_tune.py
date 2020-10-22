@@ -102,7 +102,8 @@ def multi_train(config):
     tf_test_acc, tf_model = TF_MODEL(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
-    for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
+    #for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
+    for attack_type in ['saltandpepper']
         for model_type in ['pt', 'tf']:
             if model_type == 'pt':
                 acc = model_attack(pt_model, model_type, attack_type, config)
