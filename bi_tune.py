@@ -55,7 +55,7 @@ def model_attack(model, model_type, attack_type, config):
             data = list(test.batch(config['batch_size']))
         images, labels = [], []
         for sample in data:
-            i = (np.array(sample[0]).astype(float)/255.0).astype(float)
+            i = (np.array(sample[0]).astype('float32')/255.0).astype(float)
             images.append(tf.convert_to_tensor(i))
             labels.append(tf.convert_to_tensor(sample[1]))
     else:
