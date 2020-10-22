@@ -58,7 +58,8 @@ def model_attack(model, model_type, attack_type, config):
         for sample in data:
             fixed_image = (np.array(sample[0]) / 255.0)
             images.append(tf.convert_to_tensor(fixed_image))
-            labels.append(tf.cast(sample[1], 'double'))
+            labels.append(sample[1])
+            #labels.append(tf.cast(sample[1], 'double'))
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
