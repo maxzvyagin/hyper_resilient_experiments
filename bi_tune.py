@@ -104,7 +104,7 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    # config = {'epochs': 1, 'batch_size': 64, 'learning_rate': .001, 'dropout': .5}
+    config = {'epochs': 1, 'batch_size': 64, 'learning_rate': .001, 'dropout': .5}
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
