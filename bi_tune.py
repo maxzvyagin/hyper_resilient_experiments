@@ -100,20 +100,19 @@ def model_attack(model, model_type, attack_type, config):
 
 def multi_train(config):
     config = {'epochs': 1, 'batch_size': 64, 'learning_rate': .001, 'dropout': .5}
-    # pt_test_acc, pt_model = PT_MODEL(config)
-    # pt_model.eval()
+    pt_test_acc, pt_model = PT_MODEL(config)
+    pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
     # now run attacks
-    # search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
-    # for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
-    for attack_type in ['saltandpepper']:
+    search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
+    for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
+    # for attack_type in ['saltandpepper']:
         # for model_type in ['pt', 'tf']:
         for model_type in ['tf']:
             if model_type == 'pt':
                 acc = model_attack(pt_model, model_type, attack_type, config)
             else:
                 acc = model_attack(tf_model, model_type, attack_type, config)
-                sys.exit()
             search_results[model_type + "_" + attack_type + "_" + "accuracy"] = acc
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
