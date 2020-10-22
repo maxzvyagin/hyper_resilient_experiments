@@ -70,9 +70,11 @@ def model_attack(model, model_type, attack_type, config):
     elif attack_type == "gaussian":
         attack = fb.attacks.L2AdditiveGaussianNoiseAttack()
     elif attack_type == "saltandpepper":
-        attack = fb.attacks.SaltAndPepperNoiseAttack(across_channels=False)
+        attack = fb.attacks.SaltAndPepperNoiseAttack()
     elif attack_type == "boundary":
         attack = fb.attacks.BoundaryAttack()
+    elif attack_type == "spatial":
+        attack = fb.attacks.SpatialAttack()
     epsilons = [
         0.0,
         0.0002,
