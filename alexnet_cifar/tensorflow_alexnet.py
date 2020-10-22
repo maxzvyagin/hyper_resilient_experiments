@@ -46,4 +46,4 @@ def cifar_tf_objective(config):
     model = TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
-    return accuracy, model
+    return accuracy, model.model
