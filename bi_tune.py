@@ -12,7 +12,7 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import sys
-from tensorflow import keras
+import tensorflow as tf
 import torch
 import torchvision
 from torch.utils.data import DataLoader
@@ -85,7 +85,7 @@ def model_attack(model, model_type, attack_type, config):
         1.0,
     ]
     accuracy_list = []
-    print("Performing FoolBox Attacks...")
+    print("Performing FoolBox Attacks for "+model_type+" with attack type "+attack_type)
     for i in tqdm(range(len(images))):
         raw_advs, clipped_advs, success = attack(fmodel, images[i], labels[i], epsilons=epsilons)
         if model_type == "pt":
