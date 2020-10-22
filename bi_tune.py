@@ -71,6 +71,8 @@ def model_attack(model, model_type, attack_type, config):
         attack = fb.attacks.L2AdditiveGaussianNoiseAttack()
     elif attack_type == "saltandpepper":
         attack = fb.attacks.SaltAndPepperNoiseAttack()
+    elif attack_type == "boundary":
+        attack = fb.attacks.BoundaryAttack()
     epsilons = [
         0.0,
         0.0002,
@@ -105,7 +107,7 @@ def multi_train(config):
     tf_test_acc, tf_model = TF_MODEL(config)
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
-    for attack_type in ['uniform', 'gaussian', 'saltandpepper']:
+    for attack_type in ['uniform', 'gaussian', 'boundary']:
     # for attack_type in ['saltandpepper']:
         for model_type in ['pt', 'tf']:
         # for model_type in ['tf']:
