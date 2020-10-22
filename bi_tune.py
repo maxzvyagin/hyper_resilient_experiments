@@ -136,7 +136,7 @@ if __name__ == "__main__":
         if args.model == "alexnet_cifar100":
             PT_MODEL = pytorch_alexnet.cifar_pt_objective
             TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-            NUM_CLASSES = 1000
+            NUM_CLASSES = 100
         ## definition of gans as the model type
         elif args.model == "gan":
             pass
