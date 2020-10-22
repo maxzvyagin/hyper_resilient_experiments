@@ -57,7 +57,7 @@ def model_attack(model, model_type, attack_type, config):
         for sample in data:
             i = (np.array(sample[0]).astype('float64')/255.0).astype(float)
             images.append(tf.convert_to_tensor(i))
-            labels.append(tf.convert_to_tensor(sample[1]))
+            labels.append(tf.convert_to_tensor(sample[1].astype('float64')))
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
