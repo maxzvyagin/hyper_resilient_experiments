@@ -24,7 +24,7 @@ class TensorFlow_AlexNet:
             keras.layers.Dropout(config['dropout']),
             keras.layers.Dense(4096, activation='relu'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(100, activation='softmax')
+            keras.layers.Dense(100, activation=tf.nn.log_softmax)
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])

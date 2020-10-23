@@ -10,7 +10,8 @@ def mnist_tf_objective(config):
         tf.keras.layers.Flatten(input_shape=(28, 28)),
         tf.keras.layers.Dense(128, activation='relu'),
         tf.keras.layers.Dropout(config['dropout']),
-        tf.keras.layers.Dense(10, activation='softmax')
+        # need to use log softmax since that's what pytorch uses in nn.CrossEntropyLoss()
+        tf.keras.layers.Dense(10, activation=tf.nn.log_softmax)
     ])
 
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
