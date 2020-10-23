@@ -18,3 +18,8 @@ def cityscapes_tf_objective(config):
 # implement this later
 def gis_tf_objective(config):
     pass
+
+
+if __name__ == "__main__":
+    config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 5}
+    res = cityscapes_tf_objective(config)

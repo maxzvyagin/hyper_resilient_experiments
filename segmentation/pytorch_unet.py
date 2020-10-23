@@ -81,4 +81,3 @@ def cityscapes_pt_objective(config):
 if __name__ == "__main__":
     config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 5}
     res = cityscapes_pt_objective(config)
-    return res
