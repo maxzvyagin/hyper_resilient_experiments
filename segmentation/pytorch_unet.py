@@ -18,12 +18,14 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=True, transform=torchvision.transforms.ToTensor(), target_transform=None, download=True),batch_size=64)
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='train',
+                                                                           transform=torchvision.transforms.ToTensor()),
+                                           batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=False,transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']))
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='test',
+                                                                           transform=torchvision.transforms.ToTensor()),
+                                           batch_size=int(self.config['batch_size']))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
