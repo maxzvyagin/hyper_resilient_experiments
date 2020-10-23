@@ -20,12 +20,11 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 
-# Default function definitions
+# Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
-
 NUM_CLASSES = 10
-
+TRIALS = 25
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -58,9 +57,7 @@ def model_attack(model, model_type, attack_type, config):
         for sample in data:
             fixed_image = (np.array(sample[0]) / 255.0).astype('float32')
             images.append(tf.convert_to_tensor(fixed_image))
-
             labels.append(sample[1])
-            #labels.append(tf.cast(sample[1], 'double'))
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
@@ -128,6 +125,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
+    parser.add_argument("-t", "--trials")
     args = parser.parse_args()
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
@@ -142,6 +140,10 @@ if __name__ == "__main__":
         else:
             print("\n ERROR: Unknown model type. Please try again. Must be one of: mnist, alexnet_cifar100, or gan.\n")
             sys.exit()
+    if not args.trials:
+        print("NOTE: Defaulting to 25 trials per scikit opt space...")
+    else:
+        TRIALS = args.trials
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
                        (0.2, 0.9),  # dropout
@@ -157,7 +159,7 @@ if __name__ == "__main__":
         search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                   metric='average_res', mode='max')
         # not using a gpu because running on local
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=3, resources_per_trial={'gpu': 1})
+        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 1})
         results.append(analysis)
 
     all_pt_results = results[0].results_df
