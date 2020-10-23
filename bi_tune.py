@@ -143,7 +143,7 @@ if __name__ == "__main__":
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
     else:
-        TRIALS = args.trials
+        TRIALS = int(args.trials)
     # Defining the hyperspace
     hyperparameters = [(0.00001, 0.1),  # learning_rate
                        (0.2, 0.9),  # dropout
