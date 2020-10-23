@@ -1,8 +1,9 @@
 ### General tuning script to combine all submodules ###
 ### Only uses PyTorch and TensorFlow ###
 
-from simple_mnist import mxnet_mnist, pt_mnist, tf_mnist
-from alexnet_cifar import mxnet_alexnet, pytorch_alexnet, tensorflow_alexnet
+from simple_mnist import pt_mnist, tf_mnist
+from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+from segmentation import pytorch_unet, tensorflow_unet
 import argparse
 from hyperspace import create_hyperspace
 from ray import tune
@@ -137,6 +138,10 @@ if __name__ == "__main__":
         ## definition of gans as the model type
         elif args.model == "gan":
             pass
+        elif args.model == "segmentation_cityscapes":
+            PT_MODEL = pytorch_unet.cityscapes_pt_objective
+            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
+            NUM_CLASSES = 20
         else:
             print("\n ERROR: Unknown model type. Please try again. Must be one of: mnist, alexnet_cifar100, or gan.\n")
             sys.exit()
