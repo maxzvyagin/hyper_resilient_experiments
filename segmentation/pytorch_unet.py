@@ -76,6 +76,9 @@ def cityscapes_pt_objective(config):
     trainer.test(model)
     return model.test_accuracy, model
 
-### two different objective functions, one for pascal VOC and one for GIS
+### two different objective functions, one for cityscapes and one for GIS
 
-
+if __name__ == "__main__":
+    config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 5}
+    res = cityscapes_pt_objective(config)
+    return res
