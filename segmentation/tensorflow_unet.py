@@ -11,7 +11,7 @@ def cityscapes_tf_objective(config):
                   metrics=['accuracy'])
     # fit model on cityscapes data
     (x_train, y_train), (x_test, y_test) = tfds.load('cityscapes',
-                                                     split=['train', 'test'], shuffle_files=False, as_supervised=True)
+                                                     split=['train', 'test'], shuffle_files=False)
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return (res_test[1], model)

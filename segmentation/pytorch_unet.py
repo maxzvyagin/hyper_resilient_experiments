@@ -18,23 +18,16 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=True,
-                                                        transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=64)
+        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=True, transform=torchvision.transforms.ToTensor(), target_transform=None, download=True),batch_size=64)
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=False,
-                                                        transform=torchvision.transforms.ToTensor(),
+        return torch.utils.data.DataLoader(torchvision.datasets.cityscapes("~/datasets/", train=False,transform=torchvision.transforms.ToTensor(),
                                                         target_transform=None, download=True),
                           batch_size=int(self.config['batch_size']))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
         return optimizer
-
-    #     def forward(self, x):
-    #         return self.model(x)
 
     def forward(self, x):
         return self.model(x)
@@ -70,7 +63,7 @@ class PyTorch_UNet(pl.LightningModule):
 
 
 def cityscapes_pt_objective(config):
-    model = PyTorch_UNet(config)
+    model = PyTorch_UNet(config, classes=20)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
