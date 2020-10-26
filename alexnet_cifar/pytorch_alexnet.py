@@ -5,6 +5,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 import statistics
 
+
 class PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=100):
         super(PyTorch_AlexNet, self).__init__()
@@ -38,9 +39,9 @@ class PyTorch_AlexNet(pl.LightningModule):
 
     def train_dataloader(self):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
-                                                               transform=torchvision.transforms.ToTensor(),
-                                                               target_transform=None, download=True),
-                                    batch_size=int(self.config['batch_size']))
+                                                        transform=torchvision.transforms.ToTensor(),
+                                                        target_transform=None, download=True),
+                          batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
@@ -52,9 +53,6 @@ class PyTorch_AlexNet(pl.LightningModule):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
         return optimizer
 
-#     def forward(self, x):
-#         return self.model(x)
-    
     def forward(self, x):
         return self.model(x)
 
@@ -86,6 +84,7 @@ class PyTorch_AlexNet(pl.LightningModule):
         avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
+
 
 def cifar_pt_objective(config):
     model = PyTorch_AlexNet(config)

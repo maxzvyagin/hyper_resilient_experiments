@@ -4,8 +4,9 @@ import tensorflow as tf
 from tensorflow import keras
 import tensorflow_datasets as tfds
 
-def cityscapes_tf_objective(config):
-    model = sm.Unet()
+
+def cityscapes_tf_objective(config, classes=20):
+    model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
     model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
@@ -15,9 +16,11 @@ def cityscapes_tf_objective(config):
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
 
+
 # implement this later
-def gis_tf_objective(config):
+def gis_tf_objective(config, classes=1):
     pass
+
 
 @tf.function
 def get_cityscapes():
@@ -26,8 +29,8 @@ def get_cityscapes():
     train = list(train)
     train_x, train_y = [], []
     for i in train:
-        train_x.append(i['image_left'].numpy()/255)
-        train_y.append(i['segmentation_label'].numpy()/255)
+        train_x.append(i['image_left'].numpy() / 255)
+        train_y.append(i['segmentation_label'].numpy() / 255)
     test_x, test_y = [], []
     test = list(test)
     for i in test:
@@ -35,6 +38,7 @@ def get_cityscapes():
         test_y.append(i['segmentation_label'].numpy() / 255)
     return (train_x, train_y), (test_x, test_y)
 
+
 if __name__ == "__main__":
-    config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 5}
-    res = cityscapes_tf_objective(config)
+    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1}
+    res = cityscapes_tf_objective(test_config, 20)
