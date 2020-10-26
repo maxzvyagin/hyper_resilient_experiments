@@ -34,7 +34,7 @@ class PyTorch_UNet(pl.LightningModule):
             torchvision.datasets.Cityscapes(
                 "~/datasets/", split='val', mode='coarse',
                 transform=torchvision.transforms.ToTensor(),
-                target_transform=custom_transform()),
+                target_transform=torchvision.transforms.ToTensor()),
             batch_size=int(self.config['batch_size']))
 
     def configure_optimizers(self):
