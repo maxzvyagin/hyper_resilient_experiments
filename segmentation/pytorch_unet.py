@@ -6,6 +6,7 @@ import torchvision
 from torch import nn
 import statistics
 
+
 ### definition of PyTorch Lightning module in order to run everything
 class PyTorch_UNet(pl.LightningModule):
     def __init__(self, config, classes=100):
@@ -18,14 +19,19 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='train', mode='coarse',
-                                                                           transform=torchvision.transforms.ToTensor()),
-                                           batch_size=int(self.config['batch_size']))
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+            "~/datasets/", split='train', mode='coarse',
+            transform=torchvision.transforms.ToTensor(),
+            target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='val', mode='coarse',
-                                                                           transform=torchvision.transforms.ToTensor()),
-                                           batch_size=int(self.config['batch_size']))
+        return torch.utils.data.DataLoader(
+            torchvision.datasets.Cityscapes(
+                "~/datasets/", split='val', mode='coarse',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -39,7 +45,7 @@ class PyTorch_UNet(pl.LightningModule):
         logits = self.forward(x)
         loss = self.criterion(logits, y)
         logs = {'train_loss': loss}
-        return {'loss': loss, 'logs':logs}
+        return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
@@ -70,6 +76,7 @@ def cityscapes_pt_objective(config):
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model
+
 
 ### two different objective functions, one for cityscapes and one for GIS
 
