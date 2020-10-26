@@ -19,6 +19,7 @@ def cityscapes_tf_objective(config):
 def gis_tf_objective(config):
     pass
 
+@tf.function
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False)
