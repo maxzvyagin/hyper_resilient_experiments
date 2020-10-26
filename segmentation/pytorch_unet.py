@@ -5,6 +5,10 @@ import torch
 import torchvision
 from torch import nn
 import statistics
+import numpy as np
+
+def custom_transform(img):
+    return torchvision.transforms.ToTensor(np.array(img))
 
 
 ### definition of PyTorch Lightning module in order to run everything
@@ -30,7 +34,7 @@ class PyTorch_UNet(pl.LightningModule):
             torchvision.datasets.Cityscapes(
                 "~/datasets/", split='val', mode='coarse',
                 transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
+                target_transform=custom_transform()),
             batch_size=int(self.config['batch_size']))
 
     def configure_optimizers(self):
@@ -72,7 +76,7 @@ class PyTorch_UNet(pl.LightningModule):
 
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=20)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=['7'], auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model
