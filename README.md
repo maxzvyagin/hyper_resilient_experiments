@@ -5,3 +5,5 @@ An implementation of automated hyperparameter tuning which results in model cons
 Subproblems:
 - MNIST, simple classification perceptron
 - CIFAR100, AlexNet architecture
+- Cityscapes, UNet ResNet34 Architecture
+
