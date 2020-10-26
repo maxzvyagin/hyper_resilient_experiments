@@ -18,12 +18,12 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='train',
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='train', mode='coarse',
                                                                            transform=torchvision.transforms.ToTensor()),
                                            batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='test',
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes("~/datasets/", split='val', mode='coarse',
                                                                            transform=torchvision.transforms.ToTensor()),
                                            batch_size=int(self.config['batch_size']))
 
@@ -74,5 +74,5 @@ def cityscapes_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 5}
-    res = cityscapes_pt_objective(config)
+    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1}
+    res = cityscapes_pt_objective(test_config)
