@@ -13,7 +13,7 @@ def custom_transform(img):
 
 ### definition of PyTorch Lightning module in order to run everything
 class PyTorch_UNet(pl.LightningModule):
-    def __init__(self, config, classes=20):
+    def __init__(self, config, classes):
         super(PyTorch_UNet, self).__init__()
         self.config = config
         self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
@@ -82,7 +82,7 @@ class PyTorch_UNet(pl.LightningModule):
 
 
 def cityscapes_pt_objective(config):
-    model = PyTorch_UNet(config, classes=20)
+    model = PyTorch_UNet(config, classes=30)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus='7', auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
