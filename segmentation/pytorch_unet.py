@@ -61,8 +61,8 @@ class PyTorch_UNet(pl.LightningModule):
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
         logits = self.forward(x)
-        loss = self.criterion(logits, y)
-        accuracy = self.accuracy(logits, y)
+        loss = self.criterion(logits, y.long())
+        accuracy = self.accuracy(logits, y.long())
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
