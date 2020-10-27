@@ -86,8 +86,9 @@ def cityscapes_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     #trainer = pl.Trainer(max_epochs=config['epochs'])
     #trainer.fit(model)
-    trainer.test(model)
-    return model.test_accuracy, model
+    #trainer.test(model)
+    #return model.test_accuracy, model.model
+    return model.model
 
 
 ### two different objective functions, one for cityscapes and one for GIS
