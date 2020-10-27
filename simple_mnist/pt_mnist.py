@@ -4,6 +4,7 @@ import torchvision
 import torch
 import statistics
 
+
 class NumberNet(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
@@ -14,7 +15,7 @@ class NumberNet(pl.LightningModule):
             nn.Dropout(config['dropout']),
             nn.Linear(128, 10))
             ## nn.Softmax())
-            # not include softmax because it's included in the Cross Entropy Loss Function
+        # not include softmax because it's included in the Cross Entropy Loss Function
         self.criterion = nn.CrossEntropyLoss()
         self.config = config
         self.test_loss = None
@@ -77,6 +78,7 @@ def mnist_pt_objective(config):
     trainer.test(model)
     return model.test_accuracy, model.model
 
+
 if __name__ == "__main__":
-    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout':0.5}
+    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = mnist_pt_objective(test_config)

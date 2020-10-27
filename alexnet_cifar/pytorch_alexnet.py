@@ -31,7 +31,7 @@ class PyTorch_AlexNet(pl.LightningModule):
             nn.Linear(4096, 4096),
             nn.ReLU(inplace=True),
             nn.Dropout(config['dropout']),
-            nn.Linear(4096, 100))
+            nn.Linear(4096, classes))
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None

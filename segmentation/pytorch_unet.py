@@ -20,29 +20,29 @@ class PyTorch_UNet(pl.LightningModule):
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
-    #         self.accuracy = pl.metrics.Accuracy()
-    #
-    #     # def train_dataloader(self):
-    #     #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-    #     #         "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
-    #     #         transform=torchvision.transforms.ToTensor(),
-    #     #         target_transform=torchvision.transforms.ToTensor()),
-    #     #         batch_size=int(self.config['batch_size']))
-    #
-    # def test_dataloader(self):
-    #     return torch.utils.data.DataLoader(
-    #         torchvision.datasets.Cityscapes(
-    #             "~/datasets/pytorch", split='val', mode='coarse', target_type='semantic',
-    #             transform=torchvision.transforms.ToTensor(),
-    #             target_transform=torchvision.transforms.ToTensor()),
-    #         batch_size=int(self.config['batch_size']))
+        self.accuracy = pl.metrics.Accuracy()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+            "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
+            transform=torchvision.transforms.ToTensor(),
+            target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
-                                                                                image_set="val"))
+        return torch.utils.data.DataLoader(
+            torchvision.datasets.Cityscapes(
+                "~/datasets/pytorch", split='val', mode='coarse', target_type='semantic',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
+
+    # def train_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
+    #
+    # def test_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
+    #                                                                             image_set="val"))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -84,10 +84,9 @@ class PyTorch_UNet(pl.LightningModule):
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=20)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
-    #trainer.fit(model)
-    #trainer.test(model)
-    #return model.test_accuracy, model.model
-    return model.model
+    trainer.fit(model)
+    trainer.test(model)
+    return model.test_accuracy, model.model
 
 
 ### two different objective functions, one for cityscapes and one for GIS
