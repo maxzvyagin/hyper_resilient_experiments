@@ -92,5 +92,5 @@ def cityscapes_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 10, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_pt_objective(test_config)
