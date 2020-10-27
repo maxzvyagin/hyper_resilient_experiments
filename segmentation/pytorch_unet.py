@@ -83,9 +83,9 @@ class PyTorch_UNet(pl.LightningModule):
 
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=20)
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
-    trainer = pl.Trainer(max_epochs=config['epochs'])
-    trainer.fit(model)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    #trainer = pl.Trainer(max_epochs=config['epochs'])
+    #trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model
 
@@ -93,6 +93,5 @@ def cityscapes_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    #torch.backends.cudnn.enabled = False
     test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_pt_objective(test_config)
