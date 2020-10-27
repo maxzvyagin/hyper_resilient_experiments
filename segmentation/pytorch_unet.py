@@ -20,8 +20,9 @@ class PyTorch_UNet(pl.LightningModule):
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
+        self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
-        self.unfold = torch.nn.Unfold((256, 256))
+        self.iou = pl.metrics.IoU()
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
@@ -63,10 +64,12 @@ class PyTorch_UNet(pl.LightningModule):
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
         logits = self.forward(x)
-        loss = self.criterion(logits, torch.squeeze(y.long(), 1))
-        accuracy = self.accuracy(logits, torch.squeeze(y.long(), 1))
-        logs = {'test_loss': loss, 'test_accuracy': accuracy}
-        return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
+        y = y.long()
+        loss = self.criterion(logits, torch.squeeze(y, 1))
+        accuracy = self.accuracy(logits, torch.squeeze(y, 1))
+        iou = self.iou(logits, torch.squeeze(y, 1))
+        logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
+        return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy, 'test_iou': iou}
 
     def test_epoch_end(self, outputs):
         loss = []
@@ -80,6 +83,11 @@ class PyTorch_UNet(pl.LightningModule):
             accuracy.append(float(x['test_accuracy']))
         avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
+        iou = []
+        for x in outputs:
+            iou.append(float(x['test_iou']))
+        avg_iou = statistics.mean(iou)
+        self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
@@ -88,7 +96,7 @@ def cityscapes_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus='7', auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy, model.model
+    return model.test_accuracy, model.model, model.test_iou 
 
 
 ### two different objective functions, one for cityscapes and one for GIS
