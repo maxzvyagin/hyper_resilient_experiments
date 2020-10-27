@@ -13,10 +13,12 @@ def custom_transform(img):
 
 ### definition of PyTorch Lightning module in order to run everything
 class PyTorch_UNet(pl.LightningModule):
-    def __init__(self, config, classes=100):
+    def __init__(self, config, classes=20):
         super(PyTorch_UNet, self).__init__()
         self.config = config
-        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
+        #self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
+        self.model = torch.hub.load('mateuszbuda/brain-segmentation-pytorch', 'unet',
+                               in_channels=3, out_channels=classes, init_features=32, pretrained=False)
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
