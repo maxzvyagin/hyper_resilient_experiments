@@ -54,15 +54,15 @@ class PyTorch_UNet(pl.LightningModule):
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
         logits = self.forward(x)
-        loss = self.criterion(logits, torch.squeeze(y.long()))
+        loss = self.criterion(logits, torch.squeeze(y.long(), 1))
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
         logits = self.forward(x)
-        loss = self.criterion(logits, torch.squeeze(y.long()))
-        accuracy = self.accuracy(logits, torch.squeeze(y.long()))
+        loss = self.criterion(logits, torch.squeeze(y.long(), 1))
+        accuracy = self.accuracy(logits, torch.squeeze(y.long(), 1))
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
