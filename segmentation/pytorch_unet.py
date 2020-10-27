@@ -20,14 +20,14 @@ class PyTorch_UNet(pl.LightningModule):
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
-        self.accuracy = pl.metrics.Accuracy()
-
-    # def train_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-    #         "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
-    #         transform=torchvision.transforms.ToTensor(),
-    #         target_transform=torchvision.transforms.ToTensor()),
-    #         batch_size=int(self.config['batch_size']))
+    #         self.accuracy = pl.metrics.Accuracy()
+    #
+    #     # def train_dataloader(self):
+    #     #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+    #     #         "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
+    #     #         transform=torchvision.transforms.ToTensor(),
+    #     #         target_transform=torchvision.transforms.ToTensor()),
+    #     #         batch_size=int(self.config['batch_size']))
     #
     # def test_dataloader(self):
     #     return torch.utils.data.DataLoader(
@@ -84,7 +84,6 @@ class PyTorch_UNet(pl.LightningModule):
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=20)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
-    #trainer = pl.Trainer(max_epochs=config['epochs'])
     #trainer.fit(model)
     #trainer.test(model)
     #return model.test_accuracy, model.model

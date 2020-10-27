@@ -91,4 +91,4 @@ def cifar_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy, model
+    return model.test_accuracy, model.model
