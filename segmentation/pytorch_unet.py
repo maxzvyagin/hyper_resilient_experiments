@@ -22,7 +22,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_accuracy = None
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
-        self.iou = pl.metrics.IoU()
+        self.iou = pl.metrics.functional.classification.iou()
 
     def train_dataloader(self):
         return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
@@ -96,7 +96,7 @@ def cityscapes_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus='7', auto_select_gpus=True)
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy, model.model, model.test_iou 
+    return model.test_accuracy, model.model, model.test_iou
 
 
 ### two different objective functions, one for cityscapes and one for GIS
