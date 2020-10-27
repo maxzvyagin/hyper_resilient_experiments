@@ -16,28 +16,33 @@ class PyTorch_UNet(pl.LightningModule):
     def __init__(self, config, classes=20):
         super(PyTorch_UNet, self).__init__()
         self.config = config
-        #self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
-        self.model = torch.hub.load('mateuszbuda/brain-segmentation-pytorch', 'unet',
-                               in_channels=3, out_channels=classes, init_features=32, pretrained=False)
+        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
         self.accuracy = pl.metrics.Accuracy()
 
+    # def train_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+    #         "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
+    #         transform=torchvision.transforms.ToTensor(),
+    #         target_transform=torchvision.transforms.ToTensor()),
+    #         batch_size=int(self.config['batch_size']))
+    #
+    # def test_dataloader(self):
+    #     return torch.utils.data.DataLoader(
+    #         torchvision.datasets.Cityscapes(
+    #             "~/datasets/pytorch", split='val', mode='coarse', target_type='semantic',
+    #             transform=torchvision.transforms.ToTensor(),
+    #             target_transform=torchvision.transforms.ToTensor()),
+    #         batch_size=int(self.config['batch_size']))
+
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-            "~/datasets/pytorch/", split='train', mode='coarse', target_type='semantic',
-            transform=torchvision.transforms.ToTensor(),
-            target_transform=torchvision.transforms.ToTensor()),
-            batch_size=int(self.config['batch_size']))
+        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(
-            torchvision.datasets.Cityscapes(
-                "~/datasets/pytorch", split='val', mode='coarse', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-            batch_size=int(self.config['batch_size']))
+        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
+                                                                                image_set="val"))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
