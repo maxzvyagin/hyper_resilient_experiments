@@ -6,6 +6,7 @@ import torchvision
 from torch import nn
 import statistics
 import numpy as np
+import torchio as tio
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -25,20 +26,32 @@ class PyTorch_UNet(pl.LightningModule):
         self.iou = pl.metrics.functional.classification.iou()
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-            "~/datasets/", split='train', mode='coarse', target_type='semantic',
-            transform=torchvision.transforms.ToTensor(),
-            target_transform=torchvision.transforms.ToTensor()),
-            batch_size=int(self.config['batch_size']))
+        train = torchvision.datasets.CocoDetection(
+            '~/datasets/coco/train2017', '~/datasets/coco/annotations/instances_train2017.json',
+            transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
+        return torch.utils.data.DataLoader(train, batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(
-            torchvision.datasets.Cityscapes(
-                "~/datasets/", split='val', mode='coarse', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-            batch_size=64)
-            #batch_size=int(self.config['batch_size']))
+        test = torchvision.datasets.CocoDetection(
+            '~/datasets/coco/val2017', '~/datasets/coco/annotations/instances_val2017.json',
+            transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
+        return torch.utils.data.DataLoader(test, batch_size=int(self.config['batch_size']))
+
+
+    # def train_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+    #         "~/datasets/", split='train', mode='coarse', target_type='semantic',
+    #         transform=torchvision.transforms.ToTensor(),
+    #         target_transform=torchvision.transforms.ToTensor()),
+    #         batch_size=int(self.config['batch_size']))
+    #
+    # def test_dataloader(self):
+    #     return torch.utils.data.DataLoader(
+    #         torchvision.datasets.Cityscapes(
+    #             "~/datasets/", split='val', mode='coarse', target_type='semantic',
+    #             transform=torchvision.transforms.ToTensor(),
+    #             target_transform=torchvision.transforms.ToTensor()),
+    #         batch_size=int(self.config['batch_size']))
 
     # def train_dataloader(self):
     #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
