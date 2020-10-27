@@ -54,7 +54,7 @@ class PyTorch_UNet(pl.LightningModule):
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
         logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        loss = self.criterion(logits, y.long())
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
 
