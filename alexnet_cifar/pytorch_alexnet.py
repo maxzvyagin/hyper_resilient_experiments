@@ -92,3 +92,8 @@ def cifar_pt_objective(config):
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model
+
+
+if __name__ == "__main__":
+    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    res = cifar_pt_objective(test_config)
