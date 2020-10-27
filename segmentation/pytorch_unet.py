@@ -6,7 +6,7 @@ import torchvision
 from torch import nn
 import statistics
 import numpy as np
-import torchio as tio
+import sklearn.metrics
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -23,7 +23,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_accuracy = None
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
-        self.iou = pl.metrics.functional.classification.iou()
+        self.iou = sklearn.metrics.jaccard_score
 
     def train_dataloader(self):
         train = torchvision.datasets.CocoDetection(
