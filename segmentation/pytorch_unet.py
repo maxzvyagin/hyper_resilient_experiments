@@ -32,7 +32,7 @@ class PyTorch_UNet(pl.LightningModule):
     def test_dataloader(self):
         return torch.utils.data.DataLoader(
             torchvision.datasets.Cityscapes(
-                "~/datasets/", split='val', mode='fine', target_type='semantic',
+                "~/datasets/", split='val', mode='coarse', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
             batch_size=int(self.config['batch_size']))
