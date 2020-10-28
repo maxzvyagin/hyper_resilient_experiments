@@ -6,10 +6,12 @@ import tensorflow_datasets as tfds
 
 
 def cityscapes_tf_objective(config, classes=20):
-    model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
-    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-    model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=['accuracy'])
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+    with strategy.scope():
+        model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
+        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+        model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                      metrics=['accuracy'])
     # fit model on cityscapes data
     (x_train, y_train), (x_test, y_test) = get_cityscapes()
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
