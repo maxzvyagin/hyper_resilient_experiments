@@ -116,5 +116,5 @@ def cityscapes_pt_objective(config):
 
 if __name__ == "__main__":
     #batch size is per gpu
-    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_pt_objective(test_config)
