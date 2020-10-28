@@ -164,7 +164,7 @@ if __name__ == "__main__":
         search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                   metric='average_res', mode='max')
         # not using a gpu because running on local
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'cpu': 10, 'gpu': 8})
         results.append(analysis)
 
     all_pt_results = results[0].results_df
