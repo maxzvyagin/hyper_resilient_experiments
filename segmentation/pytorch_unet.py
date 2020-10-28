@@ -80,7 +80,7 @@ class PyTorch_UNet(pl.LightningModule):
         y = y.long()
         loss = self.criterion(logits, torch.squeeze(y, 1))
         accuracy = self.accuracy(logits, torch.squeeze(y, 1))
-        iou = self.iou(logits, torch.squeeze(y, 1))
+        iou = self.iou(nn.LogSoftmax(logits), torch.squeeze(y, 1))
         logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy, 'test_iou': iou}
 
