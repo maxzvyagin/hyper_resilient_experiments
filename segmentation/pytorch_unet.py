@@ -38,27 +38,27 @@ class PyTorch_UNet(pl.LightningModule):
     #     return torch.utils.data.DataLoader(test, batch_size=int(self.config['batch_size']))
 
 
-    # def train_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-    #         "~/datasets/", split='train', mode='coarse', target_type='semantic',
-    #         transform=torchvision.transforms.ToTensor(),
-    #         target_transform=torchvision.transforms.ToTensor()),
-    #         batch_size=int(self.config['batch_size']))
-    #
-    # def test_dataloader(self):
-    #     return torch.utils.data.DataLoader(
-    #         torchvision.datasets.Cityscapes(
-    #             "~/datasets/", split='val', mode='coarse', target_type='semantic',
-    #             transform=torchvision.transforms.ToTensor(),
-    #             target_transform=torchvision.transforms.ToTensor()),
-    #         batch_size=int(self.config['batch_size']))
-
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
+        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+            "~/datasets/", split='train', mode='coarse', target_type='semantic',
+            transform=torchvision.transforms.ToTensor(),
+            target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
-                                                                                image_set="val"))
+        return torch.utils.data.DataLoader(
+            torchvision.datasets.Cityscapes(
+                "~/datasets/", split='val', mode='coarse', target_type='semantic',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+            batch_size=int(self.config['batch_size']))
+
+    # def train_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
+    #
+    # def test_dataloader(self):
+    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
+    #                                                                             image_set="val"))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
