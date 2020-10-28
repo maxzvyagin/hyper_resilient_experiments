@@ -24,10 +24,10 @@ def gis_tf_objective(config, classes=1):
     pass
 
 
-@tf.function
+#@tf.function
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
-    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False)
+    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False, data_dir='~/lustre_data/')
     train = list(train)
     train_x, train_y = [], []
     for i in train:
