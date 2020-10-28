@@ -25,17 +25,17 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
         self.iou = sklearn.metrics.jaccard_score
 
-    def train_dataloader(self):
-        train = torchvision.datasets.CocoDetection(
-            '~/datasets/coco/train2017', '~/datasets/coco/annotations/instances_train2017.json',
-            transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
-        return torch.utils.data.DataLoader(train, batch_size=int(self.config['batch_size']))
-
-    def test_dataloader(self):
-        test = torchvision.datasets.CocoDetection(
-            '~/datasets/coco/val2017', '~/datasets/coco/annotations/instances_val2017.json',
-            transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
-        return torch.utils.data.DataLoader(test, batch_size=int(self.config['batch_size']))
+    # def train_dataloader(self):
+    #     train = torchvision.datasets.CocoDetection(
+    #         '~/datasets/coco/train2017', '~/datasets/coco/annotations/instances_train2017.json',
+    #         transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
+    #     return torch.utils.data.DataLoader(train, batch_size=int(self.config['batch_size']))
+    #
+    # def test_dataloader(self):
+    #     test = torchvision.datasets.CocoDetection(
+    #         '~/datasets/coco/val2017', '~/datasets/coco/annotations/instances_val2017.json',
+    #         transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
+    #     return torch.utils.data.DataLoader(test, batch_size=int(self.config['batch_size']))
 
 
     # def train_dataloader(self):
@@ -53,12 +53,12 @@ class PyTorch_UNet(pl.LightningModule):
     #             target_transform=torchvision.transforms.ToTensor()),
     #         batch_size=int(self.config['batch_size']))
 
-    # def train_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
-    #
-    # def test_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
-    #                                                                             image_set="val"))
+    def train_dataloader(self):
+        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
+
+    def test_dataloader(self):
+        return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
+                                                                                image_set="val"))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
