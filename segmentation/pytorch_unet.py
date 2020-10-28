@@ -106,7 +106,7 @@ class PyTorch_UNet(pl.LightningModule):
 
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=30)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='ddp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou
