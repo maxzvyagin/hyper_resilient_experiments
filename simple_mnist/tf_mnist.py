@@ -25,3 +25,7 @@ def mnist_tf_objective(config):
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return (res_test[1], model)
+
+if __name__ == "__main__":
+    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    res = mnist_tf_objective(test_config)
