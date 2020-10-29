@@ -126,11 +126,11 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     #ray.init(local_mode=True,  num_gpus=100)
     #ray.init(local_mode=True, num_gpus=100, num_cpus=256)
     #time.sleep(5)
     ray.init(local_mode=True)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
