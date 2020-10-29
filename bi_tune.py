@@ -22,6 +22,7 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 from concurrent import futures
+import time
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -126,6 +127,7 @@ def multi_train(config):
 if __name__ == "__main__":
     #ray.init(local_mode=True,  num_gpus=100)
     ray.init()
+    time.sleep(5)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
