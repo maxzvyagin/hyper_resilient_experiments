@@ -21,6 +21,7 @@ from torch.utils.data import DataLoader
 import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
+from concurrent import futures
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -124,7 +125,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
-    ray.init(local_mode=True, num_gpus=8)
+    ray.init(local_mode=True)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
@@ -139,11 +140,12 @@ if __name__ == "__main__":
             NUM_CLASSES = 100
         ## definition of gans as the model type
         elif args.model == "gan":
-            pass
+            print("Error: GAN not implemented.")
+            sys.exit()
         elif args.model == "segmentation_cityscapes":
             PT_MODEL = pytorch_unet.cityscapes_pt_objective
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 20
+            NUM_CLASSES = 30
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, or segmentation.\n")
@@ -159,7 +161,7 @@ if __name__ == "__main__":
                        (10, 1000)]  # batch size
     space = create_hyperspace(hyperparameters)
 
-    # Aggregating the results
+    # Run and aggregate the results
     results = []
     for section in tqdm(space):
         # create a skopt gp minimize object
@@ -170,6 +172,7 @@ if __name__ == "__main__":
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         results.append(analysis)
 
+    # save results to specified csv file
     all_pt_results = results[0].results_df
     for i in range(1, len(results)):
         all_pt_results = all_pt_results.append(results[i].results_df)
