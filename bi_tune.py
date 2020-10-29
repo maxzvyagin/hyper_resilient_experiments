@@ -127,7 +127,7 @@ def multi_train(config):
 if __name__ == "__main__":
     #ray.init(local_mode=True,  num_gpus=100)
     ray.init(local_mode=True)
-    time.sleep(5)
+    #time.sleep(5)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
@@ -173,7 +173,7 @@ if __name__ == "__main__":
         # not using a gpu because running on local
         #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                            resources_per_trial={'cpu': 256, 'gpu': 8})
+                            resources_per_trial={'cpu': 200, 'gpu': 8})
         results.append(analysis)
 
     # save results to specified csv file
