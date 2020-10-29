@@ -73,7 +73,8 @@ class NumberNet(pl.LightningModule):
 
 def mnist_pt_objective(config):
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='ddp')
+    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='ddp')
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[1, 2, 3, 4], distributed_backend='ddp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model
