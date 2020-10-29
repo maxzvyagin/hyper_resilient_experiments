@@ -147,7 +147,7 @@ if __name__ == "__main__":
             NUM_CLASSES = 30
         else:
             print("\n ERROR: Unknown model type. Please try again. "
-                  "Must be one of: mnist, alexnet_cifar100, or segmentation.\n")
+                  "Must be one of: mnist, alexnet_cifar100, or segmentation_cityscapes.\n")
             sys.exit()
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
@@ -168,7 +168,8 @@ if __name__ == "__main__":
         search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                   metric='average_res', mode='max')
         # not using a gpu because running on local
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS)
         results.append(analysis)
 
     # save results to specified csv file
