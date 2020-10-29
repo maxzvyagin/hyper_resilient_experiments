@@ -104,10 +104,9 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    # pt_test_acc, pt_model = PT_MODEL(config)
-    # pt_model.eval()
+    pt_test_acc, pt_model = PT_MODEL(config)
+    pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
-    sys.exit()
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
@@ -125,7 +124,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
-    ray.init(local_mode=True,  num_gpus=100)
+    #ray.init(local_mode=True,  num_gpus=100)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
