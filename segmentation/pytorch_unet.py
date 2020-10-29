@@ -14,9 +14,10 @@ def custom_transform(img):
 
 ### definition of PyTorch Lightning module in order to run everything
 class PyTorch_UNet(pl.LightningModule):
-    def __init__(self, config, classes):
+    def __init__(self, config, classes, dataset='cityscapes'):
         super(PyTorch_UNet, self).__init__()
         self.config = config
+        self.dataset = dataset
         self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
         self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
@@ -39,19 +40,27 @@ class PyTorch_UNet(pl.LightningModule):
 
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-            "~/lustre_data/", split='train', mode='fine', target_type='semantic',
-            transform=torchvision.transforms.ToTensor(),
-            target_transform=torchvision.transforms.ToTensor()),
-            batch_size=int(self.config['batch_size']))
-
-    def test_dataloader(self):
-        return torch.utils.data.DataLoader(
-            torchvision.datasets.Cityscapes(
-                "~/lustre_data/", split='val', mode='fine', target_type='semantic',
+        if self.dataset == 'cityscapes':
+            return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+                "~/lustre_data/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-            batch_size=int(self.config['batch_size']))
+                batch_size=int(self.config['batch_size']))
+        else:
+            # implement gis data
+            pass
+
+    def test_dataloader(self):
+        if self.dataset == 'cityscapes':
+            return torch.utils.data.DataLoader(
+                torchvision.datasets.Cityscapes(
+                    "~/lustre_data/", split='val', mode='fine', target_type='semantic',
+                    transform=torchvision.transforms.ToTensor(),
+                    target_transform=torchvision.transforms.ToTensor()),
+                batch_size=int(self.config['batch_size']))
+        else:
+            # implement gis data
+            pass
 
     # def train_dataloader(self):
     #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
@@ -103,6 +112,9 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
+# load in gis data
+def gis_dataloader():
+    pass
 
 def cityscapes_pt_objective(config):
     model = PyTorch_UNet(config, classes=30)
@@ -111,10 +123,9 @@ def cityscapes_pt_objective(config):
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou
 
-
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    #batch size is per gpu
+    # Note that batch size is per gpu
     test_config = {'batch_size': 8, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_pt_objective(test_config)
