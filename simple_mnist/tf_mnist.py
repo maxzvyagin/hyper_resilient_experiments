@@ -8,7 +8,7 @@ def mnist_tf_objective(config):
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
 
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:5", "/gpu:6", "/gpu:7", "/gpu:8"])
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = tf.keras.models.Sequential([
             tf.keras.layers.Flatten(input_shape=(28, 28)),
