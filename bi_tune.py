@@ -169,7 +169,7 @@ if __name__ == "__main__":
                                   metric='average_res', mode='max')
         # not using a gpu because running on local
         #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS)
+        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 1})
         results.append(analysis)
 
     # save results to specified csv file
