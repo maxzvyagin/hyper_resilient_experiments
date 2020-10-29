@@ -6,6 +6,7 @@ from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from segmentation import pytorch_unet, tensorflow_unet
 import argparse
 from hyperspace import create_hyperspace
+import ray
 from ray import tune
 from ray.tune.suggest.skopt import SkOptSearch
 from skopt import Optimizer
@@ -123,6 +124,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
+    ray.init(local_mode=True)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
@@ -143,7 +145,8 @@ if __name__ == "__main__":
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
             NUM_CLASSES = 20
         else:
-            print("\n ERROR: Unknown model type. Please try again. Must be one of: mnist, alexnet_cifar100, or gan.\n")
+            print("\n ERROR: Unknown model type. Please try again. "
+                  "Must be one of: mnist, alexnet_cifar100, or segmentation.\n")
             sys.exit()
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
