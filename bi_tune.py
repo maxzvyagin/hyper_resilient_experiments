@@ -125,6 +125,7 @@ def multi_train(config):
 
 if __name__ == "__main__":
     #ray.init(local_mode=True,  num_gpus=100)
+    ray.init()
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
