@@ -82,7 +82,7 @@ class PyTorch_UNet(pl.LightningModule):
 
     def training_step_end(self, outputs):
         # only use when  on dp
-        loss = self.criterion(outputs['forward'], outputs['expected'])
+        loss = self.criterion(outputs['forward'], outputs['expected'].long())
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
 
@@ -91,7 +91,7 @@ class PyTorch_UNet(pl.LightningModule):
         return {'forward': self.forward(x), 'expected': y}
 
     def test_step_end(self, outputs):
-        loss = self.criterion(outputs['forward'], outputs['expected'])
+        loss = self.criterion(outputs['forward'], outputs['expected'].long())
         accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         iou = self.iou(nn.LogSoftmax(outputs['forward']), outputs['expected'])
         logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
