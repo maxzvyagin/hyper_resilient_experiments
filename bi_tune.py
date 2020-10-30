@@ -106,6 +106,7 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
+    tune.util.wait_for_gpu()
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
@@ -131,7 +132,8 @@ if __name__ == "__main__":
     #ray.init(local_mode=True,  num_gpus=100)
     #ray.init(local_mode=True, num_gpus=100, num_cpus=256)
     #time.sleep(5)
-    ray.init(local_mode=True, num_gpus=8)
+    #ray.init(local_mode=True, num_gpus=8)
+    ray.init()
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
