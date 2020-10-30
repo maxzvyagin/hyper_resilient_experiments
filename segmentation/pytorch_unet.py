@@ -6,7 +6,7 @@ import torchvision
 from torch import nn
 import statistics
 import numpy as np
-import sklearn.metrics
+import os
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -78,18 +78,22 @@ class PyTorch_UNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, torch.squeeze(y.long(), 1))
+        return {'forward': self.forward(x), 'expected': y}
+
+    def training_step_end(self, outputs):
+        # only use when  on dp
+        loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        logits = self.forward(x)
-        y = y.long()
-        loss = self.criterion(logits, torch.squeeze(y, 1))
-        accuracy = self.accuracy(logits, torch.squeeze(y, 1))
-        iou = self.iou(nn.LogSoftmax(logits), torch.squeeze(y, 1))
+        return {'forward': self.forward(x), 'expected': y}
+
+    def test_step_end(self, outputs):
+        loss = self.criterion(outputs['forward'], outputs['expected'])
+        accuracy = self.accuracy(outputs['forward'], outputs['expected'])
+        iou = self.iou(nn.LogSoftmax(outputs['forward']), outputs['expected'])
         logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy, 'test_iou': iou}
 
@@ -117,8 +121,9 @@ def gis_dataloader():
     pass
 
 def cityscapes_pt_objective(config):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = PyTorch_UNet(config, classes=30)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='ddp')
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou

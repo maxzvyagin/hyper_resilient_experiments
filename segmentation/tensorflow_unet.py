@@ -1,11 +1,11 @@
 ### Tensorflow UNet with Resnet34 Backbone
 import segmentation_models as sm
 import tensorflow as tf
-from tensorflow import keras
 import tensorflow_datasets as tfds
-
+import os
 
 def cityscapes_tf_objective(config, classes=20):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
