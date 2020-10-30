@@ -4,7 +4,7 @@ import torchvision
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 import statistics
-
+import os
 
 class PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=100):
@@ -92,6 +92,7 @@ class PyTorch_AlexNet(pl.LightningModule):
 
 
 def cifar_pt_objective(config):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = PyTorch_AlexNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     trainer.fit(model)
