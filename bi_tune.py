@@ -106,7 +106,7 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    tune.util.wait_for_gpu()
+    #tune.util.wait_for_gpu()
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
