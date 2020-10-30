@@ -42,7 +42,7 @@ class PyTorch_UNet(pl.LightningModule):
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
             return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
-                "~/lustre_data/", split='train', mode='fine', target_type='semantic',
+                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']))
@@ -54,7 +54,7 @@ class PyTorch_UNet(pl.LightningModule):
         if self.dataset == 'cityscapes':
             return torch.utils.data.DataLoader(
                 torchvision.datasets.Cityscapes(
-                    "~/lustre_data/", split='val', mode='fine', target_type='semantic',
+                    "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
                     transform=torchvision.transforms.ToTensor(),
                     target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']))

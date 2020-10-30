@@ -27,7 +27,8 @@ def gis_tf_objective(config, classes=1):
 #@tf.function
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
-    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False, data_dir='~/lustre_data/')
+    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+                            data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     train = list(train)
     train_x, train_y = [], []
     for i in train:
@@ -42,6 +43,5 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
-    with tf.device('/device:GPU:7'):
-        test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
-        res = cityscapes_tf_objective(test_config)
+    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
+    res = cityscapes_tf_objective(test_config)
