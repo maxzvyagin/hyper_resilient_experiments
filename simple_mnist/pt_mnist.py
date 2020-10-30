@@ -55,6 +55,8 @@ class NumberNet(pl.LightningModule):
         for res in outputs:
             yhat.extend(res[0])
             y.extend(res[1])
+        print(yhat)
+        print(y)
         yhat = torch.Tensor(yhat)
         y = torch.Tensor(y)
         #outputs = torch.cat(outputs, dim=1)
