@@ -131,7 +131,7 @@ if __name__ == "__main__":
     #ray.init(local_mode=True,  num_gpus=100)
     #ray.init(local_mode=True, num_gpus=100, num_cpus=256)
     #time.sleep(5)
-    ray.init(local_mode=True, gpus=8)
+    ray.init(local_mode=True, num_gpus=8)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
