@@ -58,16 +58,21 @@ class PyTorch_AlexNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def training_step_end(self, outputs):
+        # only use when  on dp
+        loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
-        return {'loss': loss}
+        return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
-        accuracy = self.accuracy(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def test_step_end(self, outputs):
+        loss = self.criterion(outputs['forward'], outputs['expected'])
+        accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
