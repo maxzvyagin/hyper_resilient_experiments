@@ -49,12 +49,12 @@ class NumberNet(pl.LightningModule):
 
     def training_step_end(self, outputs):
         # only use when  on dp
-        print(outputs)
+        #print(outputs)
         yhat = []
         y = []
         for res in outputs:
-            yhat.extend(res[0])
-            y.extend(res[1])
+            yhat.extend(res['forward'])
+            y.extend(res['expected'])
         print(yhat)
         print(y)
         yhat = torch.Tensor(yhat)
