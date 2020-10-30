@@ -44,6 +44,7 @@ class NumberNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
+        print(len(x))
         return {'forward': self.forward(x), 'expected': y}
         #return self.forward(x)
 
