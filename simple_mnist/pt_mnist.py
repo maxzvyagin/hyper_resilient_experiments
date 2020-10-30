@@ -49,9 +49,7 @@ class NumberNet(pl.LightningModule):
 
     def training_step_end(self, outputs):
         # only use when  on dp
-        f = open("/tmp/outputs.txt", "w")
-        f.write(outputs)
-        f.close()
+        print(outputs)
         yhat = []
         y = []
         for res in outputs:
