@@ -44,8 +44,8 @@ class NumberNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        #return {'forward': self.forward(x), 'expected': y}
-        return self.forward(x)
+        return {'forward': self.forward(x), 'expected': y}
+        #return self.forward(x)
 
 
     def training_step_end(self, outputs):
@@ -101,5 +101,5 @@ def mnist_pt_objective(config):
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = mnist_pt_objective(test_config)
