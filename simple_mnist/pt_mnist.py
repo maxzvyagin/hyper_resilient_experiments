@@ -55,6 +55,8 @@ class NumberNet(pl.LightningModule):
         for res in outputs:
             yhat.extend(res[0])
             y.extend(res[1])
+        yhat = torch.Tensor(yhat)
+        y = torch.Tensor(y)
         #outputs = torch.cat(outputs, dim=1)
         loss = self.criterion(yhat, y)
         logs = {'train_loss': loss}
