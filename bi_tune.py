@@ -177,7 +177,7 @@ if __name__ == "__main__":
         # not using a gpu because running on local
         #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                            resources_per_trial={'cpu': 64, 'gpu': 20})
+                            resources_per_trial={'cpu': 5, 'gpu': 20})
         results.append(analysis)
 
     # save results to specified csv file
