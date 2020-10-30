@@ -44,8 +44,18 @@ class NumberNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        return self.forward(x), y
+
+
+    def training_step_end(self, outputs):
+        # only use when  on dp
+        yhat = []
+        y = []
+        for res in outputs:
+            yhat.extend(res[0])
+            y.extend(res[1])
+        #outputs = torch.cat(outputs, dim=1)
+        loss = self.criterion(yhat, y)
         logs = {'train_loss': loss}
         return {'loss': loss}
 
@@ -75,7 +85,7 @@ class NumberNet(pl.LightningModule):
 def mnist_pt_objective(config):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='ddp')
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
     #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=4, auto_select_gpus=True)
     #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[8, 9, 10, 11], distributed_backend='ddp')
