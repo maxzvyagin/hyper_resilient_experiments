@@ -107,9 +107,10 @@ def model_attack(model, model_type, attack_type, config):
 
 def multi_train(config):
     #tune.util.wait_for_gpu()
-    pt_test_acc, pt_model = PT_MODEL(config)
-    pt_model.eval()
+    # pt_test_acc, pt_model = PT_MODEL(config)
+    # pt_model.eval()
     tf_test_acc, tf_model = TF_MODEL(config)
+    sys.exit()
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
