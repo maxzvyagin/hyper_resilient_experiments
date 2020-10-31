@@ -179,7 +179,7 @@ if __name__ == "__main__":
         else:
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                       metric='average_res', mode='max')
-\        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
                             resources_per_trial={'cpu': 5, 'gpu': 8})
         results.append(analysis)
