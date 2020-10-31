@@ -173,10 +173,13 @@ if __name__ == "__main__":
     for section in tqdm(space):
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
-        search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
-                                  metric='average_res', mode='max')
-        # not using a gpu because running on local
-        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        if args.model == "segmentation_cityscapes":
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size'],
+                                      metric='average_res', mode='max')
+        else:
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
+                                      metric='average_res', mode='max')
+\        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
                             resources_per_trial={'cpu': 5, 'gpu': 8})
         results.append(analysis)

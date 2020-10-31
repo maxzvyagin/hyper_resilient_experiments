@@ -3,6 +3,10 @@ import tensorflow as tf
 from tensorflow import keras
 import os
 
+from tensorflow.compat.v1 import ConfigProto
+from tensorflow.compat.v1 import InteractiveSession
+
+
 class TensorFlow_AlexNet:
     def __init__(self, config):
         # get dataset
@@ -46,6 +50,9 @@ class TensorFlow_AlexNet:
         return res_test[1]
 
 def cifar_tf_objective(config):
+    config = ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = InteractiveSession(config=config)
     model = TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
