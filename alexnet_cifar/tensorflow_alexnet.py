@@ -15,7 +15,8 @@ class TensorFlow_AlexNet:
         # define the model using alexnet architecture
         # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
         # updated to match existing pytorch model
-        strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+        #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+        strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
         with strategy.scope():
             self.model = keras.models.Sequential([
                 keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),
