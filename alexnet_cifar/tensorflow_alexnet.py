@@ -50,9 +50,9 @@ class TensorFlow_AlexNet:
         return res_test[1]
 
 def cifar_tf_objective(config):
-    config = ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = InteractiveSession(config=config)
+    gpu_config = ConfigProto()
+    gpu_config.gpu_options.allow_growth = True
+    session = InteractiveSession(config=gpu_config)
     model = TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
