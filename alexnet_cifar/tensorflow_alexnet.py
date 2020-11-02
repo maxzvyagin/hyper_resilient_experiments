@@ -53,10 +53,11 @@ def cifar_tf_objective(config):
     gpu_config = ConfigProto()
     gpu_config.gpu_options.allow_growth = True
     session = InteractiveSession(config=gpu_config)
-    model = TensorFlow_AlexNet(config)
-    model.fit()
-    accuracy = model.test()
-    return accuracy, model.model
+    with session:
+        model = session.run(TensorFlow_AlexNet(config))
+        session.run(model.fit())
+        accuracy = session.run(model.test())
+        return accuracy, model.model
 
 if __name__ == "__main__":
     test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
