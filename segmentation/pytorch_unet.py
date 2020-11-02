@@ -26,19 +26,6 @@ class PyTorch_UNet(pl.LightningModule):
         self.accuracy = pl.metrics.Accuracy()
         self.iou = pl.metrics.functional.classification.iou
 
-    # def train_dataloader(self):
-    #     train = torchvision.datasets.CocoDetection(
-    #         '~/datasets/coco/train2017', '~/datasets/coco/annotations/instances_train2017.json',
-    #         transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
-    #     return torch.utils.data.DataLoader(train, batch_size=int(self.config['batch_size']))
-    #
-    # def test_dataloader(self):
-    #     test = torchvision.datasets.CocoDetection(
-    #         '~/datasets/coco/val2017', '~/datasets/coco/annotations/instances_val2017.json',
-    #         transform=torchvision.transforms.ToTensor(), target_transform=torchvision.transforms.ToTensor())
-    #     return torch.utils.data.DataLoader(test, batch_size=int(self.config['batch_size']))
-
-
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
             return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
@@ -61,13 +48,6 @@ class PyTorch_UNet(pl.LightningModule):
         else:
             # implement gis data
             pass
-
-    # def train_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True))
-    #
-    # def test_dataloader(self):
-    #     return torch.utils.data.DataLoader(torchvision.datasets.VOCSegmentation("~/datasets/pytorch/", download=True,
-    #                                                                             image_set="val"))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -116,7 +96,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
-# load in gis data
+# load in gis data using gis_preprocess.py
 def gis_dataloader():
     pass
 
