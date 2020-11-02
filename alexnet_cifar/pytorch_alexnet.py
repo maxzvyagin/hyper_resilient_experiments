@@ -102,5 +102,5 @@ def cifar_pt_objective(config):
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 3, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = cifar_pt_objective(test_config)
