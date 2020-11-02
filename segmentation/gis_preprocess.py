@@ -520,12 +520,13 @@ def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=Fals
                 print("WARNING: no image type match, defaulting to RGB+IR")
                 windows = get_windows(pair[0], mask, large_image)
             # cache the windows
+            # need to convert to the tensorflow tensors instead of pytorch
+            for i in range(len(windows)):
+                windows[i] = (pt_to_tf(windows[i][0]),pt_to_tf(windows[i][1]))
             cache_object = open(name, "wb+")
             pickle.dump(windows, cache_object)
         samples.extend(windows)
-    # need to convert to the tensorflow tensors instead of pytorch
-    for i in len(samples):
-        samples[i] = (pt_to_tf(samples[i][0]),pt_to_tf(samples[i][1]))
+
     return tf.data.Dataset(samples)
 
 
