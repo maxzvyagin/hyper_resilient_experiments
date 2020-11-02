@@ -466,6 +466,11 @@ class PT_GISDataset(Dataset):
         res['mask'] = pulled_sample[1]
         return res
 
+def pt_to_tf(x):
+    """ Converts a pytorch tensor to a tensorflow tensor and returns it"""
+    n = x.numpy()
+    t = tf.convert_to_tensor(n)
+    return t
 
 def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     """ Returns a Tensorflow dataset of images and masks"""
@@ -518,8 +523,9 @@ def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=Fals
             cache_object = open(name, "wb+")
             pickle.dump(windows, cache_object)
         samples.extend(windows)
-    # now return samples
-    #return samples
+    # need to convert to the tensorflow tensors instead of pytorch
+    for i in len(samples):
+        samples[i] = (pt_to_tf(samples[i][0]),pt_to_tf(samples[i][1]))
     return tf.data.Dataset(samples)
 
 
