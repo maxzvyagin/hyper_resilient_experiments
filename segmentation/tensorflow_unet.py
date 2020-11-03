@@ -16,7 +16,7 @@ def cityscapes_tf_objective(config, classes=20):
         model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                       metrics=['accuracy'])
     # fit model on cityscapes data
-    (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
+    (x_train, y_train), (x_test, y_test) = get_cityscapes()
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
@@ -33,8 +33,8 @@ def gis_tf_objective(config, classes=1):
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                       metrics=['accuracy'])
-    # fit model on cityscapes data
-    (x_train, y_train), (x_test, y_test) = get_cityscapes()
+    # fit model on gis data
+    (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
