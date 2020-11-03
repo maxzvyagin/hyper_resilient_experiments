@@ -547,7 +547,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
             y_samples.extend(y)
 
     # generate test_train splits
-    (x_train, y_train), (x_test, y_test) = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
+    x_train, x_test, y_train, y_test = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
                                                             random_state=42)
     cache_object = open(name, "wb")
     pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
