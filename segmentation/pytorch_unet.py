@@ -110,7 +110,7 @@ def segmentation_pt_objective(config, dataset="cityscapes"):
     if dataset == "cityscapes":
         model = PyTorch_UNet(config, classes=30)
     else:
-        model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=4)
+        model = PyTorch_UNet(config, classes=2, dataset=dataset, in_channels=4)
     #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[4], distributed_backend='dp')
     trainer.fit(model)
