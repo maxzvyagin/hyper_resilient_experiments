@@ -17,8 +17,8 @@ class TensorFlow_AlexNet:
         # updated to match existing pytorch model
         gpus = tf.config.experimental.list_physical_devices('GPU')
         tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
-        #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
-        strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
+        strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+        #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
         with strategy.scope():
             self.model = keras.models.Sequential([
                 keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),

@@ -41,9 +41,9 @@ class PyTorch_UNet(pl.LightningModule):
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=256)
+                batch_size=int(self.config['batch_size']), num_workers=128)
         else:
-            return DataLoader(self.train_set, batch_size=self.config['batch_size'], num_workers=256)
+            return DataLoader(self.train_set, batch_size=self.config['batch_size'], num_workers=128)
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
@@ -51,9 +51,9 @@ class PyTorch_UNet(pl.LightningModule):
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=256)
+                batch_size=int(self.config['batch_size']), num_workers=128)
         else:
-            return DataLoader(self.test_set, batch_size=self.config['batch_size'], num_workers=256)
+            return DataLoader(self.test_set, batch_size=self.config['batch_size'], num_workers=128)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
