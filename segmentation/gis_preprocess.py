@@ -403,7 +403,7 @@ def augment_dataset(dataset):
     return augmented_samples
 
 
-def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=False):
+def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     """ Return PT GIS Datasets with Train Test Split"""
 
     if not img_and_shps:
@@ -481,7 +481,7 @@ def pt_to_tf(x):
     t = tf.convert_to_tensor(n)
     return t
 
-def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=False):
+def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     """ Returns a Tensorflow dataset of images and masks"""
     # Default is theta file system location
     if not img_and_shps:
