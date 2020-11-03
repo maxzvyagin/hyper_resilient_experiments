@@ -7,6 +7,7 @@ from torch import nn
 import statistics
 import numpy as np
 import os
+from gis_preprocess import TF_GISDataset
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))

@@ -527,7 +527,7 @@ def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=Fals
             pickle.dump(windows, cache_object)
         samples.extend(windows)
 
-    return tf.data.Dataset(samples)
+    return tf.data.Dataset.from_tensors(samples)
 
 
 class PT_UnlabelledGISDataset(Dataset):
