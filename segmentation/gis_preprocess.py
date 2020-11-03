@@ -17,6 +17,7 @@ import imgaug as ia
 import imgaug.augmenters as iaa
 from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 import tensorflow as tf
+from sklearn.model_selection import train_test_split
 
 
 def mask_from_shp(img_f, shp_f):
@@ -402,69 +403,75 @@ def augment_dataset(dataset):
     return augmented_samples
 
 
+def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+    """ Return PT GIS Datasets with Train Test Split"""
+
+    if not img_and_shps:
+        img_and_shps = [
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+
+    samples = []
+    for pair in img_and_shps:
+        # check if there is a cached object available
+        if theta:
+            name = "/local/scratch/"
+        else:
+            name = "/tmp/"
+        name += pair[0].split("/")[-1]
+        name += image_type
+        if large_image:
+            name += "large_image"
+        name += "PTdataset.pkl"
+        if path.exists(name):
+            try:
+                cache_object = open(name, "rb")
+                windows = pickle.load(cache_object)
+            except:
+                print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
+                sys.exit()
+        # process each pair and generate the windows
+        else:
+            mask = mask_from_shp(pair[0], pair[1])
+            if image_type == "full_channel":
+                windows = get_windows(pair[0], mask, large_image)
+            elif image_type == "rgb":
+                windows = get_rgb_windows(pair[0], mask, large_image)
+            elif image_type == "ir":
+                windows = get_ir_windows(pair[0], mask, large_image)
+            elif image_type == "hsv":
+                windows = get_hsv_windows(pair[0], mask, large_image)
+            elif image_type == "hsv_with_ir":
+                windows = get_hsv_with_ir_windows(pair[0], mask, large_image)
+            elif image_type == "veg_index":
+                windows = get_vegetation_index_windows(pair[0], mask, large_image)
+            else:
+                print("WARNING: no image type match, defaulting to RGB+IR")
+                windows = get_windows(pair[0], mask, large_image)
+            # cache the windows
+            cache_object = open(name, "wb+")
+            pickle.dump(windows, cache_object)
+        samples.extend(windows)
+        # now create test train split of samples
+        train, test = train_test_split(samples, train_size=0.8, shuffle=False, random_state=42)
+        return PT_GISDataset(train), PT_GISDataset(test)
+
+
 class PT_GISDataset(Dataset):
     """Generates a dataset for Pytorch of image and labelled mask."""
 
     # need to be given a list of tuple consisting of filepaths, (img, shp) to get pairs of windows for training
-    def __init__(self, img_and_shps, image_type, large_image=False, data_list=None, theta=True):
+    def __init__(self, data_list):
         # can be initialized from a list of samples instead of from files
-        if data_list is not None:
-            self.samples = data_list
-            self.image_type = image_type
-            return
-        else:
-            self.samples = []
-            self.image_type = image_type
-            for pair in img_and_shps:
-                # check if there is a cached object available
-                if theta:
-                    name = "/local/scratch/"
-                else:
-                    name = "/tmp/"
-                name += pair[0].split("/")[-1]
-                name += image_type
-                if large_image:
-                    name += "large_image"
-                name += "PTdataset.pkl"
-                if path.exists(name):
-                    try:
-                        cache_object = open(name, "rb")
-                        windows = pickle.load(cache_object)
-                    except:
-                        print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
-                        sys.exit()
-                # process each pair and generate the windows
-                else:
-                    mask = mask_from_shp(pair[0], pair[1])
-                    if image_type == "full_channel":
-                        windows = get_windows(pair[0], mask, large_image)
-                    elif image_type == "rgb":
-                        windows = get_rgb_windows(pair[0], mask, large_image)
-                    elif image_type == "ir":
-                        windows = get_ir_windows(pair[0], mask, large_image)
-                    elif image_type == "hsv":
-                        windows = get_hsv_windows(pair[0], mask, large_image)
-                    elif image_type == "hsv_with_ir":
-                        windows = get_hsv_with_ir_windows(pair[0], mask, large_image)
-                    elif image_type == "veg_index":
-                        windows = get_vegetation_index_windows(pair[0], mask, large_image)
-                    else:
-                        print("WARNING: no image type match, defaulting to RGB+IR")
-                        windows = get_windows(pair[0], mask, large_image)
-                    # cache the windows
-                    cache_object = open(name, "wb+")
-                    pickle.dump(windows, cache_object)
-                self.samples.extend(windows)
+        self.samples = data_list
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, index):
-        res = {}
-        pulled_sample = self.samples[index]
-        res['image'] = pulled_sample[0]
-        res['mask'] = pulled_sample[1]
-        return res
+        return self.samples[index]
 
 def pt_to_tf(x):
     """ Converts a pytorch tensor to a tensorflow tensor and returns it"""
@@ -472,7 +479,7 @@ def pt_to_tf(x):
     t = tf.convert_to_tensor(n)
     return t
 
-def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     """ Returns a Tensorflow dataset of images and masks"""
     # Default is theta file system location
     if not img_and_shps:
@@ -482,7 +489,7 @@ def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=Fals
             ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
              "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
 
-    samples = []
+    x_samples, y_samples = [], []
     for pair in img_and_shps:
         # check if there is a cached object available
         if theta:
@@ -521,68 +528,16 @@ def TF_GISDataset(img_and_shps=None, image_type="full_channel", large_image=Fals
                 windows = get_windows(pair[0], mask, large_image)
             # cache the windows
             # need to convert to the tensorflow tensors instead of pytorch
-            for i in range(len(windows)):
-                windows[i] = (pt_to_tf(windows[i][0]),pt_to_tf(windows[i][1]))
+            x, y = [], []
+            for sample in windows:
+                x.append(pt_to_tf(sample[0]))
+                y.append(pt_to_tf(sample[1]))
             cache_object = open(name, "wb+")
-            pickle.dump(windows, cache_object)
-        samples.extend(windows)
+            pickle.dump((x, y), cache_object)
+        x_samples.extend(x)
+        y_samples.extend(y)
 
-    return tf.data.Dataset.from_tensors(samples)
-
-
-class PT_UnlabelledGISDataset(Dataset):
-    """ Used for sampling for unsupervised learning purposes."""
-
-    def __init__(self, img_and_shps, image_type, large_image=False, num_images=500):
-        self.samples = []
-        self.image_type = image_type
-        for pair in img_and_shps:
-            # check if there is a cached object available
-            name = "/tmp/"
-            name += pair[0].split("/")[-1]
-            name += image_type
-            if large_image:
-                name += "large_image"
-            name += "unlabelled_dataset.pkl"
-            if path.exists(name):
-                try:
-                    cache_object = open(name, "rb")
-                    windows = pickle.load(cache_object)
-                except:
-                    print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
-                    sys.exit()
-            # process each pair and generate the windows
-            else:
-                mask = mask_from_shp(pair[0], pair[1])
-                if image_type == "full_channel":
-                    windows = get_windows(pair[0], mask, large_image, unlabelled=True, num=num_images, get_max=False,
-                                          rand=True)
-                elif image_type == "rgb":
-                    windows = get_rgb_windows(pair[0], mask, large_image, unlabelled=True, num=num_images,
-                                              get_max=False,
-                                              rand=True)
-                elif image_type == "ir":
-                    windows = get_ir_windows(pair[0], mask, large_image, unlabelled=True, num=num_images, get_max=False,
-                                             rand=True)
-                elif image_type == "hsv":
-                    windows = get_hsv_windows(pair[0], mask, large_image, unlabelled=True, num=num_images,
-                                              get_max=False)
-                elif image_type == "hsv_with_ir":
-                    windows = get_hsv_with_ir_windows(pair[0], mask, large_image, unlabelled=True, num=num_images,
-                                                      get_max=False, rand=True)
-                elif image_type == "veg_index":
-                    windows = get_vegetation_index_windows(pair[0], mask, large_image, unlabelled=True, num=num_images,
-                                                           get_max=False, rand=True)
-                else:
-                    print("WARNING: no image type match, defaulting to RGB+IR")
-                    windows = get_windows(pair[0], mask, large_image, unlabelled=True, num=num_images, rand=True)
-                # cache the windows
-                cache_object = open(name, "wb+")
-                pickle.dump(windows, cache_object)
-            self.samples.extend(windows)
-
-    def __len__(self):
-        return len(self.samples)
-
-    def __getitem__(self, index):
-        return self.samples[index]
+    # generate test_train splits
+    (x_train, y_train), (x_test, y_test) = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
+                                                            random_state=42)
+    return (x_train, y_train), (x_test, y_test)

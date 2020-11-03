@@ -7,7 +7,9 @@ from torch import nn
 import statistics
 import numpy as np
 import os
-from gis_preprocess import TF_GISDataset
+from gis_preprocess import pt_gis_train_test_split
+from torch.utils.data import DataLoader
+
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -20,35 +22,37 @@ class PyTorch_UNet(pl.LightningModule):
         self.config = config
         self.dataset = dataset
         self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
-        self.criterion = nn.CrossEntropyLoss()
+        if dataset == "gis":
+            self.criterion = nn.BCEWithLogitsLoss()
+        else:
+            self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
         self.iou = pl.metrics.functional.classification.iou
+        if self.dataset == "gis":
+            self.train_set, self.test_set = pt_gis_train_test_split()
 
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
-            return torch.utils.data.DataLoader(torchvision.datasets.Cityscapes(
+            return DataLoader(torchvision.datasets.Cityscapes(
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']))
         else:
-            # implement gis data
-            pass
+            return DataLoader(self.train_set, batch_size=self.config['batch_size'])
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
-            return torch.utils.data.DataLoader(
-                torchvision.datasets.Cityscapes(
-                    "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
-                    transform=torchvision.transforms.ToTensor(),
-                    target_transform=torchvision.transforms.ToTensor()),
+            return DataLoader(torchvision.datasets.Cityscapes(
+                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']))
         else:
-            # implement gis data
-            pass
+            return DataLoader(self.test_set, batch_size=self.config['batch_size'])
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -97,21 +101,23 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
-# load in gis data using gis_preprocess.py
-def gis_dataloader():
-    pass
 
-def cityscapes_pt_objective(config):
+def segmentation_pt_objective(config, dataset="cityscapes"):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-    model = PyTorch_UNet(config, classes=30)
+    if dataset == "cityscapes":
+        model = PyTorch_UNet(config, classes=30)
+    else:
+        model = PyTorch_UNet(config, classes=2, dataset=dataset)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou
+
 
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
     # Note that batch size is per gpu
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
-    res = cityscapes_pt_objective(test_config)
+    res = segmentation_pt_objective(test_config)
+    res = segmentation_pt_objective(test_config, dataset="gis")

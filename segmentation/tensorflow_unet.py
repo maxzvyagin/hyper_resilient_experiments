@@ -3,8 +3,25 @@ import segmentation_models as sm
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
+from gis_preprocess import tf_gis_test_train_split
 
 def cityscapes_tf_objective(config, classes=20):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+    with strategy.scope():
+        model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
+        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+        model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                      metrics=['accuracy'])
+    # fit model on cityscapes data
+    (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
+    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
+    res_test = model.evaluate(x_test, y_test)
+    return res_test[1], model
+
+
+# same model just using gis data instead
+def gis_tf_objective(config, classes=1):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
@@ -18,13 +35,6 @@ def cityscapes_tf_objective(config, classes=20):
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
 
-
-# implement this later
-def gis_tf_objective(config, classes=1):
-    pass
-
-
-#@tf.function
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
