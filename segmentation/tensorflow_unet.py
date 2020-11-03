@@ -58,6 +58,6 @@ def get_cityscapes():
 
 if __name__ == "__main__":
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
-    res = cityscapes_tf_objective(test_config)
-    print(res[0])
+    #res = cityscapes_tf_objective(test_config)
+    #print(res[0])
     res = gis_tf_objective(test_config)
