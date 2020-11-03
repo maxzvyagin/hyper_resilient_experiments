@@ -82,13 +82,13 @@ class PyTorch_UNet(pl.LightningModule):
         if self.dataset == "gis":
             loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
             accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected'])
-            iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
+            #iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
         else:
             loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
             accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1))
-            iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
-        logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
-        return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy, 'test_iou': iou}
+            #iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
+        logs = {'test_loss': loss, 'test_accuracy': accuracy}
+        return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
     def test_epoch_end(self, outputs):
         loss = []
@@ -102,11 +102,11 @@ class PyTorch_UNet(pl.LightningModule):
             accuracy.append(float(x['test_accuracy']))
         avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
-        iou = []
-        for x in outputs:
-            iou.append(float(x['test_iou']))
-        avg_iou = statistics.mean(iou)
-        self.test_iou = avg_iou
+        # iou = []
+        # for x in outputs:
+        #     iou.append(float(x['test_iou']))
+        # avg_iou = statistics.mean(iou)
+        # self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
