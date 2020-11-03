@@ -41,9 +41,9 @@ class PyTorch_UNet(pl.LightningModule):
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']))
+                batch_size=int(self.config['batch_size']), num_workers=256)
         else:
-            return DataLoader(self.train_set, batch_size=self.config['batch_size'])
+            return DataLoader(self.train_set, batch_size=self.config['batch_size'], num_workers=256)
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
@@ -51,9 +51,9 @@ class PyTorch_UNet(pl.LightningModule):
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']))
+                batch_size=int(self.config['batch_size']), num_workers=256)
         else:
-            return DataLoader(self.test_set, batch_size=self.config['batch_size'])
+            return DataLoader(self.test_set, batch_size=self.config['batch_size'], num_workers=256)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -122,6 +122,12 @@ def segmentation_pt_objective(config, dataset="cityscapes"):
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou
+
+def cityscapes_pt_objective(config):
+    return segmentation_pt_objective(config, dataset="cityscapes")
+
+def gis_pt_pbjective(config):
+    return segmentation_pt_objective(config, dataset="gis")
 
 
 ### two different objective functions, one for cityscapes and one for GIS

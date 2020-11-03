@@ -15,7 +15,7 @@ class NumberNet(pl.LightningModule):
             nn.ReLU(),
             nn.Dropout(config['dropout']),
             nn.Linear(128, 10))
-            ## nn.Softmax())
+        ## nn.Softmax())
         # not include softmax because it's included in the Cross Entropy Loss Function
         self.criterion = nn.CrossEntropyLoss()
         self.config = config
@@ -27,13 +27,13 @@ class NumberNet(pl.LightningModule):
         return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=True,
                                                                       transform=torchvision.transforms.ToTensor(),
                                                                       target_transform=None, download=True),
-                                           batch_size=int(self.config['batch_size']))
+                                           batch_size=int(self.config['batch_size']), num_workers=256)
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=False,
                                                                       transform=torchvision.transforms.ToTensor(),
                                                                       target_transform=None, download=True),
-                                           batch_size=int(self.config['batch_size']))
+                                           batch_size=int(self.config['batch_size']), num_workers=256)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -81,9 +81,9 @@ def mnist_pt_objective(config):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = NumberNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=4, auto_select_gpus=True)
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[8, 9, 10, 11], distributed_backend='ddp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=4, auto_select_gpus=True)
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[8, 9, 10, 11], distributed_backend='ddp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model

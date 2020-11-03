@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 import statistics
 import os
 
+
 class PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=100):
         super(PyTorch_AlexNet, self).__init__()
@@ -41,13 +42,13 @@ class PyTorch_AlexNet(pl.LightningModule):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
                                                         transform=torchvision.transforms.ToTensor(),
                                                         target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']))
+                          batch_size=int(self.config['batch_size']), num_workers=256)
 
     def test_dataloader(self):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                         transform=torchvision.transforms.ToTensor(),
                                                         target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']))
+                          batch_size=int(self.config['batch_size']), num_workers=256)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -95,7 +96,7 @@ def cifar_pt_objective(config):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = PyTorch_AlexNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[1, 2, 3, 4], distributed_backend='dp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[1, 2, 3, 4], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model

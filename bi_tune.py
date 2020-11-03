@@ -153,6 +153,10 @@ if __name__ == "__main__":
             PT_MODEL = pytorch_unet.cityscapes_pt_objective
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
             NUM_CLASSES = 30
+        elif args.model == "segmentation_gis":
+            PT_MODEL = pytorch_unet.gis_pt_pbjective
+            TF_MODEL = tensorflow_unet.gis_tf_objective
+            NUM_CLASSES = 1
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, or segmentation_cityscapes.\n")
@@ -186,7 +190,7 @@ if __name__ == "__main__":
                                       metric='average_res', mode='max')
         #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                            resources_per_trial={'cpu': 5, 'gpu': 8})
+                            resources_per_trial={'cpu': 256, 'gpu': 8})
         results.append(analysis)
 
     # save results to specified csv file
