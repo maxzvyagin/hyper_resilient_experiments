@@ -17,11 +17,11 @@ def custom_transform(img):
 
 ### definition of PyTorch Lightning module in order to run everything
 class PyTorch_UNet(pl.LightningModule):
-    def __init__(self, config, classes, dataset='cityscapes'):
+    def __init__(self, config, classes, dataset='cityscapes', in_channels=3):
         super(PyTorch_UNet, self).__init__()
         self.config = config
         self.dataset = dataset
-        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes)
+        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels)
         if dataset == "gis":
             self.criterion = nn.BCEWithLogitsLoss()
         else:
@@ -107,7 +107,7 @@ def segmentation_pt_objective(config, dataset="cityscapes"):
     if dataset == "cityscapes":
         model = PyTorch_UNet(config, classes=30)
     else:
-        model = PyTorch_UNet(config, classes=2, dataset=dataset)
+        model = PyTorch_UNet(config, classes=2, dataset=dataset, in_channels=4)
     #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[4], distributed_backend='dp')
     trainer.fit(model)
