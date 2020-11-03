@@ -505,7 +505,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
             name = "/local/scratch/"
         else:
             name = "/tmp/"
-        name += pair[0].split("/")[-1]
+        name += "gis_data"
         name += image_type
         if large_image:
             name += "large_image"
@@ -513,7 +513,8 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
         if path.exists(name):
             try:
                 cache_object = open(name, "rb")
-                windows = pickle.load(cache_object)
+                (x_train, y_train), (x_test, y_test) = pickle.load(cache_object)
+                return (x_train, y_train), (x_test, y_test)
             except:
                 print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
                 sys.exit()
@@ -541,12 +542,12 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
             for sample in windows:
                 x.append(pt_to_tf(sample[0]))
                 y.append(pt_to_tf(sample[1]))
-            cache_object = open(name, "wb")
-            pickle.dump((x, y), cache_object)
-        x_samples.extend(x)
-        y_samples.extend(y)
+            x_samples.extend(x)
+            y_samples.extend(y)
 
     # generate test_train splits
     (x_train, y_train), (x_test, y_test) = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
                                                             random_state=42)
+    cache_object = open(name, "wb")
+    pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
     return (x_train, y_train), (x_test, y_test)
