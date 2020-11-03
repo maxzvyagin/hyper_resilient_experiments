@@ -169,7 +169,7 @@ if __name__ == "__main__":
     if args.model == "segmentation_cityscapes":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
-                           (1, 2)]  # batch size
+                           (1, 4)]  # batch size
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
