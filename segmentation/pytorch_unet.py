@@ -82,11 +82,11 @@ class PyTorch_UNet(pl.LightningModule):
         if self.dataset == "gis":
             loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
             accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected'])
-            iou = self.iou(nn.LogSoftmax(outputs['forward'].squeeze(1)), outputs['expected'])
+            iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
         else:
             loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
             accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1))
-            iou = self.iou(nn.LogSoftmax(outputs['forward']), outputs['expected'].squeeze(1))
+            iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
         logs = {'test_loss': loss, 'test_accuracy': accuracy, 'test_iou': iou}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy, 'test_iou': iou}
 
