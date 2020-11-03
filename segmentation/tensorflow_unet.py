@@ -8,8 +8,9 @@ from gis_preprocess import tf_gis_test_train_split
 def cityscapes_tf_objective(config, classes=20):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
-    #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes)
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
@@ -26,8 +27,7 @@ def cityscapes_tf_objective(config, classes=20):
 def gis_tf_objective(config, classes=1):
     os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
-    #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:6"])
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
