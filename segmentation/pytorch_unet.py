@@ -7,9 +7,10 @@ from torch import nn
 import statistics
 import numpy as np
 import os
+import sys
+sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
-
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))

@@ -3,6 +3,8 @@ import segmentation_models as sm
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
+import sys
+sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
 def cityscapes_tf_objective(config, classes=20):
