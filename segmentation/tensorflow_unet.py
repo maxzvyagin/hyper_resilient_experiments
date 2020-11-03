@@ -6,8 +6,8 @@ import os
 from gis_preprocess import tf_gis_test_train_split
 
 def cityscapes_tf_objective(config, classes=20):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '4'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
     with strategy.scope():
@@ -24,8 +24,8 @@ def cityscapes_tf_objective(config, classes=20):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-    os.environ['CUDA_VISIBLE_DEVICES'] = '4'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
     with strategy.scope():
