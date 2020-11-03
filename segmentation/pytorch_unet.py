@@ -68,7 +68,7 @@ class PyTorch_UNet(pl.LightningModule):
     def training_step_end(self, outputs):
         # only use when  on dp
         if self.dataset == "gis":
-            loss = self.criterion(outputs['forward'], outputs['expected'].long())
+            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'].long())
         else:
             loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
         logs = {'train_loss': loss}
