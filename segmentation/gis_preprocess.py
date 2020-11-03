@@ -420,7 +420,7 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
         #     name = "/local/scratch/"
         # else:
         #     name = "/tmp/"
-        name = "/tmp/"
+        name = "/tmp/mzvyagin/"
         name += "gis_data"
         name += image_type
         if large_image:
@@ -499,7 +499,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
         #     name = "/local/scratch/"
         # else:
         #     name = "/tmp/"
-        name = "/tmp/"
+        name = "/tmp/mzvyagin/"
         name += "gis_data"
         name += image_type
         if large_image:
