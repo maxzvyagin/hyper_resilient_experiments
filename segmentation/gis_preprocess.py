@@ -403,7 +403,7 @@ def augment_dataset(dataset):
     return augmented_samples
 
 
-def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=False):
     """ Return PT GIS Datasets with Train Test Split"""
 
     if not img_and_shps:
@@ -455,7 +455,7 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
                 print("WARNING: no image type match, defaulting to RGB+IR")
                 windows = get_windows(pair[0], mask, large_image)
             # cache the windows
-            cache_object = open(name, "wb+")
+            cache_object = open(name, "wb")
             pickle.dump(windows, cache_object)
         samples.extend(windows)
         # now create test train split of samples
@@ -483,7 +483,7 @@ def pt_to_tf(x):
     t = tf.convert_to_tensor(n)
     return t
 
-def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=False):
     """ Returns a Tensorflow dataset of images and masks"""
     # Default is theta file system location
     if not img_and_shps:
@@ -541,7 +541,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
             for sample in windows:
                 x.append(pt_to_tf(sample[0]))
                 y.append(pt_to_tf(sample[1]))
-            cache_object = open(name, "wb+")
+            cache_object = open(name, "wb")
             pickle.dump((x, y), cache_object)
         x_samples.extend(x)
         y_samples.extend(y)
