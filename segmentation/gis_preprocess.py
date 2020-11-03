@@ -424,7 +424,7 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
             name = "/local/scratch/"
         else:
             name = "/tmp/"
-        name += pair[0].split("/")[-1]
+        name += "gis_data"
         name += image_type
         if large_image:
             name += "large_image"
@@ -432,7 +432,8 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
         if path.exists(name):
             try:
                 cache_object = open(name, "rb")
-                windows = pickle.load(cache_object)
+                train, test = pickle.load(cache_object)
+                return PT_GISDataset(train), PT_GISDataset(test)
             except:
                 print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
                 sys.exit()
@@ -455,11 +456,11 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
                 print("WARNING: no image type match, defaulting to RGB+IR")
                 windows = get_windows(pair[0], mask, large_image)
             # cache the windows
-            cache_object = open(name, "wb")
-            pickle.dump(windows, cache_object)
         samples.extend(windows)
         # now create test train split of samples
         train, test = train_test_split(samples, train_size=0.8, shuffle=False, random_state=42)
+        cache_object = open(name, "wb")
+        pickle.dump((train, test), cache_object)
         return PT_GISDataset(train), PT_GISDataset(test)
 
 
