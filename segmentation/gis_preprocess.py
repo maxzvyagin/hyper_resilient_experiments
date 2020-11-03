@@ -481,6 +481,7 @@ class PT_GISDataset(Dataset):
 def pt_to_tf(x):
     """ Converts a pytorch tensor to a tensorflow tensor and returns it"""
     n = x.numpy()
+    n = np.swapaxes(n, 0, -1)
     t = tf.convert_to_tensor(n)
     return t
 
