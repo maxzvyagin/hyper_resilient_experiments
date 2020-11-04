@@ -16,7 +16,7 @@ class NumberNet(pl.LightningModule):
             nn.Dropout(config['dropout']),
             nn.Linear(128, 10))
         ## nn.Softmax())
-        # not include softmax because it's included in the Cross Entropy Loss Function
+        # not including softmax because it's included in the Cross Entropy Loss Function
         self.criterion = nn.CrossEntropyLoss()
         self.config = config
         self.test_loss = None

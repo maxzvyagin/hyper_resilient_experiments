@@ -140,6 +140,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
+        args.model = "mnist"
     else:
         if args.model == "alexnet_cifar100":
             PT_MODEL = pytorch_alexnet.cifar_pt_objective
