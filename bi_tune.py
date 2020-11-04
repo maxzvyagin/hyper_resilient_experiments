@@ -44,23 +44,23 @@ def model_attack(model, model_type, attack_type, config):
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=config['batch_size'])
+                              batch_size=int(config['batch_size']))
         # cityscapes
         elif NUM_CLASSES == 30:
             data = DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
+                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=config['batch_size'])
+                batch_size=int(config['batch_size']))
         # gis
         elif NUM_CLASSES == 1:
             train_set, test_set = pt_gis_train_test_split()
-            data = DataLoader(test_set, batch_size=config['batch_size'])
+            data = DataLoader(test_set, batch_size=int(config['batch_size']))
         else:
             data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
                                                          transform=torchvision.transforms.ToTensor(),
                                                          target_transform=None, download=True),
-                              batch_size=config['batch_size'])
+                              batch_size=int(config['batch_size']))
         images, labels = [], []
         for sample in data:
             images.append(sample[0].to(device))
@@ -71,19 +71,19 @@ def model_attack(model, model_type, attack_type, config):
         # cifar
         if NUM_CLASSES == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(config['batch_size']))
+            data = list(test.batch(int(config['batch_size'])))
         # cityscapes
         elif NUM_CLASSES == 30:
             (x_train, y_train), (x_test, y_test) = get_cityscapes()
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size']))
+            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # gis
         elif NUM_CLASSES == 1:
             (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size']))
+            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # mnist
         else:
             train, test = tfds.load('mnist', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(config['batch_size']))
+            data = list(test.batch(int(config['batch_size'])))
         images, labels = [], []
         for sample in data:
             fixed_image = (np.array(sample[0]) / 255.0).astype('float32')
