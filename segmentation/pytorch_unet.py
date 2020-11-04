@@ -122,7 +122,7 @@ class PyTorch_UNet(pl.LightningModule):
 
 
 def segmentation_pt_objective(config, dataset="cityscapes"):
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     if dataset == "cityscapes":
         model = PyTorch_UNet(config, classes=30)
     else:
