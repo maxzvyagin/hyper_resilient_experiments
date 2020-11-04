@@ -37,7 +37,7 @@ def gis_tf_objective(config, classes=1):
     with strategy.scope():
         model = tf.keras.Sequential()
         model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
-                          activation="identity"))
+                          activation=None))
         model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
@@ -69,6 +69,6 @@ def get_cityscapes():
 
 if __name__ == "__main__":
     test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1}
-    res = cityscapes_tf_objective(test_config)
+    res = gis_tf_objective(test_config)
     #print(res[0])
     #res = gis_tf_objective(test_config)
