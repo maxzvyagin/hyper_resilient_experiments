@@ -27,7 +27,7 @@ from concurrent import futures
 import time
 from torch.utils.data import DataLoader
 from segmentation import gis_preprocess
-from gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 from segmentation.tensorflow_unet import get_cityscapes
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
