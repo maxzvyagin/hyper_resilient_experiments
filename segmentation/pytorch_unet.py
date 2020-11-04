@@ -8,9 +8,11 @@ import statistics
 import numpy as np
 import os
 import sys
+
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
+
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -22,7 +24,9 @@ class PyTorch_UNet(pl.LightningModule):
         super(PyTorch_UNet, self).__init__()
         self.config = config
         self.dataset = dataset
-        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels, activation=None)
+        # sigmoid is part of BCE with logits loss
+        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels,
+                              activation=None)
         if dataset == "gis":
             self.criterion = nn.BCEWithLogitsLoss()
         else:
@@ -93,11 +97,11 @@ class PyTorch_UNet(pl.LightningModule):
         if self.dataset == "gis":
             loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
             accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected'])
-            #iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
+            # iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
         else:
             loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
             accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1))
-            #iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
+            # iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
@@ -122,19 +126,21 @@ class PyTorch_UNet(pl.LightningModule):
 
 
 def segmentation_pt_objective(config, dataset="cityscapes"):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     if dataset == "cityscapes":
         model = PyTorch_UNet(config, classes=30)
     else:
         model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=4)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
-    #trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[4], distributed_backend='dp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[4], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model, model.test_iou
 
+
 def cityscapes_pt_objective(config):
     return segmentation_pt_objective(config, dataset="cityscapes")
+
 
 def gis_pt_pbjective(config):
     return segmentation_pt_objective(config, dataset="gis")
@@ -146,4 +152,4 @@ if __name__ == "__main__":
     # Note that batch size is per gpu
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
     res = segmentation_pt_objective(test_config)
-    #res = segmentation_pt_objective(test_config, dataset="gis")
+    # res = segmentation_pt_objective(test_config, dataset="gis")

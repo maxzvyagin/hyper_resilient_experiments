@@ -4,12 +4,14 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
 import sys
+
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
+
 def cityscapes_tf_objective(config, classes=30):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
@@ -29,16 +31,18 @@ def cityscapes_tf_objective(config, classes=30):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     gpus = tf.config.experimental.list_physical_devices('GPU')
     tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
-        model = tf.keras.Sequential()
-        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
-                          activation=None))
-        model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
+        model = sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
+                        activation="sigmoid")
+        # model = tf.keras.Sequential()
+        # model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
+        #                   activation="sigmoid"))
+        # model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
@@ -47,6 +51,7 @@ def gis_tf_objective(config, classes=1):
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
+
 
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
@@ -70,5 +75,5 @@ def get_cityscapes():
 if __name__ == "__main__":
     test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1}
     res = gis_tf_objective(test_config)
-    #print(res[0])
-    #res = gis_tf_objective(test_config)
+    # print(res[0])
+    # res = gis_tf_objective(test_config)
