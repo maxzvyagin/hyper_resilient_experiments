@@ -176,6 +176,7 @@ if __name__ == "__main__":
                            (10, 100),  # epochs
                            (10, 1000)]  # batch size
     else:
+        print("in else")
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
