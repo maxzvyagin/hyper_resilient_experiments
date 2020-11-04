@@ -10,7 +10,8 @@ from tensorflow.compat.v1 import InteractiveSession
 class TensorFlow_AlexNet:
     def __init__(self, config):
         # get dataset
-        os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+        #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
+        os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
         # define the model using alexnet architecture
         # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
