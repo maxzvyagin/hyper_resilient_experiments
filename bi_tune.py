@@ -176,8 +176,6 @@ if __name__ == "__main__":
                            (10, 100),  # epochs
                            (10, 1000)]  # batch size
     else:
-        print("in else")
-        sys.exit()
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
@@ -189,7 +187,7 @@ if __name__ == "__main__":
     for section in tqdm(space):
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
-        if args.model == "segmentation_cityscapes" or "segmentation_gis":
+        if args.model == "segmentation_cityscapes" or args.model == "segmentation_gis":
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size'],
                                       metric='average_res', mode='max')
         else:
