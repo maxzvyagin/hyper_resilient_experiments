@@ -37,8 +37,13 @@ class PyTorch_UNet(pl.LightningModule):
 
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
+            # return DataLoader(torchvision.datasets.Cityscapes(
+            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
+            #     transform=torchvision.transforms.ToTensor(),
+            #     target_transform=torchvision.transforms.ToTensor()),
+            #     batch_size=int(self.config['batch_size']), num_workers=10)
             return DataLoader(torchvision.datasets.Cityscapes(
-                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
+                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=10)
@@ -47,8 +52,13 @@ class PyTorch_UNet(pl.LightningModule):
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
+            # return DataLoader(torchvision.datasets.Cityscapes(
+            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
+            #     transform=torchvision.transforms.ToTensor(),
+            #     target_transform=torchvision.transforms.ToTensor()),
+            #     batch_size=int(self.config['batch_size']), num_workers=10)
             return DataLoader(torchvision.datasets.Cityscapes(
-                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
+                "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=10)
