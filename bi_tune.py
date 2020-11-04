@@ -174,7 +174,7 @@ if __name__ == "__main__":
     elif args.model == "segmentation_gis":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
-                           (10, 1000)]  # batch size
+                           (10, 500)]  # batch size
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
