@@ -22,7 +22,7 @@ class PyTorch_UNet(pl.LightningModule):
         super(PyTorch_UNet, self).__init__()
         self.config = config
         self.dataset = dataset
-        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels)
+        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels, activation=None)
         if dataset == "gis":
             self.criterion = nn.BCEWithLogitsLoss()
         else:
