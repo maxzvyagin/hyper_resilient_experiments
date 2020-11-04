@@ -4,6 +4,7 @@ import torchvision
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 import statistics
+import os
 
 
 class PyTorch_AlexNet(pl.LightningModule):
@@ -41,13 +42,13 @@ class PyTorch_AlexNet(pl.LightningModule):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
                                                         transform=torchvision.transforms.ToTensor(),
                                                         target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']))
+                          batch_size=int(self.config['batch_size']), num_workers=10)
 
     def test_dataloader(self):
         return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                         transform=torchvision.transforms.ToTensor(),
                                                         target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']))
+                          batch_size=int(self.config['batch_size']), num_workers=10)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -58,16 +59,21 @@ class PyTorch_AlexNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def training_step_end(self, outputs):
+        # only use when  on dp
+        loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
-        return {'loss': loss}
+        return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
-        accuracy = self.accuracy(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def test_step_end(self, outputs):
+        loss = self.criterion(outputs['forward'], outputs['expected'])
+        accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
@@ -87,13 +93,15 @@ class PyTorch_AlexNet(pl.LightningModule):
 
 
 def cifar_pt_objective(config):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = PyTorch_AlexNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[1, 2, 3, 4], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 64, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = cifar_pt_objective(test_config)

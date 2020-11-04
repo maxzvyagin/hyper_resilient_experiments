@@ -3,6 +3,7 @@ import pytorch_lightning as pl
 import torchvision
 import torch
 import statistics
+import os
 
 
 class NumberNet(pl.LightningModule):
@@ -14,8 +15,8 @@ class NumberNet(pl.LightningModule):
             nn.ReLU(),
             nn.Dropout(config['dropout']),
             nn.Linear(128, 10))
-            ## nn.Softmax())
-        # not include softmax because it's included in the Cross Entropy Loss Function
+        ## nn.Softmax())
+        # not including softmax because it's included in the Cross Entropy Loss Function
         self.criterion = nn.CrossEntropyLoss()
         self.config = config
         self.test_loss = None
@@ -26,13 +27,13 @@ class NumberNet(pl.LightningModule):
         return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=True,
                                                                       transform=torchvision.transforms.ToTensor(),
                                                                       target_transform=None, download=True),
-                                           batch_size=int(self.config['batch_size']))
+                                           batch_size=int(self.config['batch_size']), num_workers=10)
 
     def test_dataloader(self):
         return torch.utils.data.DataLoader(torchvision.datasets.MNIST("~/resiliency/", train=False,
                                                                       transform=torchvision.transforms.ToTensor(),
                                                                       target_transform=None, download=True),
-                                           batch_size=int(self.config['batch_size']))
+                                           batch_size=int(self.config['batch_size']), num_workers=10)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
@@ -43,16 +44,21 @@ class NumberNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def training_step_end(self, outputs):
+        # only use when  on dp
+        loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
-        return {'loss': loss}
+        return {'loss': loss, 'logs': logs}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
-        accuracy = self.accuracy(logits, y)
+        return {'forward': self.forward(x), 'expected': y}
+
+    def test_step_end(self, outputs):
+        loss = self.criterion(outputs['forward'], outputs['expected'])
+        accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
 
@@ -72,8 +78,12 @@ class NumberNet(pl.LightningModule):
 
 
 def mnist_pt_objective(config):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=1, auto_select_gpus=True)
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=4, auto_select_gpus=True)
+    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[8, 9, 10, 11], distributed_backend='ddp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model

@@ -6,6 +6,7 @@ from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from segmentation import pytorch_unet, tensorflow_unet
 import argparse
 from hyperspace import create_hyperspace
+import ray
 from ray import tune
 from ray.tune.suggest.skopt import SkOptSearch
 from skopt import Optimizer
@@ -13,6 +14,7 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import sys
+sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 import tensorflow as tf
 import torch
 import torchvision
@@ -20,6 +22,9 @@ from torch.utils.data import DataLoader
 import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
+import os
+from concurrent import futures
+import time
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -102,10 +107,13 @@ def model_attack(model, model_type, attack_type, config):
 
 
 def multi_train(config):
-    config = {'epochs': 1, 'batch_size': 64, 'learning_rate': .001, 'dropout': .5}
-    pt_test_acc, pt_model = PT_MODEL(config)
-    pt_model.eval()
-    tf_test_acc, tf_model = TF_MODEL(config)
+    # simultaneous model training on 4 gpus each
+    with futures.ThreadPoolExecutor() as executor:
+        pt_thread = executor.submit(PT_MODEL, config)
+        tf_thread = executor.submit(TF_MODEL, config)
+        pt_test_acc, pt_model = pt_thread.result()
+        pt_model.eval()
+        tf_test_acc, tf_model = tf_thread.result()
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc, 'tf_test_acc': tf_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
@@ -115,6 +123,7 @@ def multi_train(config):
             else:
                 acc = model_attack(tf_model, model_type, attack_type, config)
             search_results[model_type + "_" + attack_type + "_" + "accuracy"] = acc
+    #print(search_results)
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
     search_results['average_res'] = average_res
@@ -123,6 +132,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
+    ray.init(local_mode=True)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
@@ -130,6 +140,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
+        args.model = "mnist"
     else:
         if args.model == "alexnet_cifar100":
             PT_MODEL = pytorch_alexnet.cifar_pt_objective
@@ -137,36 +148,57 @@ if __name__ == "__main__":
             NUM_CLASSES = 100
         ## definition of gans as the model type
         elif args.model == "gan":
-            pass
+            print("Error: GAN not implemented.")
+            sys.exit()
         elif args.model == "segmentation_cityscapes":
             PT_MODEL = pytorch_unet.cityscapes_pt_objective
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 20
+            NUM_CLASSES = 30
+        elif args.model == "segmentation_gis":
+            PT_MODEL = pytorch_unet.gis_pt_pbjective
+            TF_MODEL = tensorflow_unet.gis_tf_objective
+            NUM_CLASSES = 1
         else:
-            print("\n ERROR: Unknown model type. Please try again. Must be one of: mnist, alexnet_cifar100, or gan.\n")
+            print("\n ERROR: Unknown model type. Please try again. "
+                  "Must be one of: mnist, alexnet_cifar100, or segmentation_cityscapes.\n")
             sys.exit()
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
     else:
         TRIALS = int(args.trials)
     # Defining the hyperspace
-    hyperparameters = [(0.00001, 0.1),  # learning_rate
-                       (0.2, 0.9),  # dropout
-                       (10, 100),  # epochs
-                       (10, 1000)]  # batch size
+    if args.model == "segmentation_cityscapes":
+        hyperparameters = [(0.00001, 0.1),  # learning_rate
+                           (10, 100),  # epochs
+                           (1, 4)]  # batch size
+    elif args.model == "segmentation_gis":
+        hyperparameters = [(0.00001, 0.1),  # learning_rate
+                           (10, 100),  # epochs
+                           (10, 1000)]  # batch size
+    else:
+        hyperparameters = [(0.00001, 0.1),  # learning_rate
+                           (0.2, 0.9),  # dropout
+                           (10, 100),  # epochs
+                           (10, 1000)]  # batch size
     space = create_hyperspace(hyperparameters)
 
-    # Aggregating the results
+    # Run and aggregate the results
     results = []
     for section in tqdm(space):
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
-        search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
-                                  metric='average_res', mode='max')
-        # not using a gpu because running on local
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 1})
+        if args.model == "segmentation_cityscapes" or "segmentation_gis":
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size'],
+                                      metric='average_res', mode='max')
+        else:
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
+                                      metric='average_res', mode='max')
+        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
+                            resources_per_trial={'cpu': 256, 'gpu': 8})
         results.append(analysis)
 
+    # save results to specified csv file
     all_pt_results = results[0].results_df
     for i in range(1, len(results)):
         all_pt_results = all_pt_results.append(results[i].results_df)
