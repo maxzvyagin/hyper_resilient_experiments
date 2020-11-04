@@ -25,7 +25,9 @@ from tqdm import tqdm
 import os
 from concurrent import futures
 import time
-
+from torch.utils.data import DataLoader
+from gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+from segmentation.tensorflow_unet import get_cityscapes
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
@@ -36,16 +38,28 @@ def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
+        # cifar
         if NUM_CLASSES == 100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
+                              batch_size=config['batch_size'])
+        # cityscapes
+        elif NUM_CLASSES == 30:
+            data = DataLoader(torchvision.datasets.Cityscapes(
+                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+                batch_size=config['batch_size'])
+        # gis
+        elif NUM_CLASSES == 1:
+            train_set, test_set = pt_gis_train_test_split()
+            data = DataLoader(test_set, batch_size=config['batch_size'])
         else:
             data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
                                                          transform=torchvision.transforms.ToTensor(),
                                                          target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
+                              batch_size=config['batch_size'])
         images, labels = [], []
         for sample in data:
             images.append(sample[0].to(device))
@@ -53,9 +67,19 @@ def model_attack(model, model_type, attack_type, config):
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
+        # cifar
         if NUM_CLASSES == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(config['batch_size']))
+        # cityscapes
+        elif NUM_CLASSES == 30:
+            (x_train, y_train), (x_test, y_test) = get_cityscapes()
+            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size']))
+        # gis
+        elif NUM_CLASSES == 1:
+            (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
+            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size']))
+        # mnist
         else:
             train, test = tfds.load('mnist', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(config['batch_size']))
