@@ -46,7 +46,7 @@ class TensorFlow_AlexNet:
 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-                             batch_size=self.config['batch_size'])
+                             batch_size=int(self.config['batch_size']))
         return res
 
     def test(self):
