@@ -25,7 +25,7 @@ def mnist_tf_objective(config):
                       loss='sparse_categorical_crossentropy',
                       metrics=['accuracy'])
 
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
+    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=int(config['batch_size']))
     res_test = model.evaluate(x_test, y_test)
     return (res_test[1], model)
 
