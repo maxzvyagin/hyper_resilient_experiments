@@ -5,6 +5,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 import statistics
 import os
+import argparse
 
 
 class PyTorch_AlexNet(pl.LightningModule):
@@ -103,5 +104,12 @@ def cifar_pt_objective(config):
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--batch")
+    args = parser.parse_args()
+    if args.batch:
+        batch = args.batch
+    else:
+        batch = 64
+    test_config = {'batch_size': batch, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = cifar_pt_objective(test_config)
