@@ -204,7 +204,7 @@ if __name__ == "__main__":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
-                           (10, 100)]  # batch size
+                           (10, 250)]  # batch size
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
