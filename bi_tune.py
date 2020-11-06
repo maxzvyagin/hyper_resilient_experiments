@@ -215,6 +215,9 @@ if __name__ == "__main__":
     # Run and aggregate the results
     results = []
     i = 0
+    error_name = args.out.split(".csv")[0]
+    error_name += "_error.txt"
+    error_file = open(error_name, "w")
     for section in tqdm(space):
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
@@ -229,7 +232,10 @@ if __name__ == "__main__":
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
                                 resources_per_trial={'cpu': 256, 'gpu': 8})
             results.append(analysis)
-        except:
+        except Exception as e:
+            error_file.write("Unable to complete trials in space "+str(i)+"... Continuing with other trials.")
+            error_file.write(str(e))
+            error_file.write("\n\n")
             print("Unable to complete trials in space "+str(i)+"... Continuing with other trials.")
         i += 1
 
