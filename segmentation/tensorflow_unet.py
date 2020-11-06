@@ -14,6 +14,7 @@ def cityscapes_tf_objective(config, classes=30):
     # os.environ['CUDA_VISIBLE_DEVICES'] = '4'
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
+    tf.random.set_seed(0)
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = tf.keras.Sequential()

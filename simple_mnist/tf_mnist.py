@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 
 def mnist_tf_objective(config):
+    tf.random.set_seed(0)
     #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
     mnist = tf.keras.datasets.mnist
 

@@ -9,6 +9,7 @@ from tensorflow.compat.v1 import InteractiveSession
 
 class TensorFlow_AlexNet:
     def __init__(self, config):
+        tf.random.set_seed(0)
         # get dataset
         #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
         #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'

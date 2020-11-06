@@ -36,7 +36,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_accuracy = None
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
-        self.iou = pl.metrics.functional.classification.iou
+        #self.iou = pl.metrics.functional.classification.iou
         if self.dataset == "gis":
             self.train_set, self.test_set = pt_gis_train_test_split()
 
