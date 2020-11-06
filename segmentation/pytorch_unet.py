@@ -135,7 +135,7 @@ def segmentation_pt_objective(config, dataset="cityscapes"):
     # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[4], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy, model.model, model.test_iou
+    return model.test_accuracy, model.model
 
 
 def cityscapes_pt_objective(config):
