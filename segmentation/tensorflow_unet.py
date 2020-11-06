@@ -48,7 +48,7 @@ def gis_tf_objective(config, classes=1):
                       metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
+    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=int(config['batch_size']))
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
 
