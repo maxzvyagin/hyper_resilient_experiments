@@ -204,7 +204,7 @@ if __name__ == "__main__":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
-                           (10, 250)]  # batch size
+                           (10, 100)]  # batch size
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
@@ -214,6 +214,7 @@ if __name__ == "__main__":
 
     # Run and aggregate the results
     results = []
+    i = 0
     for section in tqdm(space):
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
@@ -224,9 +225,13 @@ if __name__ == "__main__":
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                       metric='average_res', mode='max')
         #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
-        analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                            resources_per_trial={'cpu': 256, 'gpu': 8})
-        results.append(analysis)
+        try:
+            analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
+                                resources_per_trial={'cpu': 256, 'gpu': 8})
+            results.append(analysis)
+        except:
+            print("Unable to complete trials in space "+str(i)+"... Continuing with other trials.")
+        i += 1
 
     # save results to specified csv file
     all_pt_results = results[0].results_df
