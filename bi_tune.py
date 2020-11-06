@@ -14,6 +14,7 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import sys
+
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 import tensorflow as tf
 import torch
@@ -29,11 +30,13 @@ from torch.utils.data import DataLoader
 from segmentation import gis_preprocess
 from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 from segmentation.tensorflow_unet import get_cityscapes
+
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 TRIALS = 25
+
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -148,7 +151,7 @@ def multi_train(config):
             else:
                 acc = model_attack(tf_model, model_type, attack_type, config)
             search_results[model_type + "_" + attack_type + "_" + "accuracy"] = acc
-    #print(search_results)
+    # print(search_results)
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
     search_results['average_res'] = average_res
@@ -157,7 +160,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
-    #ray.init(local_mode=True)
+    # ray.init(local_mode=True)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
@@ -227,17 +230,19 @@ if __name__ == "__main__":
         else:
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
                                       metric='average_res', mode='max')
-        #analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
                                 resources_per_trial={'cpu': 256, 'gpu': 8})
             results.append(analysis)
         except Exception as e:
-            error_file.write("Unable to complete trials in space "+str(i)+"... Continuing with other trials.")
+            error_file.write("Unable to complete trials in space " + str(i) + "... Exception below.")
             error_file.write(str(e))
             error_file.write("\n\n")
-            print("Unable to complete trials in space "+str(i)+"... Continuing with other trials.")
+            print("Unable to complete trials in space " + str(i) + "... Continuing with other trials.")
         i += 1
+
+    error_file.close()
 
     # save results to specified csv file
     all_pt_results = results[0].results_df
@@ -245,3 +250,5 @@ if __name__ == "__main__":
         all_pt_results = all_pt_results.append(results[i].results_df)
 
     all_pt_results.to_csv(args.out)
+    print("Ray Tune results have been saved at " + args.out + " .")
+    print("Error file has been saved at " + error_name + " .")
