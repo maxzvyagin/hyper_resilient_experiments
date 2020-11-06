@@ -185,7 +185,7 @@ if __name__ == "__main__":
             NUM_CLASSES = 1
         else:
             print("\n ERROR: Unknown model type. Please try again. "
-                  "Must be one of: mnist, alexnet_cifar100, or segmentation_cityscapes.\n")
+                  "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
             sys.exit()
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
