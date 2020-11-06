@@ -57,8 +57,8 @@ def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
-    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-                            data_dir='/home/mzvyagin/datasets/')
+    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+    #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
     train_x, train_y = [], []
     for i in train:
