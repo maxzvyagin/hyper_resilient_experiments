@@ -415,11 +415,6 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
 
     samples = []
     for pair in img_and_shps:
-        # check if there is a cached object available
-        # if theta:
-        #     name = "/local/scratch/"
-        # else:
-        #     name = "/tmp/"
         name = "/tmp/mzvyagin/"
         name += "gis_data"
         name += image_type
@@ -494,11 +489,6 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
 
     x_samples, y_samples = [], []
     for pair in img_and_shps:
-        # check if there is a cached object available
-        # if theta:
-        #     name = "/local/scratch/"
-        # else:
-        #     name = "/tmp/"
         name = "/tmp/mzvyagin/"
         name += "gis_data"
         name += image_type
