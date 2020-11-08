@@ -3,7 +3,7 @@ import os
 
 def mnist_tf_objective(config):
     tf.random.set_seed(0)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
     mnist = tf.keras.datasets.mnist
 
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
