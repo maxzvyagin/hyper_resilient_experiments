@@ -235,7 +235,7 @@ if __name__ == "__main__":
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                                resources_per_trial={'cpu': 256, 'gpu': 8})
+                                resources_per_trial={'cpu': 200, 'gpu': 8})
             results.append(analysis)
         except Exception as e:
             error_file.write("Unable to complete trials in space " + str(i) + "... Exception below.")
