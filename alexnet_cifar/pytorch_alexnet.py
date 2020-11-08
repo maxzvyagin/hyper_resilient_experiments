@@ -98,7 +98,6 @@ def cifar_pt_objective(config):
     torch.manual_seed(0)
     model = PyTorch_AlexNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
-    # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[1, 2, 3, 4], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model

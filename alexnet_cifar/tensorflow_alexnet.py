@@ -10,17 +10,12 @@ from tensorflow.compat.v1 import InteractiveSession
 class TensorFlow_AlexNet:
     def __init__(self, config):
         tf.random.set_seed(0)
-        # get dataset
-        #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3,4,5,6,7'
-        #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
         # define the model using alexnet architecture
         # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
         # updated to match existing pytorch model
-        # gpus = tf.config.experimental.list_physical_devices('GPU')
-        # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
+        os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
         strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
-        #strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4"])
         with strategy.scope():
             self.model = keras.models.Sequential([
                 keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),

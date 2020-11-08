@@ -10,11 +10,8 @@ from gis_preprocess import tf_gis_test_train_split
 
 
 def cityscapes_tf_objective(config, classes=30):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '4'
-    # gpus = tf.config.experimental.list_physical_devices('GPU')
-    # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     tf.random.set_seed(0)
+    os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = tf.keras.Sequential()
@@ -32,18 +29,12 @@ def cityscapes_tf_objective(config, classes=30):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '4'
-    gpus = tf.config.experimental.list_physical_devices('GPU')
-    tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
+    tf.random.set_seed(0)
+    os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
                         activation="sigmoid")
-        # model = tf.keras.Sequential()
-        # model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
-        #                   activation="sigmoid"))
-        # model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
