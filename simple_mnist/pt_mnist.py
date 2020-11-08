@@ -79,7 +79,7 @@ class NumberNet(pl.LightningModule):
 
 def mnist_pt_objective(config):
     torch.manual_seed(0)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     model = NumberNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3], distributed_backend='dp')
     # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
