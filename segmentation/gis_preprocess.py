@@ -407,11 +407,17 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
     """ Return PT GIS Datasets with Train Test Split"""
 
     if not img_and_shps:
+        # img_and_shps = [
+        #     ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+        #      "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+        #     ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+        #      "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
         img_and_shps = [
-            ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
-             "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
-            ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
-             "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+
 
     samples = []
     for pair in img_and_shps:
@@ -450,7 +456,7 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
             # cache the windows
         samples.extend(windows)
         # now create test train split of samples
-        train, test = train_test_split(samples, train_size=0.8, shuffle=False, random_state=42)
+        train, test = train_test_split(samples, train_size=0.8, shuffle=False, random_state=0)
         cache_object = open(name, "wb")
         pickle.dump((train, test), cache_object)
         return PT_GISDataset(train), PT_GISDataset(test)
@@ -470,6 +476,7 @@ class PT_GISDataset(Dataset):
     def __getitem__(self, index):
         return self.samples[index]
 
+
 def pt_to_tf(x):
     """ Converts a pytorch tensor to a tensorflow tensor and returns it"""
     n = x.numpy()
@@ -477,15 +484,22 @@ def pt_to_tf(x):
     t = tf.convert_to_tensor(n)
     return t
 
+
 def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     """ Returns a Tensorflow dataset of images and masks"""
     # Default is theta file system location
     if not img_and_shps:
+        # img_and_shps = [
+        #     ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+        #      "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+        #     ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+        #      "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+
         img_and_shps = [
-            ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
-             "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
-            ("/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
-             "/lus/iota-fs0/projects/CVD_Research/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
 
     x_samples, y_samples = [], []
     for pair in img_and_shps:
@@ -532,7 +546,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
 
     # generate test_train splits
     x_train, x_test, y_train, y_test = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
-                                                            random_state=42)
+                                                        random_state=0)
     cache_object = open(name, "wb")
     pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
     return (x_train, y_train), (x_test, y_test)
