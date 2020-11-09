@@ -84,9 +84,9 @@ class PyTorch_UNet(pl.LightningModule):
     def training_step_end(self, outputs):
         # only use when  on dp
         if self.dataset == "gis":
-            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
+            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected']).detach()
         else:
-            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
+            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1)).detach()
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
 
@@ -96,12 +96,12 @@ class PyTorch_UNet(pl.LightningModule):
 
     def test_step_end(self, outputs):
         if self.dataset == "gis":
-            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
-            accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected'])
+            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected']).detach()
+            accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected']).detach()
             # iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
         else:
-            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
-            accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1))
+            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1)).detach()
+            accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1)).detach()
             # iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
         logs = {'test_loss': loss, 'test_accuracy': accuracy}
         return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
