@@ -136,7 +136,7 @@ def model_attack(model, model_type, attack_type, config):
 
 def multi_train(config):
     # simultaneous model training on 4 gpus each
-    with futures.ThreadPoolExecutor() as executor:
+    with futures.ProcessPoolExecutor() as executor:
         pt_thread = executor.submit(PT_MODEL, config)
         tf_thread = executor.submit(TF_MODEL, config)
         pt_test_acc, pt_model = pt_thread.result()
