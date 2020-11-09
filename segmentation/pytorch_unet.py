@@ -66,9 +66,9 @@ class PyTorch_UNet(pl.LightningModule):
                 "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=10)
+                batch_size=int(self.config['batch_size']), num_workers=5)
         else:
-            return DataLoader(self.test_set, batch_size=int(self.config['batch_size']), num_workers=10)
+            return DataLoader(self.test_set, batch_size=int(self.config['batch_size']), num_workers=5)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
