@@ -143,7 +143,7 @@ def cityscapes_pt_objective(config):
     return segmentation_pt_objective(config, dataset="cityscapes")
 
 
-def gis_pt_pbjective(config):
+def gis_pt_objective(config):
     return segmentation_pt_objective(config, dataset="gis")
 
 

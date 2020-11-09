@@ -205,7 +205,7 @@ if __name__ == "__main__":
     if args.model == "segmentation_cityscapes":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
-                           (8, 64)]  # batch size
+                           (8, 32)]  # batch size
     elif args.model == "segmentation_gis":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
