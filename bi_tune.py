@@ -205,16 +205,16 @@ if __name__ == "__main__":
     if args.model == "segmentation_cityscapes":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
-                           (4, 24)]  # batch size
+                           (8, 64)]  # batch size
     elif args.model == "segmentation_gis":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (10, 100),  # epochs
-                           (10, 75)]  # batch size
+                           (100, 1000)]  # batch size
     elif args.model == "alexnet_cifar100":
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
-                           (10, 250)]  # batch size
+                           (250, 1000)]  # batch size
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
