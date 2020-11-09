@@ -30,8 +30,8 @@ def cityscapes_tf_objective(config, classes=30):
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
     tf.random.set_seed(0)
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:4", "/gpu:5", "/gpu:6", "/gpu:7"])
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+                                                       "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes, input_shape=(None, None, 4),
                         activation="sigmoid")
