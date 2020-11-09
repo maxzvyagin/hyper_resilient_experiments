@@ -512,8 +512,8 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
         if path.exists(name):
             try:
                 cache_object = open(name, "rb")
-                train, test = pickle.load(cache_object)
-                return train, test
+                (x_train, y_train), (x_test, y_test) = pickle.load(cache_object)
+                return (x_train, y_train), (x_test, y_test)
             except:
                 print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
                 sys.exit()
@@ -548,7 +548,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
     x_train, x_test, y_train, y_test = train_test_split(x_samples, y_samples, train_size=0.8, shuffle=False,
                                                         random_state=0)
     cache_object = open(name, "wb")
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-    pickle.dump((train, test), cache_object)
-    return train, test
+    #train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    #test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+    pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
+    return (x_train, y_train), (x_test, y_test)
