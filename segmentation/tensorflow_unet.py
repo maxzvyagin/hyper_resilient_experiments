@@ -24,7 +24,8 @@ def cityscapes_tf_objective(config, classes=30):
                       metrics=['accuracy'])
     # fit model on cityscapes data
     (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=config['batch_size'])
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(config['batch_size'])
+    res = model.fit(train, epochs=config['epochs'], batch_size=config['batch_size'])
     res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
 
@@ -55,11 +56,15 @@ def get_cityscapes():
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
-    train_x, train_y = [], []
-    for i in train:
-        train_x.append(i['image_left'].numpy() / 255)
-        train_y.append(i['segmentation_label'].numpy() / 255)
-    test_x, test_y = [], []
+    train_x = [pair[0] for pair in train]
+    train_y = [pair[1] for pair in train]
+    train_x = map(lambda x: x.numpy()/255.0, train_x)
+    train_y = map(lambda x: x.numpy()/255.0, train_y)
+    # train_x, train_y = [], []
+    # for i in train:
+    #     train_x.append(i['image_left'].numpy() / 255)
+    #     train_y.append(i['segmentation_label'].numpy() / 255)
+    # test_x, test_y = [], []
     test = list(test)
     for i in test:
         test_x.append(i['image_left'].numpy() / 255)
