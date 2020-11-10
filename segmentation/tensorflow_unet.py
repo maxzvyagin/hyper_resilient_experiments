@@ -35,6 +35,7 @@ def cityscapes_tf_objective(config, classes=30):
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
     tf.random.set_seed(0)
+    b = int(config['batch_size'])
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
@@ -46,8 +47,10 @@ def gis_tf_objective(config, classes=1):
                       metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=int(config['batch_size']))
-    res_test = model.evaluate(x_test, y_test)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    res_test = model.evaluate(test)
     return res_test[1], model
 
 
@@ -82,6 +85,6 @@ def get_cityscapes():
 
 if __name__ == "__main__":
     test_config = {'batch_size': 250, 'learning_rate': .001, 'epochs': 1}
-    res = cityscapes_tf_objective(test_config)
+    #res = cityscapes_tf_objective(test_config)
     # print(res[0])
     #res = gis_tf_objective(test_config)
