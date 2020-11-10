@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import argparse
 
 def analyze(filename):
-
+    pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
