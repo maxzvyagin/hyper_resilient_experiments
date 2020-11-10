@@ -143,7 +143,7 @@ def multi_train(config):
     #     tf_thread = executor.submit(TF_MODEL, config)
     #     tf_test_acc, tf_model = tf_thread.result()
     pt_test_acc, pt_model = PT_MODEL(config)
-
+    pt_model.eval()
     # now run attacks
     search_results = {'pt_test_acc': pt_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
