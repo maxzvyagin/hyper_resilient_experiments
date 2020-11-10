@@ -11,6 +11,10 @@ class TensorFlow_AlexNet:
     def __init__(self, config):
         tf.random.set_seed(0)
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
+        options = tf.data.Options()
+        options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+        self.train = tf.data.Dataset.from_tensor_slices(self.x_train, self.y_train)
+        self.train = self.train.with_options(options)
         # define the model using alexnet architecture
         # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
         # updated to match existing pytorch model
@@ -44,7 +48,7 @@ class TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
+        res = self.model.fit(self.train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
         return res
 
