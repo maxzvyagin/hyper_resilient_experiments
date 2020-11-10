@@ -30,6 +30,7 @@ from torch.utils.data import DataLoader
 from segmentation import gis_preprocess
 from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 from segmentation.tensorflow_unet import get_cityscapes
+import multiprocessing
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -157,7 +158,11 @@ def multi_train(config):
         pt_acc = model_attack(pt_model, "pt", attack_type, config)
         search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # print(search_results)
-    tf_test_acc, tf_model = TF_MODEL(config)
+    return_dict = {}
+    p = multiprocessing.Process(target=TF_MODEL, args=(config, return_dict))
+    p.start()
+    p.join()
+    tf_test_acc, tf_model = return_dict['accuracy'], return_dict['model']
     search_results = {'tf_test_acc': tf_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
         pt_acc = model_attack(tf_model, "tf", attack_type, config)
