@@ -14,7 +14,7 @@ class TensorFlow_AlexNet:
         options = tf.data.Options()
         options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
         self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train))
-        self.train = self.train.with_options(options).batch(self.config['batch_size'])
+        self.train = self.train.with_options(options).batch(config['batch_size'])
         # define the model using alexnet architecture
         # from: https://towardsdatascience.com/implementing-alexnet-cnn-architecture-using-tensorflow-2-0-and-keras-2113e090ad98
         # updated to match existing pytorch model
