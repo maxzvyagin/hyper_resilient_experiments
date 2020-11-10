@@ -56,8 +56,8 @@ def get_cityscapes():
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
-    train_x = [pair[0] for pair in train]
-    train_y = [pair[1] for pair in train]
+    train_x = [pair['image_left'] for pair in train]
+    train_y = [pair['segmentation_label'] for pair in train]
     train_x = map(lambda x: x.numpy()/255.0, train_x)
     train_y = map(lambda x: x.numpy()/255.0, train_y)
     # train_x, train_y = [], []
