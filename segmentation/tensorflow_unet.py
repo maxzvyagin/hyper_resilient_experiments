@@ -10,6 +10,7 @@ from gis_preprocess import tf_gis_test_train_split
 
 
 def cityscapes_tf_objective(config, classes=30):
+    b = int(config['batch_size'])
     tf.random.set_seed(0)
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
@@ -24,9 +25,10 @@ def cityscapes_tf_objective(config, classes=30):
                       metrics=['accuracy'])
     # fit model on cityscapes data
     (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(config['batch_size'])
-    res = model.fit(train, epochs=config['epochs'], batch_size=config['batch_size'])
-    res_test = model.evaluate(x_test, y_test)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
+    res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    res_test = model.evaluate(test)
     return res_test[1], model
 
 
@@ -52,7 +54,7 @@ def gis_tf_objective(config, classes=1):
 def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     # first try loading from cache object, otherwise load from scratch
-    
+
     train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
                             data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
