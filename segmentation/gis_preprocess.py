@@ -13,9 +13,9 @@ import pickle
 from os import path
 import sys
 import random
-import imgaug as ia
-import imgaug.augmenters as iaa
-from imgaug.augmentables.segmaps import SegmentationMapsOnImage
+# import imgaug as ia
+# import imgaug.augmenters as iaa
+# from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
