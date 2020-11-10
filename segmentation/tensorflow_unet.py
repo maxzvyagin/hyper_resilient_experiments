@@ -64,7 +64,7 @@ def get_cityscapes():
     # for i in train:
     #     train_x.append(i['image_left'].numpy() / 255)
     #     train_y.append(i['segmentation_label'].numpy() / 255)
-    # test_x, test_y = [], []
+    test_x, test_y = [], []
     test = list(test)
     for i in test:
         test_x.append(i['image_left'].numpy() / 255)
