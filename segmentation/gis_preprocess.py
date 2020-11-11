@@ -550,5 +550,5 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
     #cache_object = open(name, "wb")
     #train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     #test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-    #pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
+    pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
     return (x_train, y_train), (x_test, y_test)
