@@ -18,7 +18,7 @@ def cityscapes_tf_objective(config, classes=30):
                                                        "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = tf.keras.Sequential()
-        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(1024, 2048, 3)))
+        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(3, 1024, 2048)))
         model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
