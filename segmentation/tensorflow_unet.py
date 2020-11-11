@@ -18,7 +18,7 @@ def cityscapes_tf_objective(config, classes=30):
                                                        "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = tf.keras.Sequential()
-        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(3, 1024, 2048)))
+        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(1024, 2048, 3)))
         model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
@@ -69,25 +69,25 @@ def get_cityscapes():
                             data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
-    # train = list(train)
-    # train_x = [pair['image_left'] for pair in train]
-    # train_y = [pair['segmentation_label'] for pair in train]
-    # train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_x))
-    # train_y = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_y))
-    # # train_x, train_y = [], []
-    # # for i in train:
-    # #     train_x.append(i['image_left'].numpy() / 255)
-    # #     train_y.append(i['segmentation_label'].numpy() / 255)
-    # #test_x, test_y = [], []
-    # test = list(test)
-    # test_x = [pair['image_left'] for pair in test]
-    # test_y = [pair['segmentation_label'] for pair in test]
-    # train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), test_x))
-    # train_y = list(map(lambda x: x.numpy() / 255.0, test_y))
-    # # for i in test:
-    # #     test_x.append(i['image_left'].numpy() / 255)
-    # #     test_y.append(i['segmentation_label'].numpy() / 255)
-    # return (train_x, train_y), (test_x, test_y)
+    train = list(train)
+    train_x = [pair['image_left'] for pair in train]
+    train_y = [pair['segmentation_label'] for pair in train]
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_x))
+    train_y = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_y))
+    # train_x, train_y = [], []
+    # for i in train:
+    #     train_x.append(i['image_left'].numpy() / 255)
+    #     train_y.append(i['segmentation_label'].numpy() / 255)
+    #test_x, test_y = [], []
+    test = list(test)
+    test_x = [pair['image_left'] for pair in test]
+    test_y = [pair['segmentation_label'] for pair in test]
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), test_x))
+    train_y = list(map(lambda x: x.numpy() / 255.0, test_y))
+    # for i in test:
+    #     test_x.append(i['image_left'].numpy() / 255)
+    #     test_y.append(i['segmentation_label'].numpy() / 255)
+    return (train_x, train_y), (test_x, test_y)
     return train, test
 
 
