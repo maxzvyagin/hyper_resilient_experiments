@@ -56,15 +56,13 @@ class TensorFlow_AlexNet:
         res_test = self.model.evaluate(self.x_test, self.y_test)
         return res_test[1]
 
-def cifar_tf_objective(config, return_dict):
+def cifar_tf_objective(config):
     # gpu_config = ConfigProto()
     # gpu_config.gpu_options.allow_growth = True
     # session = InteractiveSession(config=gpu_config)
     model = TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
-    return_dict['accuracy'] = accuracy
-    return_dict['model'] = model.model
     return accuracy, model.model
 
 if __name__ == "__main__":

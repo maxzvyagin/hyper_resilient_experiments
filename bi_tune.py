@@ -157,12 +157,14 @@ def multi_train(config):
         #     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
         pt_acc = model_attack(pt_model, "pt", attack_type, config)
         search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    del pt_model
+    torch.cuda.empty_cache()
     # print(search_results)
-    return_dict = {}
-    p = multiprocessing.Process(target=TF_MODEL, args=(config, return_dict))
-    p.start()
-    p.join()
-    tf_test_acc, tf_model = return_dict['accuracy'], return_dict['model']
+    # return_dict = {}
+    # p = multiprocessing.Process(target=TF_MODEL, args=(config, return_dict))
+    # p.start()
+    # p.join()
+    tf_test_acc, tf_model = TF_MODEL(config)
     search_results = {'tf_test_acc': tf_test_acc}
     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
         pt_acc = model_attack(tf_model, "tf", attack_type, config)
