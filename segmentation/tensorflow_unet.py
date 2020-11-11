@@ -51,6 +51,7 @@ def gis_tf_objective(config, classes=1):
                                                        "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape=(None, None, 4))
+
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
@@ -59,7 +60,7 @@ def gis_tf_objective(config, classes=1):
     print(x_train[0].shape)
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b, drop_remainder=True)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
     res_test = model.evaluate(test)
