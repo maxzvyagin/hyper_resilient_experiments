@@ -30,9 +30,9 @@ def cityscapes_tf_objective(config, classes=30):
     # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
     train, test = get_cityscapes()
     train = train.with_options(options).batch(b)
-    test = with_options(options).batch(b)
+    test = test.with_options(options).batch(b)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
     res_test = model.evaluate(test)
     return res_test[1], model
 
