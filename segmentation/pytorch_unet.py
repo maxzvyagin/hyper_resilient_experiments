@@ -158,5 +158,5 @@ if __name__ == "__main__":
     else:
         batch_size = 4
     test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1}
-    #res = segmentation_pt_objective(test_config)
+    res = segmentation_pt_objective(test_config)
     res = segmentation_pt_objective(test_config, dataset="gis")
