@@ -52,6 +52,7 @@ def gis_tf_objective(config, classes=1):
                       metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
+    print(x_train[0].shape)
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
@@ -93,6 +94,6 @@ def get_cityscapes():
 
 if __name__ == "__main__":
     test_config = {'batch_size': 250, 'learning_rate': .001, 'epochs': 1}
-    res = cityscapes_tf_objective(test_config)
+    #res = cityscapes_tf_objective(test_config)
     # print(res[0])
     res = gis_tf_objective(test_config)
