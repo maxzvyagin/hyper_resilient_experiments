@@ -26,11 +26,11 @@ def cityscapes_tf_objective(config, classes=30):
         model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                       metrics=['accuracy'])
     # fit model on cityscapes data
-    # options = tf.data.Options()
-    # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
     # train = train.with_options(options).batch(b)
@@ -98,7 +98,7 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 10, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_tf_objective(test_config)
     # print(res[0])
     res = gis_tf_objective(test_config)
