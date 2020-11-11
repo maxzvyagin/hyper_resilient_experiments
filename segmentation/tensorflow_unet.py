@@ -47,7 +47,7 @@ def gis_tf_objective(config, classes=1):
                                                        "/gpu:6", "/gpu:7"])
     with strategy.scope():
         model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid",
-                        input_shape=(256, 256, 4))
+                        input_shape=(256, 4))
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
