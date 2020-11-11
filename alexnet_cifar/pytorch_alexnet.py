@@ -100,7 +100,7 @@ def cifar_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0, 1, 2, 3, 4, 5, 6, 7], distributed_backend='dp')
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy.de, model.model
+    return model.test_accuracy, model.model
 
 
 if __name__ == "__main__":
