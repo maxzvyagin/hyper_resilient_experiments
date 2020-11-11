@@ -8,6 +8,8 @@ from tensorflow import keras
 
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 
