@@ -205,6 +205,8 @@ if __name__ == "__main__":
             PT_MODEL = pytorch_unet.gis_pt_pbjective
             TF_MODEL = tensorflow_unet.gis_tf_objective
             NUM_CLASSES = 1
+        elif args.model == "mnist_nofool":
+            NO_FOOL = True
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
@@ -227,8 +229,6 @@ if __name__ == "__main__":
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
                            (50, 500)]  # batch size
-    elif args.model == "mnist_nofool":
-        NO_FOOL = True
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout
