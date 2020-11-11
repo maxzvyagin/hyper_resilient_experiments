@@ -8,6 +8,11 @@ def mnist_tf_objective(config):
 
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    train = train.with_options(options)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
@@ -27,8 +32,8 @@ def mnist_tf_objective(config):
                       loss='sparse_categorical_crossentropy',
                       metrics=['accuracy'])
 
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=int(config['batch_size']))
-    res_test = model.evaluate(x_test, y_test)
+    res = model.fit(train, epochs=config['epochs'], batch_size=int(config['batch_size']))
+    res_test = model.evaluate(x_test)
     return (res_test[1], model)
 
 if __name__ == "__main__":
