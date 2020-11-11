@@ -37,7 +37,7 @@ PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 TRIALS = 25
-
+NO_FOOL = False
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -145,18 +145,18 @@ def multi_train(config):
     #     tf_test_acc, tf_model = tf_thread.result()
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
-    # now run attacks
     search_results = {'pt_test_acc': pt_test_acc}
-    for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-        # with futures.ThreadPoolExecutor() as executor:
-        #     pt_thread = executor.submit(model_attack, [pt_model, "pt", attack_type, config])
-        #     tf_thread = executor.submit(model_attack, [tf_model, "tf", attack_type, config])
-        #     pt_acc = pt_thread.result()
-        #     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-        #     tf_acc = tf_thread.result()
-        #     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
-        pt_acc = model_attack(pt_model, "pt", attack_type, config)
-        search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    if not NO_FOOL:
+        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
+            # with futures.ThreadPoolExecutor() as executor:
+            #     pt_thread = executor.submit(model_attack, [pt_model, "pt", attack_type, config])
+            #     tf_thread = executor.submit(model_attack, [tf_model, "tf", attack_type, config])
+            #     pt_acc = pt_thread.result()
+            #     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+            #     tf_acc = tf_thread.result()
+            #     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
+            pt_acc = model_attack(pt_model, "pt", attack_type, config)
+            search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     del pt_model
     torch.cuda.empty_cache()
     # print(search_results)
@@ -166,9 +166,10 @@ def multi_train(config):
     # p.join()
     tf_test_acc, tf_model = TF_MODEL(config)
     search_results = {'tf_test_acc': tf_test_acc}
-    for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-        pt_acc = model_attack(tf_model, "tf", attack_type, config)
-        search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    if not NO_FOOL:
+        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
+            pt_acc = model_attack(tf_model, "tf", attack_type, config)
+            search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
@@ -226,6 +227,8 @@ if __name__ == "__main__":
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
                            (50, 500)]  # batch size
+    elif args.model == "mnist_nofool":
+        NO_FOOL = True
     else:
         hyperparameters = [(0.00001, 0.1),  # learning_rate
                            (0.2, 0.9),  # dropout

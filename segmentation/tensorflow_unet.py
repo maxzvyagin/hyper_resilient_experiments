@@ -47,7 +47,10 @@ def gis_tf_objective(config, classes=1):
                       metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    train = train.with_options(options)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
     res_test = model.evaluate(test)
