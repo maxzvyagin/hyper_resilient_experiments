@@ -9,6 +9,9 @@ from tensorflow import keras
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 def cityscapes_tf_objective(config, classes=30):
     b = int(config['batch_size'])
@@ -16,15 +19,15 @@ def cityscapes_tf_objective(config, classes=30):
     keras.backend.set_image_data_format('channels_last')
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
-                                                       "/gpu:6", "/gpu:7"])
-    with strategy.scope():
-        model = tf.keras.Sequential()
-        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(1024, 2048, 3)))
-        model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-        model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-                      metrics=['accuracy'])
+    # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+    #                                                    "/gpu:6", "/gpu:7"])
+    # with strategy.scope():
+    model = tf.keras.Sequential()
+    model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None, input_shape=(1024, 2048, 3)))
+    model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['accuracy'])
     # fit model on cityscapes data
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
@@ -47,14 +50,14 @@ def gis_tf_objective(config, classes=1):
     b = int(config['batch_size'])
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
-                                                       "/gpu:6", "/gpu:7"])
-    with strategy.scope():
-        model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape=(None, None, 4))
+    # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+    #                                                    "/gpu:6", "/gpu:7"])
+    # with strategy.scope():
+    model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape=(None, None, 4))
 
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-        model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                      metrics=['accuracy'])
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                  metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
     print(x_train[0].shape)
@@ -98,7 +101,7 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1}
     res = cityscapes_tf_objective(test_config)
     # print(res[0])
-    # res = gis_tf_objective(test_config)
+    res = gis_tf_objective(test_config)
