@@ -134,6 +134,7 @@ def model_attack(model, model_type, attack_type, config):
         accuracy_list.append(robust_accuracy)
     return np.array(accuracy_list).mean()
 
+@ray.remote(num_gpus=8, max_calls=1)
 def multi_train(config):
     # simultaneous model training on 4 gpus each
     # # with futures.ProcessPoolExecutor() as executor:
