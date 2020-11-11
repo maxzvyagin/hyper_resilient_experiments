@@ -70,7 +70,8 @@ def gis_tf_objective(config, classes=1):
     # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
-    res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    #res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    res = model.fit(train, epochs=config['epochs'])
     res_test = model.evaluate(test)
     return res_test[1], model
 
