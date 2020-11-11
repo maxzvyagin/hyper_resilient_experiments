@@ -1,7 +1,7 @@
 ### Tensorflow UNet with Resnet34 Backbone
 import segmentation_models as sm
 import tensorflow as tf
-import tensorflow_datasets as tfds
+#import tensorflow_datasets as tfds
 import os
 import sys
 from tensorflow import keras
