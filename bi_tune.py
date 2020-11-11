@@ -134,7 +134,6 @@ def model_attack(model, model_type, attack_type, config):
         accuracy_list.append(robust_accuracy)
     return np.array(accuracy_list).mean()
 
-@ray.remote(num_gpus=8, max_calls=1)
 def multi_train(config):
     # simultaneous model training on 4 gpus each
     # # with futures.ProcessPoolExecutor() as executor:
@@ -254,7 +253,7 @@ if __name__ == "__main__":
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                                resources_per_trial={'cpu': 25, 'gpu': 8},
+                                resources_per_trial={'cpu': 25, 'gpu': 8}, num_gpus=8,
                                 local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
             results.append(analysis)
         except Exception as e:
