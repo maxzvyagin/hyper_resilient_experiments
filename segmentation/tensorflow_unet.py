@@ -13,7 +13,7 @@ from gis_preprocess import tf_gis_test_train_split
 
 
 def cityscapes_tf_objective(config, classes=30):
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     b = int(config['batch_size'])
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
