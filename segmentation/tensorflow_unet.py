@@ -39,7 +39,8 @@ def cityscapes_tf_objective(config, classes=30):
     #                         data_dir='/home/mzvyagin/datasets/')
     # train = train.with_options(options).batch(b)
     # test = test.with_options(options).batch(b)
-    res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    #res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    res = model.fit(train, epochs=config['epochs'])
     res_test = model.evaluate(test)
     return res_test[1], model
 
