@@ -31,7 +31,8 @@ def cityscapes_tf_objective(config, classes=30):
     # (x_train, y_train), (x_test, y_test) = get_cityscapes()
     # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
     # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
-    train, test = get_cityscapes()
+    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+                            data_dir='/home/mzvyagin/datasets/')
     train = train.with_options(options).batch(b)
     test = test.with_options(options).batch(b)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
