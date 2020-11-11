@@ -69,8 +69,8 @@ def gis_tf_objective(config, classes=1):
     # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
     # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b, drop_remainder=True)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b, drop_remainder=True)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
     #res = model.fit(train, epochs=config['epochs'])
     res_test = model.evaluate(test)
