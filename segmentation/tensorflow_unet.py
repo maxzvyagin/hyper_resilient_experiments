@@ -10,10 +10,10 @@ sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
 # import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 def cityscapes_tf_objective(config, classes=30):
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     b = int(config['batch_size'])
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
@@ -45,6 +45,7 @@ def cityscapes_tf_objective(config, classes=30):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     b = int(config['batch_size'])
