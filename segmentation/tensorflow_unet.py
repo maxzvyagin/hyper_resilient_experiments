@@ -67,8 +67,8 @@ def get_cityscapes():
     train = list(train)
     train_x = [pair['image_left'] for pair in train]
     train_y = [pair['segmentation_label'] for pair in train]
-    train_x = list(map(lambda x: x.numpy()/255.0, train_x))
-    train_y = list(map(lambda x: x.numpy()/255.0, train_y))
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_x))
+    train_y = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_y))
     # train_x, train_y = [], []
     # for i in train:
     #     train_x.append(i['image_left'].numpy() / 255)
@@ -77,7 +77,7 @@ def get_cityscapes():
     test = list(test)
     test_x = [pair['image_left'] for pair in test]
     test_y = [pair['segmentation_label'] for pair in test]
-    train_x = list(map(lambda x: x.numpy() / 255.0, test_x))
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), test_x))
     train_y = list(map(lambda x: x.numpy() / 255.0, test_y))
     # for i in test:
     #     test_x.append(i['image_left'].numpy() / 255)
