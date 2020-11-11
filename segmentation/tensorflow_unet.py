@@ -13,21 +13,21 @@ from gis_preprocess import tf_gis_test_train_split
 
 
 def cityscapes_tf_objective(config, classes=30):
-    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     b = int(config['batch_size'])
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
-                                                       "/gpu:6", "/gpu:7"])
-    with strategy.scope():
-        model = tf.keras.Sequential()
-        model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None))
-        model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-        model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-                      metrics=['accuracy'])
+    # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+    #                                                    "/gpu:6", "/gpu:7"])
+    # with strategy.scope():
+    model = tf.keras.Sequential()
+    model.add(sm.Unet('resnet34', encoder_weights=None, classes=classes, activation=None))
+    model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
+                  metrics=['accuracy'])
     # fit model on cityscapes data
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
@@ -75,10 +75,10 @@ def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     # first try loading from cache object, otherwise load from scratch
 
-    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-                            data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-    #                         data_dir='/home/mzvyagin/datasets/')
+    #                         data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
+    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+                            data_dir='/home/mzvyagin/datasets/')
     train = list(train)
     train_x = [pair['image_left'] for pair in train]
     train_y = [pair['segmentation_label'] for pair in train]
