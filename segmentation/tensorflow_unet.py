@@ -55,12 +55,13 @@ def gis_tf_objective(config, classes=1):
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
     #                                                    "/gpu:6", "/gpu:7"])
-    # with strategy.scope():
-    model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape=(None, None, 4))
+    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0"])
+    with strategy.scope():
+        model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape=(None, None, 4))
 
-    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-    model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                  metrics=['accuracy'])
+        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+        model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                      metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
     print(len(x_train))
