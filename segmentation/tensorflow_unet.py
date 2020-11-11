@@ -28,15 +28,14 @@ def cityscapes_tf_objective(config, classes=30):
     # fit model on cityscapes data
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    # (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
-    # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
-    train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-                            data_dir='/home/mzvyagin/datasets/')
-    train = train.with_options(options).batch(b)
-    test = test.with_options(options).batch(b)
+    (x_train, y_train), (x_test, y_test) = get_cityscapes()
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
+    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+    #                         data_dir='/home/mzvyagin/datasets/')
+    # train = train.with_options(options).batch(b)
+    # test = test.with_options(options).batch(b)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
-
     res_test = model.evaluate(test)
     return res_test[1], model
 
@@ -81,8 +80,7 @@ def get_cityscapes():
     train = list(train)
     train_x = [pair['image_left'] for pair in train]
     train_y = [pair['segmentation_label'] for pair in train]
-    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_x))
-    train_y = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), train_y))
+    train_x = list(map(lambda x: x.numpy()/255.0, train_x))
     # train_x, train_y = [], []
     # for i in train:
     #     train_x.append(i['image_left'].numpy() / 255)
@@ -92,7 +90,6 @@ def get_cityscapes():
     test_x = [pair['image_left'] for pair in test]
     test_y = [pair['segmentation_label'] for pair in test]
     train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy()/255.0), test_x))
-    train_y = list(map(lambda x: x.numpy() / 255.0, test_y))
     # for i in test:
     #     test_x.append(i['image_left'].numpy() / 255)
     #     test_y.append(i['segmentation_label'].numpy() / 255)
