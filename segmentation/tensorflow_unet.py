@@ -26,13 +26,13 @@ def cityscapes_tf_objective(config, classes=30):
     # fit model on cityscapes data
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    # (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
-    train, test = get_cityscapes()
-    train = train.with_options(options).batch(b)
-    test = test.with_options(options).batch(b)
+    (x_train, y_train), (x_test, y_test) = get_cityscapes()
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
+    # train, test = get_cityscapes()
+    # train = train.with_options(options).batch(b)
+    # test = test.with_options(options).batch(b)
     res = model.fit(train, epochs=config['epochs'], batch_size=b)
-    # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     res_test = model.evaluate(test)
     return res_test[1], model
 
@@ -46,7 +46,7 @@ def gis_tf_objective(config, classes=1):
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
                                                        "/gpu:6", "/gpu:7"])
     with strategy.scope():
-        model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid")
+        model = sm.Unet('resnet34', encoder_weights=None, classes=classes, activation="sigmoid", input_shape = )
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
@@ -88,7 +88,7 @@ def get_cityscapes():
     #     test_x.append(i['image_left'].numpy() / 255)
     #     test_y.append(i['segmentation_label'].numpy() / 255)
     return (train_x, train_y), (test_x, test_y)
-    return train, test
+    #return train, test
 
 
 if __name__ == "__main__":
