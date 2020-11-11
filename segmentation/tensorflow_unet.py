@@ -48,7 +48,7 @@ def cityscapes_tf_objective(config, classes=30):
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
     #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-    #tf.random.set_seed(0)
+    tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     b = int(config['batch_size'])
     # gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -70,8 +70,8 @@ def gis_tf_objective(config, classes=1):
     # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
-    #res = model.fit(train, epochs=config['epochs'], batch_size=b)
-    res = model.fit(train, epochs=config['epochs'])
+    res = model.fit(train, epochs=config['epochs'], batch_size=b)
+    #res = model.fit(train, epochs=config['epochs'])
     res_test = model.evaluate(test)
     return res_test[1], model
 
@@ -105,7 +105,7 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 5, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 8, 'learning_rate': .001, 'epochs': 1}
     #res = cityscapes_tf_objective(test_config)
     # print(res[0])
     res = gis_tf_objective(test_config)
