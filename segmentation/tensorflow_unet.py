@@ -31,7 +31,8 @@ def cityscapes_tf_objective(config, classes=30):
     # fit model on cityscapes data
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    (x_train, y_train), (x_test, y_test) = get_cityscapes()
+    #(x_train, y_train), (x_test, y_test) = get_cityscapes()
+
     train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
