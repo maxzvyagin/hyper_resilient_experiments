@@ -10,7 +10,6 @@ sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
 
-
 def cityscapes_tf_objective(config, classes=30):
     b = int(config['batch_size'])
     tf.random.set_seed(0)
