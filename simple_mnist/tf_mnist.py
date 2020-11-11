@@ -12,7 +12,7 @@ def mnist_tf_objective(config):
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     train = train.with_options(options).batch(b)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
     strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
