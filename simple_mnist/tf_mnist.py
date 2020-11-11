@@ -33,7 +33,7 @@ def mnist_tf_objective(config):
                       metrics=['accuracy'])
 
     res = model.fit(train, epochs=config['epochs'], batch_size=int(config['batch_size']))
-    res_test = model.evaluate(x_test)
+    res_test = model.evaluate(test)
     return (res_test[1], model)
 
 if __name__ == "__main__":
