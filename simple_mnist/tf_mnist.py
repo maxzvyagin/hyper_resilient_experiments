@@ -5,13 +5,13 @@ def mnist_tf_objective(config):
     tf.random.set_seed(0)
     #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
     mnist = tf.keras.datasets.mnist
-
+    b = int(config['batch_size'])
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
     train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
     options = tf.data.Options()
     options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    train = train.with_options(options)
+    train = train.with_options(options).batch(b)
     test = tf.data.Dataset.from_tensor_slices((x_test, y_test))
     # gpus = tf.config.experimental.list_physical_devices('GPU')
     # tf.config.experimental.set_visible_devices(gpus[4:8], 'GPU')
@@ -32,7 +32,7 @@ def mnist_tf_objective(config):
                       loss='sparse_categorical_crossentropy',
                       metrics=['accuracy'])
 
-    res = model.fit(train, epochs=config['epochs'], batch_size=int(config['batch_size']))
+    res = model.fit(train, epochs=config['epochs'], batch_size=b)
     res_test = model.evaluate(test)
     return (res_test[1], model)
 
