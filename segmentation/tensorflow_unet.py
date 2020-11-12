@@ -10,6 +10,7 @@ sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
 from UNet.tensorflow_unet import make_tensorflow_unet
+from model import unet
 
 # import os
 
@@ -55,9 +56,10 @@ def gis_tf_objective(config, classes=1):
     # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
     #                                                    "/gpu:6", "/gpu:7"])
     # with strategy.scope():
-    model = keras.models.Sequential()
-    model.add(make_tensorflow_unet(4, 1))
-    model.add(keras.layers.Dense(1, activation="sigmoid"))
+    # model = keras.models.Sequential()
+    # model.add(make_tensorflow_unet(4, 1))
+    # model.add(keras.layers.Dense(1, activation="sigmoid"))
+    model =unet.Unet()
 
 
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
