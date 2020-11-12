@@ -252,9 +252,11 @@ if __name__ == "__main__":
                                       metric='average_res', mode='max')
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
+            # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
+            #                     resources_per_trial={'cpu': 25, 'gpu': 8},
+            #                     local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                                resources_per_trial={'cpu': 25, 'gpu': 8},
-                                local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
+                                resources_per_trial={'cpu': 25, 'gpu': 8})
             results.append(analysis)
         except Exception as e:
             error_file.write("Unable to complete trials in space " + str(i) + "... Exception below.")
