@@ -5,9 +5,9 @@ import torch.nn.functional as F
 from .unet_parts import *
 
 
-class PyTorch_UNet(nn.Module):
+class PyTorch_UNet_Model(nn.Module):
     def __init__(self, n_channels, n_classes, bilinear=True):
-        super(PyTorch_UNet, self).__init__()
+        super(PyTorch_UNet_Model, self).__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
