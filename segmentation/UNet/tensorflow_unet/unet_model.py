@@ -23,7 +23,6 @@ def make_tensorflow_unet(n_channels, n_classes, bilinear=False):
 
 
 class TensorFlow_UNet_Model(keras.models.Model):
-
     def __init__(self, n_channels, n_classes, bilinear=False):
         super(TensorFlow_UNet_Model, self).__init__()
         self.inc = DoubleConv(n_channels, 64)
