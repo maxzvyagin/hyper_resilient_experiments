@@ -59,7 +59,7 @@ def gis_tf_objective(config, classes=1):
     # model = keras.models.Sequential()
     # model.add(make_tensorflow_unet(4, 1))
     # model.add(keras.layers.Dense(1, activation="sigmoid"))
-        model =unet.Unet()
+        model = make_tensorflow_unet(4, 1)
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
