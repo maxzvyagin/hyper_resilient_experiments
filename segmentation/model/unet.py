@@ -29,8 +29,8 @@ class Unet(tf.keras.Model):
         https://arxiv.org/pdf/1505.04597
 
     """
-    def __init__(self):
-        super().__init__(self, classes=30)
+    def __init__(self, classes=30):
+        super().__init__(self)
         self.input_block = InputBlock(filters=64)
         self.bottleneck = BottleneckBlock(1024)
         self.output_block = OutputBlock(filters=64, n_classes=classes)
