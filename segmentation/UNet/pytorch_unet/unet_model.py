@@ -6,7 +6,7 @@ from .unet_parts import *
 
 
 class PyTorch_UNet_Model(nn.Module):
-    def __init__(self, n_channels, n_classes, bilinear=True):
+    def __init__(self, n_channels, n_classes, bilinear=False):
         super(PyTorch_UNet_Model, self).__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
