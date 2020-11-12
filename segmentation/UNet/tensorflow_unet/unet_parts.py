@@ -33,9 +33,9 @@ class Down(keras.layers.Layer):
 
     def __init__(self, in_channels, out_channels):
         super(Down, self).__init__()
-        self.maxpool_conv = keras.models.Sequential(
+        self.maxpool_conv = keras.models.Sequential([
             keras.layers.MaxPool2D(2),
-            DoubleConv(in_channels, out_channels)
+            DoubleConv(in_channels, out_channels)]
         )
 
     def call(self, x):
