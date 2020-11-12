@@ -6,7 +6,7 @@ from .unet_parts import *
 def make_tensorflow_unet(n_channels, n_classes, bilinear=False):
     model = keras.models.Sequential()
     # downsample
-    model.add(DoubleConv(n_channels, 64))
+    model.add(DoubleConv(n_channels, 64, first=True))
     model.add(Down(64, 128))
     model.add(Down(128, 256))
     model.add(Down(256, 512))
