@@ -28,7 +28,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.config = config
         self.dataset = dataset
         # sigmoid is part of BCE with logits loss
-        self.model = PyTorch_UNet
+        self.model = PyTorch_UNet(in_channels, classes)
         if dataset == "gis":
             self.criterion = nn.BCEWithLogitsLoss()
         else:
