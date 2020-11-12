@@ -45,7 +45,7 @@ class Down(keras.layers.Layer):
 class Up(keras.layers.Layer):
     """Upscaling then double conv"""
 
-    def __init__(self, in_channels, out_channels, bilinear=True):
+    def __init__(self, in_channels, out_channels, bilinear=False):
         super(Up, self).__init__()
 
         # if bilinear, use the normal convolutions to reduce the number of channels
