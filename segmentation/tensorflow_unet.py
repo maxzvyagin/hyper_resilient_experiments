@@ -1,7 +1,7 @@
 ### Tensorflow UNet with Resnet34 Backbone
 #import segmentation_models as sm
 import tensorflow as tf
-#import tensorflow_datasets as tfds
+import tensorflow_datasets as tfds
 import os
 import sys
 from tensorflow import keras
@@ -48,21 +48,21 @@ def cityscapes_tf_objective(config, classes=30):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
-    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-    #tf.random.set_seed(0)
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     b = int(config['batch_size'])
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
-                                                       "/gpu:6", "/gpu:7"])
-    with strategy.scope():
-        model = keras.models.Sequential()
-        model.add(make_tensorflow_unet(4, 1))
-        model.add(keras.layers.Dense(1, activation="sigmoid"))
+    # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+    #                                                    "/gpu:6", "/gpu:7"])
+    # with strategy.scope():
+    model = keras.models.Sequential()
+    model.add(make_tensorflow_unet(4, 1))
+    model.add(keras.layers.Dense(1, activation="sigmoid"))
 
 
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-        model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                      metrics=['accuracy'])
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                  metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
     print(len(x_train))
