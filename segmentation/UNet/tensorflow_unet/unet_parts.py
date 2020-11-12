@@ -47,7 +47,7 @@ class Up(keras.layers.Layer):
             self.up = keras.layers.UpSampling2D(size=2, mode='bilinear')
             self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
         else:
-            self.up = keras.layers.Conv2DTranspose(filters=in_channels//2, kernel_size=2, stride=2)
+            self.up = keras.layers.Conv2DTranspose(filters=in_channels//2, kernel_size=2, strides=2)
             self.conv = DoubleConv(in_channels, out_channels)
 
 
