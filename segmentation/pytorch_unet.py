@@ -14,6 +14,8 @@ sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
+from UNet.pytorch_unet import PyTorch_UNet
+
 
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
@@ -26,8 +28,7 @@ class PyTorch_UNet(pl.LightningModule):
         self.config = config
         self.dataset = dataset
         # sigmoid is part of BCE with logits loss
-        self.model = smp.Unet('resnet34', encoder_weights=None, classes=classes, in_channels=in_channels,
-                              activation=None)
+        self.model = PyTorch_UNet
         if dataset == "gis":
             self.criterion = nn.BCEWithLogitsLoss()
         else:
