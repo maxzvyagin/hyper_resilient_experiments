@@ -9,7 +9,7 @@ from tensorflow import keras
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 from gis_preprocess import tf_gis_test_train_split
 
-from UNet.tensorflow_unet import make_tensorflow_unet
+from UNet.tensorflow_unet import TensorFlow_UNet_Model
 from model import unet
 
 # import os
@@ -59,7 +59,7 @@ def gis_tf_objective(config, classes=1):
     # model = keras.models.Sequential()
     # model.add(make_tensorflow_unet(4, 1))
     # model.add(keras.layers.Dense(1, activation="sigmoid"))
-        model = make_tensorflow_unet(4, 1)
+        model = TensorFlow_UNet_Model(4, 1)
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
