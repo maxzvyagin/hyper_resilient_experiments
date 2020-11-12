@@ -1,5 +1,5 @@
 ### Tensorflow UNet with Resnet34 Backbone
-#import segmentation_models as sm
+import segmentation_models as sm
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
@@ -49,7 +49,7 @@ def cityscapes_tf_objective(config, classes=30):
 
 # same model just using gis data instead
 def gis_tf_objective(config, classes=1):
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    #os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     b = int(config['batch_size'])
@@ -59,7 +59,7 @@ def gis_tf_objective(config, classes=1):
     # model = keras.models.Sequential()
     # model.add(make_tensorflow_unet(4, 1))
     # model.add(keras.layers.Dense(1, activation="sigmoid"))
-        model = TensorFlow_UNet_Model(4, 1)
+        model = sm.Unet('resnet34', activation="sigmoid")
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                       metrics=['accuracy'])
