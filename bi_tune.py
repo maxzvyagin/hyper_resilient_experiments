@@ -3,7 +3,7 @@
 
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from segmentation import pytorch_unet, tensorflow_unet
+#from segmentation import pytorch_unet, tensorflow_unet
 import argparse
 from hyperspace import create_hyperspace
 import ray
@@ -178,7 +178,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
-    ray.init(num_gpus=8)
+    #ray.init(num_gpus=8)
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
