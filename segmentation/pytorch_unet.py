@@ -1,5 +1,5 @@
 ### PyTorch UNet with Resnet 34 Backbone
-import segmentation_models_pytorch as smp
+#import segmentation_models_pytorch as smp
 import pytorch_lightning as pl
 import torch
 import torchvision
