@@ -80,10 +80,10 @@ def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     # first try loading from cache object, otherwise load from scratch
 
-    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-    #                         data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-                            data_dir='/home/mzvyagin/datasets/')
+                            data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
+    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+    #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
     train_x = [pair['image_left'] for pair in train]
     train_y = [pair['segmentation_label'] for pair in train]
@@ -106,6 +106,6 @@ def get_cityscapes():
 
 if __name__ == "__main__":
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
-    #res = cityscapes_tf_objective(test_config)
+    res = cityscapes_tf_objective(test_config)
     # print(res[0])
     res = gis_tf_objective(test_config)
