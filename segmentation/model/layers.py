@@ -115,7 +115,7 @@ class BottleneckBlock(tf.keras.Model):
             self.conv_transpose = tf.keras.layers.Conv2DTranspose(filters=filters // 2,
                                                                   kernel_size=(3, 3),
                                                                   strides=(2, 2),
-                                                                  padding='same',
+                                                                  padding='valid',
                                                                   activation=tf.nn.relu)
 
     def call(self, inputs, training):
@@ -147,7 +147,7 @@ class UpsampleBlock(tf.keras.Model):
             self.conv_transpose = tf.keras.layers.Conv2DTranspose(filters=filters // 2,
                                                                   kernel_size=(3, 3),
                                                                   strides=(2, 2),
-                                                                  padding='same',
+                                                                  padding='valid',
                                                                   activation=tf.nn.relu)
 
     def call(self, inputs, residual_input):
