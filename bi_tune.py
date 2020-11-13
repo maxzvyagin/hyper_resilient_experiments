@@ -2,7 +2,7 @@
 ### Only uses PyTorch and TensorFlow ###
 
 import sys
-sys.path.append("/home/mzvyagin/hyper_resilient")
+#.path.append("/home/mzvyagin/hyper_resilient")
 #sys.path.append("/usr/local/lib/python3.6/dist-packages/")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
@@ -18,7 +18,7 @@ import statistics
 import foolbox as fb
 
 
-sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
+#sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 import tensorflow as tf
 import torch
 import torchvision
@@ -29,7 +29,7 @@ from tqdm import tqdm
 import os
 import time
 from torch.utils.data import DataLoader
-from segmentation import gis_preprocess
+# from segmentation import gis_preprocess
 # from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 # from segmentation.tensorflow_unet import get_cityscapes
 import multiprocessing
