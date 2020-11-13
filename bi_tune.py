@@ -3,8 +3,7 @@
 
 import sys
 sys.path.append("/home/mzvyagin/hyper_resilient")
-try:
-    sys.path.append("usr/local/lib")
+sys.path.append("usr/local/lib")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 #from segmentation import pytorch_unet, tensorflow_unet
