@@ -166,7 +166,7 @@ def multi_train(config):
     # p.start()
     # p.join()
     tf_test_acc, tf_model = TF_MODEL(config)
-    search_results = {'tf_test_acc': tf_test_acc}
+    search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
         for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
             pt_acc = model_attack(tf_model, "tf", attack_type, config)
