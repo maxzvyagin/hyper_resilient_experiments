@@ -3,7 +3,7 @@
 
 import sys
 sys.path.append("/home/mzvyagin/hyper_resilient")
-sys.path.append("/usr/local/lib/python3.6/dist-packages/")
+#sys.path.append("/usr/local/lib/python3.6/dist-packages/")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 #from segmentation import pytorch_unet, tensorflow_unet
