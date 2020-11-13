@@ -26,7 +26,6 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 import os
-from concrt futures
 import time
 from torch.utils.data import DataLoader
 from segmentation import gis_preprocess
