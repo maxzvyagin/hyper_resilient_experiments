@@ -25,8 +25,8 @@ class TensorFlow_AlexNet:
         # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
         #                                                    "/gpu:6", "/gpu:7"])
         # with strategy.scope():
-        self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train))
-        self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test))
+        self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(b)
+        self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),

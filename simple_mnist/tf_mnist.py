@@ -8,7 +8,8 @@ def mnist_tf_objective(config):
     b = int(config['batch_size'])
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
     x_train, x_test = x_train / 255.0, x_test / 255.0
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
     # options = tf.data.Options()
     # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     # train = train.with_options(options).batch(b)
