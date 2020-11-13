@@ -256,11 +256,11 @@ if __name__ == "__main__":
                                       metric='average_res', mode='max')
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
-            # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-            #                     resources_per_trial={'cpu': 25, 'gpu': 8},
-            #                     local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
             analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-                                resources_per_trial={'cpu': 25, 'gpu': 1})
+                                resources_per_trial={'cpu': 25, 'gpu': 1},
+                                local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
+            # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
+            #                     resources_per_trial={'cpu': 25, 'gpu': 1})
             results.append(analysis)
             sys.exit()
         except Exception as e:
