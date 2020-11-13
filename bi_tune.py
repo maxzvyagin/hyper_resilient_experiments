@@ -26,7 +26,7 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 import os
-from concurrent import futures
+from concrt futures
 import time
 from torch.utils.data import DataLoader
 from segmentation import gis_preprocess
@@ -181,6 +181,7 @@ def multi_train(config):
 
 if __name__ == "__main__":
     #ray.init(num_gpus=8)
+    ray.init(address="auto")
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
