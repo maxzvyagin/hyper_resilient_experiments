@@ -1,6 +1,8 @@
 ### General tuning script to combine all submodules ###
 ### Only uses PyTorch and TensorFlow ###
 
+import sys
+sys.path.append("/home/mzvyagin/hyper_resilient")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 #from segmentation import pytorch_unet, tensorflow_unet
@@ -13,7 +15,7 @@ from skopt import Optimizer
 from tqdm import tqdm
 import statistics
 import foolbox as fb
-import sys
+
 
 sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 import tensorflow as tf
