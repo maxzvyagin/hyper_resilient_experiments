@@ -44,7 +44,7 @@ def train_models(i, o):
     torch.save(pt_model, o + "/bottom_pt_model")
     tf_model.save(o + "/bottom_tf_model")
     # write out accuracies
-    f = open(o+"/test_accuracies.txt")
+    f = open(o+"/test_accuracies.txt", "w")
     f.write("Top PyTorch Accuracy: "+str(top_pt_test_acc))
     f.write("Top TensorFlow Accuracy: "+str(top_tf_test_acc))
     f.write("Bottom PyTorch Accuracy: "+str(bottom_pt_test_acc))
