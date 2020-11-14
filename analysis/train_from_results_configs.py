@@ -6,7 +6,7 @@ import torch
 from ..simple_mnist import pt_mnist, tf_mnist
 from ..alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 import argparse
-import pandas as
+import pandas as pd
 import os
 
 PT_MODEL = pt_mnist.mnist_pt_objective
