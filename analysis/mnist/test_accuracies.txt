@@ -1,0 +1,4 @@
+Top PyTorch Accuracy: 0.9802693262182433
+Top TensorFlow Accuracy: 0.9800999760627747
+Bottom PyTorch Accuracy: 0.10260775550504139
+Bottom TensorFlow Accuracy: 0.0982000008225441
