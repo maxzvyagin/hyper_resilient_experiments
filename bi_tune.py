@@ -215,6 +215,15 @@ if __name__ == "__main__":
             PT_MODEL = pytorch_alexnet.cifar_pt_objective
             TF_MODEL = tensorflow_alexnet.cifar_tf_objective
             NUM_CLASSES = 100
+        elif args.model == "alexnet_cifar10":
+            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+            NUM_CLASSES = 10
+        elif args.model == "cifar10_nofool":
+            NO_FOOL = True
+            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+            NUM_CLASSES = 10
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")

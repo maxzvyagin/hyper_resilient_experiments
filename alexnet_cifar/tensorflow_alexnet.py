@@ -8,10 +8,15 @@ from tensorflow.compat.v1 import InteractiveSession
 
 
 class TensorFlow_AlexNet:
-    def __init__(self, config):
+    def __init__(self, config, ten=False):
         tf.random.set_seed(0)
         b = int(config['batch_size'])
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
+        if ten:
+            (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar10.load_data()
+            classes = 10
+        else:
+            (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
+            classes = 100
         # options = tf.data.Options()
         # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
         # self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).with_options(options).batch(b)
@@ -41,7 +46,7 @@ class TensorFlow_AlexNet:
             keras.layers.Dropout(config['dropout']),
             keras.layers.Dense(4096, activation='relu'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(100, activation=None)
+            keras.layers.Dense(classes, activation=None)
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
@@ -64,6 +69,15 @@ def cifar_tf_objective(config):
     # gpu_config.gpu_options.allow_growth = True
     # session = InteractiveSession(config=gpu_config)
     model = TensorFlow_AlexNet(config)
+    model.fit()
+    accuracy = model.test()
+    return accuracy, model.model
+
+def cifar10_tf_objective(config):
+    # gpu_config = ConfigProto()
+    # gpu_config.gpu_options.allow_growth = True
+    # session = InteractiveSession(config=gpu_config)
+    model = TensorFlow_AlexNet(config, ten=True)
     model.fit()
     accuracy = model.test()
     return accuracy, model.model
