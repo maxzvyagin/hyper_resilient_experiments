@@ -16,6 +16,7 @@ from skopt import Optimizer
 from tqdm import tqdm
 import statistics
 import foolbox as fb
+import time
 
 
 #sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")

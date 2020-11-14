@@ -69,5 +69,5 @@ def cifar_tf_objective(config):
     return accuracy, model.model
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 64, 'learning_rate': .1, 'epochs': 20, 'dropout': 0.5}
+    test_config = {'batch_size': 500, 'learning_rate': .1, 'epochs': 20, 'dropout': 0.9}
     res = cifar_tf_objective(test_config)
