@@ -25,8 +25,8 @@ class TensorFlow_AlexNet:
         # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
         #                                                    "/gpu:6", "/gpu:7"])
         # with strategy.scope():
-        self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(b)
-        self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
+        # self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(b)
+        # self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
@@ -51,12 +51,12 @@ class TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(self.train, epochs=self.config['epochs'],
+        res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
         return res
 
     def test(self):
-        res_test = self.model.evaluate(self.test_set)
+        res_test = self.model.evaluate(self.x_test, self.y_test)
         return res_test[1]
 
 def cifar_tf_objective(config):

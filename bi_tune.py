@@ -181,8 +181,7 @@ def multi_train(config):
 
 
 if __name__ == "__main__":
-    #ray.init(num_gpus=8)
-    #ray.init(address="auto")
+    startTime = time.time()
     ray.init()
     parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
@@ -265,6 +264,10 @@ if __name__ == "__main__":
             print("Unable to complete trials in space " + str(i) + "... Continuing with other trials.")
         i += 1
 
+    print("Measured time needed to run trials: ")
+    executionTime = (time.time() - startTime)
+    print('Execution time in seconds: ' + str(executionTime))
+
     error_file.close()
 
     # save results to specified csv file
@@ -275,3 +278,4 @@ if __name__ == "__main__":
     all_pt_results.to_csv(args.out)
     print("Ray Tune results have been saved at " + args.out + " .")
     print("Error file has been saved at " + error_name + " .")
+
