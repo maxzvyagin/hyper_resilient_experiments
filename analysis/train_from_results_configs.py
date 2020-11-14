@@ -1,6 +1,8 @@
 """ Given a csv file of Ray Tune results, train models using the top and bottom configurations sorted by average_res,
 save models to given directory """
 
+import sys
+sys.path.append("..")
 import tensorflow as tf
 import torch
 from ..simple_mnist import pt_mnist, tf_mnist
