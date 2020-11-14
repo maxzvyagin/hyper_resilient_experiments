@@ -41,6 +41,7 @@ TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
+MNIST = True
 
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
@@ -49,6 +50,11 @@ def model_attack(model, model_type, attack_type, config):
         # cifar
         if NUM_CLASSES == 100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
+                                                            transform=torchvision.transforms.ToTensor(),
+                                                            target_transform=None, download=True),
+                              batch_size=int(config['batch_size']))
+        elif NUM_CLASSES == 10 and not MNIST:
+            data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
@@ -78,6 +84,9 @@ def model_attack(model, model_type, attack_type, config):
         # cifar
         if NUM_CLASSES == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
+            data = list(test.batch(int(config['batch_size'])))
+        elif NUM_CLASSES == 10 and not MNIST:
+            train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
         # cityscapes
         elif NUM_CLASSES == 30:
@@ -219,6 +228,7 @@ if __name__ == "__main__":
             PT_MODEL = pytorch_alexnet.cifar10_pt_objective
             TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
             NUM_CLASSES = 10
+            MNIST = False
         elif args.model == "cifar10_nofool":
             NO_FOOL = True
             PT_MODEL = pytorch_alexnet.cifar10_pt_objective
