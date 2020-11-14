@@ -26,8 +26,8 @@ def train_models(i, o):
     print("Training top configuration...")
     top_config = {'learning_rate': float(sorted_ray_results['config.learning_rate'][0]),
                   'dropout': float(sorted_ray_results['config.dropout'][0]),
-                  'epochs': float(sorted_ray_results['config.epochs'][0]),
-                  'batch_size': float(sorted_ray_results['config.batch_size'][0])}
+                  'epochs': int(sorted_ray_results['config.epochs'][0]),
+                  'batch_size': int(sorted_ray_results['config.batch_size'][0])}
     top_pt_test_acc, pt_model = PT_MODEL(top_config)
     top_tf_test_acc, tf_model = TF_MODEL(top_config)
     torch.save(pt_model, o+"/top_pt_model")
@@ -37,8 +37,8 @@ def train_models(i, o):
     i = len(sorted_ray_results)-1
     bottom_config = {'learning_rate': float(sorted_ray_results['config.learning_rate'][i]),
                      'dropout': float(sorted_ray_results['config.dropout'][i]),
-                     'epochs': float(sorted_ray_results['config.epochs'][i]),
-                     'batch_size': float(sorted_ray_results['config.batch_size'][i])}
+                     'epochs': int(sorted_ray_results['config.epochs'][i]),
+                     'batch_size': int(sorted_ray_results['config.batch_size'][i])}
     bottom_pt_test_acc, pt_model = PT_MODEL(bottom_config)
     bottom_tf_test_acc, tf_model = TF_MODEL(bottom_config)
     torch.save(pt_model, o + "/bottom_pt_model")
