@@ -38,5 +38,5 @@ def mnist_tf_objective(config):
     return (res_test[1], model)
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 1000, 'learning_rate': .001, 'epochs': 50, 'dropout': 0.5}
+    test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 50, 'dropout': 0.5}
     res = mnist_tf_objective(test_config)
