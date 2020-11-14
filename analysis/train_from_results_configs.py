@@ -22,13 +22,12 @@ def train_models(i, o):
     ray_results = pd.read_csv(i)
     sorted_ray_results = ray_results.sort_values('average_res')
     sorted_ray_results = sorted_ray_results.reset_index(drop=True)
-    sorted_ray_results.reindex()
     # top config
     print("Training top configuration...")
-    top_config = {'learning_rate': float(sorted_ray_results[0]['config.learning_rate']),
-                  'dropout': float(sorted_ray_results[0]['config.dropout']),
-                  'epochs': float(sorted_ray_results[0]['config.epochs']),
-                  'batch_size': float(sorted_ray_results[0]['config.batch_size'])}
+    top_config = {'learning_rate': float(sorted_ray_results['config.learning_rate'][0]),
+                  'dropout': float(sorted_ray_results['config.dropout'][0]),
+                  'epochs': float(sorted_ray_results['config.epochs'][0]),
+                  'batch_size': float(sorted_ray_results['config.batch_size'][0])}
     top_pt_test_acc, pt_model = PT_MODEL(top_config)
     top_tf_test_acc, tf_model = TF_MODEL(top_config)
     torch.save(pt_model, o+"/top_pt_model")
@@ -36,10 +35,10 @@ def train_models(i, o):
     # bottom config
     print("Training bottom configuration...")
     i = len(sorted_ray_results)-1
-    bottom_config = {'learning_rate': float(sorted_ray_results[i]['config.learning_rate']),
-                     'dropout': float(sorted_ray_results[i]['config.dropout']),
-                     'epochs': float(sorted_ray_results[i]['config.epochs']),
-                     'batch_size': float(sorted_ray_results[i]['config.batch_size'])}
+    bottom_config = {'learning_rate': float(sorted_ray_results['config.learning_rate'][i]),
+                     'dropout': float(sorted_ray_results['config.dropout'][i]),
+                     'epochs': float(sorted_ray_results['config.epochs'][i]),
+                     'batch_size': float(sorted_ray_results['config.batch_size'][i])}
     bottom_pt_test_acc, pt_model = PT_MODEL(bottom_config)
     bottom_tf_test_acc, tf_model = TF_MODEL(bottom_config)
     torch.save(pt_model, o + "/bottom_pt_model")
