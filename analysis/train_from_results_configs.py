@@ -67,3 +67,4 @@ if __name__ == "__main__":
     elif args.model == "cifar100":
         PT_MODEL = pytorch_alexnet.cifar_pt_objective
         TF_MODEL = tensorflow_alexnet.cifar_tf_objective
+    train_models(args.input, args.output)
