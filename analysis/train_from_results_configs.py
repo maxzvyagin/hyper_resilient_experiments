@@ -20,7 +20,7 @@ def train_models(i, o):
     except:
         "NOTE: Error creating output directory "+o
     ray_results = pd.read_csv(i)
-    sorted_ray_results = ray_results.sort_values('average_res')
+    sorted_ray_results = ray_results.sort_values('average_res', ascending=False)
     sorted_ray_results = sorted_ray_results.reset_index(drop=True)
     # top config
     print("Training top configuration...")
@@ -45,10 +45,10 @@ def train_models(i, o):
     tf_model.save(o + "/bottom_tf_model")
     # write out accuracies
     f = open(o+"/test_accuracies.txt", "w")
-    f.write("Top PyTorch Accuracy: "+str(top_pt_test_acc))
-    f.write("Top TensorFlow Accuracy: "+str(top_tf_test_acc))
-    f.write("Bottom PyTorch Accuracy: "+str(bottom_pt_test_acc))
-    f.write("Bottom TensorFlow Accuracy: "+str(bottom_tf_test_acc))
+    f.write("Top PyTorch Accuracy: "+str(top_pt_test_acc)+"\n")
+    f.write("Top TensorFlow Accuracy: "+str(top_tf_test_acc)+"\n")
+    f.write("Bottom PyTorch Accuracy: "+str(bottom_pt_test_acc)+"\n")
+    f.write("Bottom TensorFlow Accuracy: "+str(bottom_tf_test_acc)+"\n")
     f.close()
 
 
