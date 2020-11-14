@@ -2,6 +2,9 @@ import tensorflow as tf
 import os
 from sklearn.metrics import log_loss
 
+def tf_log_loss(y_true, y_pred):
+    return log_loss(y_true.numpy(), y_pred.numpy())
+
 def mnist_tf_objective(config):
     tf.random.set_seed(0)
     #os.environ['CUDA_VISIBLE_DEVICES'] = '4,5,6,7'
@@ -31,7 +34,7 @@ def mnist_tf_objective(config):
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
 
     model.compile(optimizer=opt,
-                  loss=log_loss,
+                  loss=tf_log_loss,
                   metrics=['accuracy'])
 
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b)
