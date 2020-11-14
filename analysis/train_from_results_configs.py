@@ -22,6 +22,7 @@ def train_models(i, o):
     ray_results = pd.read_csv(i)
     sorted_ray_results = ray_results.sort_values('average_res')
     sorted_ray_results = sorted_ray_results.reset_index(drop=True)
+    sorted_ray_results.reindex()
     # top config
     print("Training top configuration...")
     top_config = {'learning_rate': float(sorted_ray_results[0]['config.learning_rate']),
