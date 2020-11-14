@@ -5,8 +5,8 @@ import sys
 sys.path.append("..")
 import tensorflow as tf
 import torch
-from ..simple_mnist import pt_mnist, tf_mnist
-from ..alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+from simple_mnist import pt_mnist, tf_mnist
+from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 import argparse
 import pandas as pd
 import os
