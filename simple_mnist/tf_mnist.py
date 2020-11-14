@@ -27,14 +27,13 @@ def mnist_tf_objective(config):
         tf.keras.layers.Flatten(input_shape=(28, 28)),
         tf.keras.layers.Dense(128, activation='relu'),
         tf.keras.layers.Dropout(config['dropout']),
-        # need to use log softmax since that's what pytorch uses in nn.CrossEntropyLoss()
-        #tf.keras.layers.Dense(10, activation=tf.nn.log_softmax)
+        tf.keras.layers.Dense(10, activation=None)
     ])
 
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
 
     model.compile(optimizer=opt,
-                  loss=tf_log_loss,
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
 
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b)

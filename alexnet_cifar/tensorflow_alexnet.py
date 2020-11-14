@@ -41,12 +41,12 @@ class TensorFlow_AlexNet:
             keras.layers.Dropout(config['dropout']),
             keras.layers.Dense(4096, activation='relu'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(100, activation=tf.nn.log_softmax)
+            keras.layers.Dense(100, activation=None)
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
         self.model.compile(optimizer=opt,
-                           loss='sparse_categorical_crossentropy',
+                           loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                            metrics=['accuracy'])
         self.config = config
 
