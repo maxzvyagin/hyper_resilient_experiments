@@ -2,7 +2,7 @@
 save models to given directory """
 
 import tensorflow as tf
-import torch as
+import torch
 from ..simple_mnist import pt_mnist, tf_mnist
 from ..alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 import argparse
