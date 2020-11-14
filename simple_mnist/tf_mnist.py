@@ -1,9 +1,5 @@
 import tensorflow as tf
 import os
-from sklearn.metrics import log_loss
-
-def tf_log_loss(y_true, y_pred):
-    return log_loss(y_true.numpy(), y_pred.numpy())
 
 def mnist_tf_objective(config):
     tf.random.set_seed(0)
