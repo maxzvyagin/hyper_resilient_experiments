@@ -30,3 +30,4 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input', help="Specify input CSV from results.")
     parser.add_argument('-o', '--output', help="Specify output file name")
     args = parser.parse_args()
+    test_top_five(args.input, args.output)
