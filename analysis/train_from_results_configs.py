@@ -51,8 +51,6 @@ def train_models(i, o):
     f.write("Bottom TensorFlow Accuracy: "+str(bottom_tf_test_acc)+"\n")
     f.close()
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', required=True, help="Input CSV from Ray Tune results.")

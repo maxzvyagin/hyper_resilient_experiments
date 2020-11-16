@@ -185,7 +185,11 @@ def multi_train(config):
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
     search_results['average_res'] = average_res
-    tune.report(**search_results)
+    try:
+        tune.report(**search_results)
+    except:
+        print("Couldn't report Tune results. Continuing.")
+        pass
     return search_results
 
 
