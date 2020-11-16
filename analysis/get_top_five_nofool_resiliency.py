@@ -18,9 +18,9 @@ def test_top_five(i, o):
         search_results = multi_train(config)
         search_results['rank'] = i
         if i == 0:
-            csv = pd.DataFrame(search_results)
+            csv = pd.DataFrame(search_results, index='rank')
         else:
-            csv.append(pd.DataFrame(search_results))
+            csv.append(pd.DataFrame(search_results, index='rank'))
     csv.to_csv(o)
 
 
