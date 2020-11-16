@@ -16,7 +16,7 @@ def test_top_five(i, o):
         config = {'learning_rate': learning_rate[i], 'dropout': dropout[i], 'epochs': epochs[i],
                   'batch_size': batch_size[i]}
         search_results = multi_train(config)
-        search_results['rank': int(i)]
+        search_results['rank'] = i
         if i == 0:
             csv = pd.DataFrame(search_results)
         else:
