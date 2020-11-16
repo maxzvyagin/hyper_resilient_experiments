@@ -18,7 +18,7 @@ def test_top_five(i, o):
                   'batch_size': batch_size[i]}
         search_results = multi_train(config)
         search_results['rank'] = i
-        records.apppend(search_results)
+        records.append(search_results)
     csv = pd.DataFrame.from_records(records)
     csv.to_csv(o)
 
