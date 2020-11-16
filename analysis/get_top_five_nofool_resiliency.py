@@ -12,15 +12,14 @@ def test_top_five(i, o):
     dropout = ray_results['config.dropout']
     epochs = ray_results['config.epochs']
     batch_size = ray_results['config.batch_size']
+    records = []
     for i in list(range(5)):
         config = {'learning_rate': learning_rate[i], 'dropout': dropout[i], 'epochs': epochs[i],
                   'batch_size': batch_size[i]}
         search_results = multi_train(config)
         search_results['rank'] = i
-        if i == 0:
-            csv = pd.DataFrame(search_results, index='rank')
-        else:
-            csv.append(pd.DataFrame(search_results, index='rank'))
+        records.apppend(search_results)
+    csv = pd.DataFrame.from_records(records)
     csv.to_csv(o)
 
 
