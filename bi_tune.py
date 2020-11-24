@@ -272,10 +272,10 @@ if __name__ == "__main__":
         # create a skopt gp minimize object
         optimizer = Optimizer(section)
         if args.model == "segmentation_cityscapes" or args.model == "segmentation_gis":
-            search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size'],
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size', 'adam_epsilon'],
                                       metric='average_res', mode='max')
         else:
-            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size'],
+            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size', 'adam_epsilon'],
                                       metric='average_res', mode='max')
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:

@@ -28,7 +28,7 @@ def cityscapes_tf_objective(config, classes=30):
     model = tf.keras.Sequential()
     model.add(make_tensorflow_unet(3, 30))
     model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
-    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
     model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                   metrics=['accuracy'])
     # fit model on cityscapes data

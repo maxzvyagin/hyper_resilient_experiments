@@ -23,7 +23,6 @@ def test_top_five(i, o):
     csv.to_csv(o)
 
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', help="Specify input CSV from results.")

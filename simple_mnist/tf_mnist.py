@@ -26,7 +26,7 @@ def mnist_tf_objective(config):
         tf.keras.layers.Dense(10, activation=None)
     ])
 
-    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
 
     model.compile(optimizer=opt,
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),

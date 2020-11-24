@@ -36,7 +36,7 @@ class NumberNet(pl.LightningModule):
                                            batch_size=int(self.config['batch_size']), num_workers=5)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'])
+        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
         return optimizer
 
     def forward(self, x):
