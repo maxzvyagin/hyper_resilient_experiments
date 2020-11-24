@@ -2,8 +2,8 @@
 ### Only uses PyTorch and TensorFlow ###
 
 import sys
-#.path.append("/home/mzvyagin/hyper_resilient")
-#sys.path.append("/usr/local/lib/python3.6/dist-packages/")
+# .path.append("/home/mzvyagin/hyper_resilient")
+# sys.path.append("/usr/local/lib/python3.6/dist-packages/")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from segmentation import pytorch_unet, tensorflow_unet
@@ -19,8 +19,7 @@ import foolbox as fb
 import time
 import json
 
-
-#sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
+# sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
 import tensorflow as tf
 import torch
 import torchvision
@@ -44,6 +43,7 @@ TRIALS = 25
 NO_FOOL = False
 MNIST = True
 
+
 def model_attack(model, model_type, attack_type, config):
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -56,8 +56,8 @@ def model_attack(model, model_type, attack_type, config):
                               batch_size=int(config['batch_size']))
         elif NUM_CLASSES == 10 and not MNIST:
             data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
-                                                            transform=torchvision.transforms.ToTensor(),
-                                                            target_transform=None, download=True),
+                                                           transform=torchvision.transforms.ToTensor(),
+                                                           target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
         # cityscapes
         elif NUM_CLASSES == 30:
@@ -147,35 +147,19 @@ def model_attack(model, model_type, attack_type, config):
         accuracy_list.append(robust_accuracy)
     return np.array(accuracy_list).mean()
 
+
 def multi_train(config):
-    # simultaneous model training on 4 gpus each
-    # # with futures.ProcessPoolExecutor() as executor:
-    #     pt_thread = executor.submit(PT_MODEL, config)
-    #     pt_test_acc, pt_model = pt_thread.result()
-    #     pt_model.eval()
-    #     tf_thread = executor.submit(TF_MODEL, config)
-    #     tf_test_acc, tf_model = tf_thread.result()
+    """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
         for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-            # with futures.ThreadPoolExecutor() as executor:
-            #     pt_thread = executor.submit(model_attack, [pt_model, "pt", attack_type, config])
-            #     tf_thread = executor.submit(model_attack, [tf_model, "tf", attack_type, config])
-            #     pt_acc = pt_thread.result()
-            #     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-            #     tf_acc = tf_thread.result()
-            #     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
             pt_acc = model_attack(pt_model, "pt", attack_type, config)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    # to avoid weird CUDA OOM errors
     del pt_model
     torch.cuda.empty_cache()
-    # print(search_results)
-    # return_dict = {}
-    # p = multiprocessing.Process(target=TF_MODEL, args=(config, return_dict))
-    # p.start()
-    # p.join()
     tf_test_acc, tf_model = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
@@ -194,59 +178,60 @@ def multi_train(config):
     return search_results
 
 
+def bitune_parse_arguments(args):
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
+    if not args.model:
+        print("NOTE: Defaulting to MNIST model training...")
+        args.model = "mnist"
+    else:
+        if args.model == "alexnet_cifar100":
+            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
+            NUM_CLASSES = 100
+        elif args.model == "gan":
+            print("Error: GAN not implemented.")
+            sys.exit()
+        elif args.model == "segmentation_cityscapes":
+            PT_MODEL = pytorch_unet.cityscapes_pt_objective
+            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
+            NUM_CLASSES = 30
+        elif args.model == "segmentation_gis":
+            PT_MODEL = pytorch_unet.gis_pt_pbjective
+            TF_MODEL = tensorflow_unet.gis_tf_objective
+            NUM_CLASSES = 1
+        elif args.model == "mnist_nofool":
+            NO_FOOL = True
+        elif args.model == "cifar100_nofool":
+            NO_FOOL = True
+            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
+            NUM_CLASSES = 100
+        elif args.model == "alexnet_cifar10":
+            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+            NUM_CLASSES = 10
+            MNIST = False
+        elif args.model == "cifar10_nofool":
+            NO_FOOL = True
+            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+            NUM_CLASSES = 10
+        else:
+            print("\n ERROR: Unknown model type. Please try again. "
+                  "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
+            sys.exit()
+    if not args.trials:
+        print("NOTE: Defaulting to 25 trials per scikit opt space...")
+    else:
+        TRIALS = int(args.trials)
+
+
 def run_bitune_experiment(args, func, mode="max", metric="average_res",
-                          ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results", bitune=False):
+                          ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results"):
     """ Parse command line arguments and begin experiment."""
     start_time = time.time()
     ray.init()
-    if bitune:
-        global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
-        if not args.model:
-            print("NOTE: Defaulting to MNIST model training...")
-            args.model = "mnist"
-        else:
-            if args.model == "alexnet_cifar100":
-                PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-                TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-                NUM_CLASSES = 100
-            elif args.model == "gan":
-                print("Error: GAN not implemented.")
-                sys.exit()
-            elif args.model == "segmentation_cityscapes":
-                PT_MODEL = pytorch_unet.cityscapes_pt_objective
-                TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-                NUM_CLASSES = 30
-            elif args.model == "segmentation_gis":
-                PT_MODEL = pytorch_unet.gis_pt_pbjective
-                TF_MODEL = tensorflow_unet.gis_tf_objective
-                NUM_CLASSES = 1
-            elif args.model == "mnist_nofool":
-                NO_FOOL = True
-            elif args.model == "cifar100_nofool":
-                NO_FOOL = True
-                PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-                TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-                NUM_CLASSES = 100
-            elif args.model == "alexnet_cifar10":
-                PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-                TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-                NUM_CLASSES = 10
-                MNIST = False
-            elif args.model == "cifar10_nofool":
-                NO_FOOL = True
-                PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-                TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-                NUM_CLASSES = 10
-            else:
-                print("\n ERROR: Unknown model type. Please try again. "
-                      "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
-                sys.exit()
-        if not args.trials:
-            print("NOTE: Defaulting to 25 trials per scikit opt space...")
-        else:
-            TRIALS = int(args.trials)
-    # Defining the hyperspace
-    # load boundaries from json file
+    # load hyperspace boundaries from json file
     try:
         f = open(args.json, "r")
     except:
@@ -266,21 +251,12 @@ def run_bitune_experiment(args, func, mode="max", metric="average_res",
     error_name += "_error.txt"
     error_file = open(error_name, "w")
     for section in tqdm(space):
-        # create a skopt gp minimize object
         optimizer = Optimizer(section)
-        if args.model == "segmentation_cityscapes" or args.model == "segmentation_gis":
-            search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size', 'adam_epsilon'],
-                                      metric=metric, mode=mode)
-        else:
-            search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size', 'adam_epsilon'],
-                                      metric=metric, mode=mode)
-        # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
+        search_algo = SkOptSearch(optimizer, list(bounds.keys()), metric=metric, mode=mode)
         try:
             analysis = tune.run(func, search_alg=search_algo, num_samples=TRIALS,
                                 resources_per_trial={'cpu': 25, 'gpu': 1},
                                 local_dir=ray_dir)
-            # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
-            #                     resources_per_trial={'cpu': 25, 'gpu': 1})
             results.append(analysis)
         except Exception as e:
             error_file.write("Unable to complete trials in space " + str(i) + "... Exception below.")
@@ -312,6 +288,6 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
+    parser.add_argument("-j", "--json")
     args = parser.parse_args()
     run_bitune_experiment(args, multi_train, bitune=True)
-
