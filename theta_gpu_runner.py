@@ -3,9 +3,9 @@
 from argparse import ArgumentParser
 import sys
 import os
-# from simple_mnist import pt_mnist, tf_mnist
-# from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-# from segmentation import pytorch_unet, tensorflow_unet
+from simple_mnist import pt_mnist, tf_mnist
+from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+from segmentation import pytorch_unet, tensorflow_unet
 from hyperspace import create_hyperspace
 import ray
 import time
