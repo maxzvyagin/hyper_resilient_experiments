@@ -3,17 +3,12 @@
 from argparse import ArgumentParser
 import sys
 import os
-from simple_mnist import pt_mnist, tf_mnist
-from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from segmentation import pytorch_unet, tensorflow_unet
 from hyperspace import create_hyperspace
 import ray
 import time
 import pickle
 import stat
 
-PT_MODEL = pt_mnist.mnist_pt_objective
-TF_MODEL = tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
@@ -83,7 +78,6 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
-
 if __name__ == "__main__":
     print("WARNING: default file locations are used to pickle arguments and hyperspaces. "
           "DO NOT RUN MORE THAN ONE EXPERIMENT AT A TIME.")
@@ -96,7 +90,6 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-n", "--nodes", help="Number of GPU nodes to submit on.")
     arguments = parser.parse_args()
-    process_args(arguments)
     spaces = create_spaces_and_args_pickles(arguments)
     space_chunks = chunks(list(range(len(spaces))), NODES)
     # given these space chunks, run in singularity container on GPU
