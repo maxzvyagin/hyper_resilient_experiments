@@ -6,7 +6,7 @@ import sys
 #sys.path.append("/usr/local/lib/python3.6/dist-packages/")
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-#from segmentation import pytorch_unet, tensorflow_unet
+from segmentation import pytorch_unet, tensorflow_unet
 import argparse
 from hyperspace import create_hyperspace
 import ray
@@ -193,14 +193,11 @@ def multi_train(config):
     return search_results
 
 
-if __name__ == "__main__":
-    startTime = time.time()
+def run_experiment(args, func):
+    """ Parse command line arguments and begin experiment."""
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST
+    start_time = time.time()
     ray.init()
-    parser = argparse.ArgumentParser("Start MNIST tuning with hyperspace, specify output csv file name.")
-    parser.add_argument("-o", "--out", required=True)
-    parser.add_argument("-m", "--model")
-    parser.add_argument("-t", "--trials")
-    args = parser.parse_args()
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -279,7 +276,7 @@ if __name__ == "__main__":
                                       metric='average_res', mode='max')
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
-            analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
+            analysis = tune.run(func, search_alg=search_algo, num_samples=TRIALS,
                                 resources_per_trial={'cpu': 25, 'gpu': 1},
                                 local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
             # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
@@ -293,8 +290,8 @@ if __name__ == "__main__":
         i += 1
 
     print("Measured time needed to run trials: ")
-    executionTime = (time.time() - startTime)
-    print('Execution time in seconds: ' + str(executionTime))
+    execution_time = (time.time() - start_time)
+    print('Execution time in seconds: ' + str(execution_time))
 
     error_file.close()
 
@@ -306,4 +303,15 @@ if __name__ == "__main__":
     all_pt_results.to_csv(args.out)
     print("Ray Tune results have been saved at " + args.out + " .")
     print("Error file has been saved at " + error_name + " .")
+
+
+if __name__ == "__main__":
+    """Run experiment with command line arguments."""
+    parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
+                                     "specify output csv file name.")
+    parser.add_argument("-o", "--out", required=True)
+    parser.add_argument("-m", "--model")
+    parser.add_argument("-t", "--trials")
+    args = parser.parse_args()
+    run_experiment(args, multi_train)
 
