@@ -33,7 +33,9 @@ NODES = 4
 
 def submit_job(chunk, args):
     command = "qsub -n 1 -A CVD-Mol-AI -t 12:00:00 --attrs pubnet=true "
-    script_name = "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/tmp/scripts/script"+args.out+str(chunk)+".sh"
+    chunk_name = str(chunk).replace(" ", "_")
+    chunk_name = chunk_name.replace(", ", "")
+    script_name = "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/tmp/scripts/script"+args.out+chunk_name+".sh"
     command = command + script_name
     f = open(script_name, "w")
     f.write("singularity shell --nv -B /lus:/lus /lus/theta-fs0/software/thetagpu/nvidia-containers/tensorflow2/tf2_20.10-py3.simg\n")
@@ -80,58 +82,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-def process_args(args):
-    """Setting global variables using arguments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, NODES, MNIST, TRIALS
-    if not args.model:
-        print("NOTE: Defaulting to MNIST model training...")
-        args.model = "mnist"
-    else:
-        if args.model == "alexnet_cifar100":
-            PT_MODEL = pytorch_alexnet.cifar_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-            NUM_CLASSES = 100
-        ## definition of gans as the model type
-        elif args.model == "gan":
-            print("Error: GAN not implemented.")
-            sys.exit()
-        elif args.model == "segmentation_cityscapes":
-            PT_MODEL = pytorch_unet.cityscapes_pt_objective
-            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 30
-        elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_pbjective
-            TF_MODEL = tensorflow_unet.gis_tf_objective
-            NUM_CLASSES = 1
-        elif args.model == "mnist_nofool":
-            NO_FOOL = True
-        elif args.model == "cifar_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "alexnet_cifar10":
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "cifar10_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-        else:
-            print("\n ERROR: Unknown model type. Please try again. "
-                  "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
-            sys.exit()
-    if not args.trials:
-        print("NOTE: Defaulting to 25 trials per scikit opt space...")
-    else:
-        TRIALS = int(args.trials)
-    if not args.nodes:
-        print("NOTE: Defaulting to 4 nodes per space...")
-    else:
-        NODES = int(args.nodes)
+
 
 if __name__ == "__main__":
     print("WARNING: default file locations are used to pickle arguments and hyperspaces. "
