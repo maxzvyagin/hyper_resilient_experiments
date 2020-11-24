@@ -8,6 +8,7 @@ from bi_tune import multi_train, model_attack
 from simple_mnist import pt_mnist, tf_mnist
 from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from segmentation import pytorch_unet, tensorflow_unet
+import sys
 
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective

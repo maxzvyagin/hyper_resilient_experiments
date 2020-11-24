@@ -106,7 +106,7 @@ class PyTorch_AlexNet(pl.LightningModule):
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
-def cifar_pt_objective(config, ten=False):
+def cifar100_pt_objective(config, ten=False):
     #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.manual_seed(0)
     model = PyTorch_AlexNet(config)
@@ -132,4 +132,4 @@ if __name__ == "__main__":
     else:
         batch = 64
     test_config = {'batch_size': batch, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
-    res = cifar_pt_objective(test_config)
+    res = cifar100_pt_objective(test_config)

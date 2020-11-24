@@ -64,7 +64,7 @@ class TensorFlow_AlexNet:
         res_test = self.model.evaluate(self.x_test, self.y_test)
         return res_test[1]
 
-def cifar_tf_objective(config):
+def cifar100_tf_objective(config):
     # gpu_config = ConfigProto()
     # gpu_config.gpu_options.allow_growth = True
     # session = InteractiveSession(config=gpu_config)
@@ -84,4 +84,4 @@ def cifar10_tf_objective(config):
 
 if __name__ == "__main__":
     test_config = {'batch_size': 500, 'learning_rate': .000001, 'epochs': 20, 'dropout': 0.9}
-    res = cifar_tf_objective(test_config)
+    res = cifar100_tf_objective(test_config)

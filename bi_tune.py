@@ -17,6 +17,7 @@ from tqdm import tqdm
 import statistics
 import foolbox as fb
 import time
+import json
 
 
 #sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
@@ -193,70 +194,69 @@ def multi_train(config):
     return search_results
 
 
-def run_experiment(args, func):
+def run_bitune_experiment(args, func, mode="max", metric="average_res",
+                          ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results", bitune=False):
     """ Parse command line arguments and begin experiment."""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST
     start_time = time.time()
     ray.init()
-    if not args.model:
-        print("NOTE: Defaulting to MNIST model training...")
-        args.model = "mnist"
-    else:
-        if args.model == "alexnet_cifar100":
-            PT_MODEL = pytorch_alexnet.cifar_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-            NUM_CLASSES = 100
-        ## definition of gans as the model type
-        elif args.model == "gan":
-            print("Error: GAN not implemented.")
-            sys.exit()
-        elif args.model == "segmentation_cityscapes":
-            PT_MODEL = pytorch_unet.cityscapes_pt_objective
-            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 30
-        elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_pbjective
-            TF_MODEL = tensorflow_unet.gis_tf_objective
-            NUM_CLASSES = 1
-        elif args.model == "mnist_nofool":
-            NO_FOOL = True
-        elif args.model == "cifar_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "alexnet_cifar10":
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "cifar10_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
+    if bitune:
+        global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
+        if not args.model:
+            print("NOTE: Defaulting to MNIST model training...")
+            args.model = "mnist"
         else:
-            print("\n ERROR: Unknown model type. Please try again. "
-                  "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
-            sys.exit()
-    if not args.trials:
-        print("NOTE: Defaulting to 25 trials per scikit opt space...")
-    else:
-        TRIALS = int(args.trials)
+            if args.model == "alexnet_cifar100":
+                PT_MODEL = pytorch_alexnet.cifar100_pt_objective
+                TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
+                NUM_CLASSES = 100
+            elif args.model == "gan":
+                print("Error: GAN not implemented.")
+                sys.exit()
+            elif args.model == "segmentation_cityscapes":
+                PT_MODEL = pytorch_unet.cityscapes_pt_objective
+                TF_MODEL = tensorflow_unet.cityscapes_tf_objective
+                NUM_CLASSES = 30
+            elif args.model == "segmentation_gis":
+                PT_MODEL = pytorch_unet.gis_pt_pbjective
+                TF_MODEL = tensorflow_unet.gis_tf_objective
+                NUM_CLASSES = 1
+            elif args.model == "mnist_nofool":
+                NO_FOOL = True
+            elif args.model == "cifar100_nofool":
+                NO_FOOL = True
+                PT_MODEL = pytorch_alexnet.cifar100_pt_objective
+                TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
+                NUM_CLASSES = 100
+            elif args.model == "alexnet_cifar10":
+                PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+                TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+                NUM_CLASSES = 10
+                MNIST = False
+            elif args.model == "cifar10_nofool":
+                NO_FOOL = True
+                PT_MODEL = pytorch_alexnet.cifar10_pt_objective
+                TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
+                NUM_CLASSES = 10
+            else:
+                print("\n ERROR: Unknown model type. Please try again. "
+                      "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
+                sys.exit()
+        if not args.trials:
+            print("NOTE: Defaulting to 25 trials per scikit opt space...")
+        else:
+            TRIALS = int(args.trials)
     # Defining the hyperspace
-    if args.model == "segmentation_cityscapes":
-        hyperparameters = [(0.00001, 0.1),  # learning_rate
-                           (10, 100),  # epochs
-                           (8, 24)]  # batch size
-    elif args.model == "segmentation_gis":
-        hyperparameters = [(0.00001, 0.1),  # learning_rate
-                           (10, 100),  # epochs
-                           (100, 1000)]  # batch size
-    else:
-        hyperparameters = [(0.00001, 0.1),  # learning_rate
-                           (0.2, 0.9),  # dropout
-                           (10, 100),  # epochs
-                           (10, 500)]  # batch size
+    # load boundaries from json file
+    try:
+        f = open(args.json, "r")
+    except:
+        print("ERROR: json file with hyperparameter bounds not found. Please use utilities/generate_hyperspace_json.py "
+              "to generate boundary file and try again.")
+        sys.exit()
+    bounds = json.load(f)
+    for n in bounds:
+        bounds[n] = tuple(bounds[n])
+    hyperparameters = list(bounds.values())
     space = create_hyperspace(hyperparameters)
 
     # Run and aggregate the results
@@ -270,15 +270,15 @@ def run_experiment(args, func):
         optimizer = Optimizer(section)
         if args.model == "segmentation_cityscapes" or args.model == "segmentation_gis":
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'epochs', 'batch_size', 'adam_epsilon'],
-                                      metric='average_res', mode='max')
+                                      metric=metric, mode=mode)
         else:
             search_algo = SkOptSearch(optimizer, ['learning_rate', 'dropout', 'epochs', 'batch_size', 'adam_epsilon'],
-                                      metric='average_res', mode='max')
+                                      metric=metric, mode=mode)
         # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS, resources_per_trial={'gpu': 8})
         try:
             analysis = tune.run(func, search_alg=search_algo, num_samples=TRIALS,
                                 resources_per_trial={'cpu': 25, 'gpu': 1},
-                                local_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results")
+                                local_dir=ray_dir)
             # analysis = tune.run(multi_train, search_alg=search_algo, num_samples=TRIALS,
             #                     resources_per_trial={'cpu': 25, 'gpu': 1})
             results.append(analysis)
@@ -313,5 +313,5 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     args = parser.parse_args()
-    run_experiment(args, multi_train)
+    run_bitune_experiment(args, multi_train, bitune=True)
 
