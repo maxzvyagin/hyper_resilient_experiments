@@ -1,23 +1,14 @@
 """Alternate batched scripting flow for running on multiple nodes on ThetaGPU systems"""
+
 from argparse import ArgumentParser
 import sys
 import os
-#.path.append("/home/mzvyagin/hyper_resilient")
-#sys.path.append("/usr/local/lib/python3.6/dist-packages/")
-from simple_mnist import pt_mnist, tf_mnist
-from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from segmentation import pytorch_unet, tensorflow_unet
-import argparse
+# from simple_mnist import pt_mnist, tf_mnist
+# from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+# from segmentation import pytorch_unet, tensorflow_unet
 from hyperspace import create_hyperspace
 import ray
-from ray import tune
-from ray.tune.suggest.skopt import SkOptSearch
-from skopt import Optimizer
-from tqdm import tqdm
-import statistics
-import foolbox as fb
 import time
-from bi_tune import multi_train, model_attack
 import pickle
 import stat
 
@@ -74,7 +65,7 @@ def create_spaces_and_args_pickles(args):
                            (0.2, 0.9),  # dropout
                            (10, 100),  # epochs
                            (10, 500),  # batch size
-                           (1, .00000001)]  # epsilon for Adam optimizer
+                           (.00000001, 1)]  # epsilon for Adam optimizer
     # create pickled space
     space = create_hyperspace(hyperparameters)
     f = open("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/tmp/hyperres_pickled_spaces", "wb")
