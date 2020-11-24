@@ -82,7 +82,7 @@ def chunks(l, n):
 
 def process_args(args):
     """Setting global variables using arguments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, NODES, MNIST
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, NODES, MNIST, TRIALS
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     arguments = parser.parse_args()
     process_args(arguments)
     spaces = create_spaces_and_args_pickles(arguments)
-    space_chunks = chunks(list(range(spaces)), NODES)
+    space_chunks = chunks(list(range(len(spaces))), NODES)
     # given these space chunks, run in singularity container on GPU
     for chunk in space_chunks:
         submit_job(chunk, arguments)
