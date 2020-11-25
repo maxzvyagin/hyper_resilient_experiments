@@ -23,7 +23,6 @@ import json
 import tensorflow as tf
 import torch
 import torchvision
-from torch.utils.data import DataLoader
 import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
@@ -31,8 +30,8 @@ import os
 import time
 from torch.utils.data import DataLoader
 # from segmentation import gis_preprocess
-# from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
-# from segmentation.tensorflow_unet import get_cityscapes
+from segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+from segmentation.tensorflow_unet import get_cityscapes
 import multiprocessing
 
 # Default constants
@@ -179,6 +178,7 @@ def multi_train(config):
 
 
 def bitune_parse_arguments(args):
+    """Parsing arguments specifically for bi tune experiments"""
     global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
@@ -226,7 +226,7 @@ def bitune_parse_arguments(args):
         TRIALS = int(args.trials)
 
 
-def run_bitune_experiment(args, func, mode="max", metric="average_res",
+def run_experiment(args, func, mode="max", metric="average_res",
                           ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/ray_results"):
     """ Parse command line arguments and begin experiment."""
     start_time = time.time()
@@ -290,4 +290,5 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     args = parser.parse_args()
-    run_bitune_experiment(args, multi_train, bitune=True)
+    bitune_parse_arguments(args)
+    run_experiment(args, multi_train)
