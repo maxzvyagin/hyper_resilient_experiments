@@ -8,8 +8,8 @@ from tensorflow import keras
 
 from segmentation.gis_preprocess import tf_gis_test_train_split
 
-from segmentation.UNet.tensorflow_unet import TensorFlow_UNet_Model
-from model import unet
+# from segmentation.UNet.tensorflow_unet import TensorFlow_UNet_Model
+# from model import unet
 
 # import os
 
