@@ -13,7 +13,7 @@ import argparse
 from segmentation.gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
-from UNet.pytorch_unet import PyTorch_UNet_Model
+from segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
 
 
 def custom_transform(img):
