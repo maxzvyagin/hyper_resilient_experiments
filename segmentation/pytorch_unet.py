@@ -10,8 +10,7 @@ import os
 import sys
 import argparse
 
-sys.path.append("/home/mzvyagin/hyper_resilient/segmentation")
-from gis_preprocess import pt_gis_train_test_split
+from segmentation.gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
 from UNet.pytorch_unet import PyTorch_UNet_Model
