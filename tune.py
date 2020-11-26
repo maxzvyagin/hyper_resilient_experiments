@@ -216,4 +216,5 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     args = parser.parse_args()
+    print(args.json)
     spaceray.run_experiment(multi_train, args)
