@@ -23,4 +23,4 @@ if __name__ == "__main__":
     parser.add_argument("-j", "--json")
     parser.add_argument("-n", "--nodes")
     args = parser.parse_args()
-    theta_spaceray.run(args, multi_train)
+    thetaspaceray.run(args, multi_train)
