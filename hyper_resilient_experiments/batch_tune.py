@@ -1,7 +1,7 @@
-from bi_tune import multi_train, model_attack, bitune_parse_arguments
-from simple_mnist import pt_mnist, tf_mnist
-from alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from segmentation import pytorch_unet, tensorflow_unet
+from hyper_resilient_experiments.bi_tune import multi_train, model_attack, bitune_parse_arguments
+from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
+from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import thetaspaceray
 import argparse
 

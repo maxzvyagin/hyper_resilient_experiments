@@ -10,10 +10,10 @@ import os
 import sys
 import argparse
 
-from segmentation.gis_preprocess import pt_gis_train_test_split
+from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
-from segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
+from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
 
 
 def custom_transform(img):
