@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
-    parser.add_argument("-j", "--json")g
+    parser.add_argument("-j", "--json")
     args = parser.parse_args()
     bitune_parse_arguments(args)
     print(PT_MODEL)
