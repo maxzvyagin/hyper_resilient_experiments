@@ -208,7 +208,6 @@ def bitune_parse_arguments(args):
         TRIALS = int(args.trials)
 
 if __name__ == "__main__":
-    """Run experiment with command line arguments."""
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
