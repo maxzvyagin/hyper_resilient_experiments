@@ -215,5 +215,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
+    parser.add_argument("--address")
+    args = parser.parse_args()
+    #ray.init(address=args.address)
     args = parser.parse_args()
     spaceray.run_experiment(args, multi_train)
