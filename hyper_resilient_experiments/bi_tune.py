@@ -1,7 +1,8 @@
 import sys
-from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
-from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
+from . import simple_mnist
+#from simple_mnist import pt_mnist, tf_mnist
+# from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
+# from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import argparse
 import ray
 from ray import tune
@@ -19,8 +20,8 @@ from hyper_resilient_experiments.segmentation.tensorflow_unet import get_citysca
 import spaceray
 
 # Default constants
-PT_MODEL = pt_mnist.mnist_pt_objective
-TF_MODEL = tf_mnist.mnist_tf_objective
+PT_MODEL = simple_mnist.pt_mnist.mnist_pt_objective
+TF_MODEL = simple_mnist.tf_mnist.mnist_tf_objective
 NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
