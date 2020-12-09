@@ -18,7 +18,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     python_requires=">=3.5",
     install_requires=['scikit-learn==0.22.1', 'scikit-optimize==0.5.2', 'ray', "ray [tune]", "hyperspaces", "spaceray",
-                      "thetaspaceray", "torch", "torchvision", "tensorflow", "segmentation_models_pytorch",
+                      "thetaspaceray", "segmentation_models_pytorch",
                       "segmentation_models"],
     classifiers=[
         # Trove classifiers
