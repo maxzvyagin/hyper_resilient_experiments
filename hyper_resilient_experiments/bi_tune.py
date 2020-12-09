@@ -1,5 +1,5 @@
 import sys
-import simple_mnist
+from hyper_resilient_experiments import simple_mnist
 #from simple_mnist import pt_mnist, tf_mnist
 # from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 # from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
