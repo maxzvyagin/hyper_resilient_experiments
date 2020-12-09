@@ -3,6 +3,7 @@ from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import argparse
+import ray
 from ray import tune
 import statistics
 import foolbox as fb
@@ -214,8 +215,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
-    parser.add_argument("--address")
-    args = parser.parse_args()
-    #ray.init(address=args.address)
+    ray.init(address="auto")
     args = parser.parse_args()
     spaceray.run_experiment(args, multi_train)
