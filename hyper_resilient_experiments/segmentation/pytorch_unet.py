@@ -54,6 +54,12 @@ class PyTorch_UNet(pl.LightningModule):
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=5)
+        elif self.dataset == "voc":
+            return DataLoader(torchvision.datasets.VOCSegmentation(
+                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+                batch_size=int(self.config['batch_size']), num_workers=5)
         else:
             return DataLoader(self.train_set, batch_size=int(self.config['batch_size']), num_workers=10)
 
@@ -65,7 +71,13 @@ class PyTorch_UNet(pl.LightningModule):
             #     target_transform=torchvision.transforms.ToTensor()),
             #     batch_size=int(self.config['batch_size']), num_workers=5)
             return DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
+                "/home/mzvyagin/datasets/", split='val', download=True,
+                transform=torchvision.transforms.ToTensor(),
+                target_transform=torchvision.transforms.ToTensor()),
+                batch_size=int(self.config['batch_size']), num_workers=5)
+        elif self.dataset == "voc":
+            return DataLoader(torchvision.datasets.VOCSegmentation(
+                "/home/mzvyagin/datasets/", split='val', download=True,
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=5)
