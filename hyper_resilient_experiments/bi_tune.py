@@ -1,7 +1,7 @@
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
+#from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import argparse
 import ray
 from ray import tune
@@ -14,8 +14,8 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
-from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
+#from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+#from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
 import faulthandler
 
