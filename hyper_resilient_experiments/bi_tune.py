@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
+import faulthandler
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -209,6 +210,7 @@ def bitune_parse_arguments(args):
         TRIALS = int(args.trials)
 
 if __name__ == "__main__":
+    faulthandler.enable()
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
