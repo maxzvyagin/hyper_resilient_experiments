@@ -49,4 +49,4 @@ if __name__ == "__main__":
     print(PT_MODEL)
     print(TF_MODEL)
     print(NO_FOOL)
-    spaceray.run_experiment(args, max_diff_train, ray_dir="~/hyperres")
+    spaceray.run_experiment(args, max_diff_train)
