@@ -32,7 +32,7 @@ def start_cluster(yaml="~/default_cluster.yaml", cluster_name="default"):
             - source ~/.bashrc; conda activate dl
         '''
     )
-    f = open(yaml, "w")
+    f = open(yaml, "w+")
     f.write(lines)
     os.popen('ray up '+yaml)
 
