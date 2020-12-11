@@ -146,7 +146,7 @@ def segmentation_pt_objective(config, dataset="cityscapes"):
     if dataset == "cityscapes":
         model = PyTorch_UNet(config, classes=30)
     elif dataset == "voc":
-        model = PyTorch_UNet(config, classes=20, dataset=dataset, in_channels=3)
+        model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=3)
     else:
         model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=4)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='dp')
