@@ -17,9 +17,7 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     workers = ""
     authorization = '{ssh_user: mzvyagin}'
     print("INCORRECT IMPLEMENTATION FOR NUM WORKERS")
-    lines = []
-    lines.append(
-        f'''
+    lines = f'''
         cluster_name: default
         provider:
             type: local
@@ -31,7 +29,6 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
         setup_commands:
             - source ~/.bashrc; conda activate dl
         '''
-    )
     f = open(yaml, "w+")
     f.write(lines)
     os.popen('ray up '+yaml)
