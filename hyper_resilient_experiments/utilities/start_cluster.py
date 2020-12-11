@@ -20,12 +20,14 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
         worker_nodes.append(x.strip())
     print(worker_nodes)
     workers = str(worker_nodes)
+    authorization = '{ssh_user: mzvyagin}'
     lines = f'''
 cluster_name: default
 provider:
     type: local
     head_ip: {host}
     worker_ips: {workers}
+auth: {authorization}
 min_workers: {num_workers}
 max_workers: {num_workers}
 setup_commands:
