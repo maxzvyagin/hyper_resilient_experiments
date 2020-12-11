@@ -14,8 +14,8 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-#from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
-#from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
+from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
 import faulthandler
 
