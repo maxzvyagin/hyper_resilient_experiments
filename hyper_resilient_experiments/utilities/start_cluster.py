@@ -14,6 +14,7 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     num_workers = len(nodes)
     worker_nodes = []
     for x in nodes:
+        print(x)
         if host in x:
             nodes.remove(x)
         else:
