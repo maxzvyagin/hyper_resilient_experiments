@@ -13,13 +13,11 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     print(nodes)
     f.close()
     num_workers = len(nodes)
+    # remove the login node from worker list
+    nodes.pop(0)
     worker_nodes = []
     for x in nodes:
-        print(x)
-        if host in x:
-            nodes.remove(x)
-        else:
-            worker_nodes.append(x.strip())
+        worker_nodes.append(x.strip())
     print(worker_nodes)
     workers = str(worker_nodes)
     lines = f'''
