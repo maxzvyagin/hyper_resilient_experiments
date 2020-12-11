@@ -24,8 +24,8 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
             type: local
             head_ip: {host}
             worker_ips: {workers}
-        min_workers = {num_workers}
-        max_workers = {num_workers}
+        min_workers: {num_workers}
+        max_workers: {num_workers}
         setup_commands:
             - source ~/.bashrc; conda activate dl
         '''
