@@ -2,7 +2,7 @@
 import os
 import argparse
 
-def start_cluster(yaml="~/default_cluster.yaml", cluster_name="default"):
+def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="default"):
     # get head node
     host = os.popen('hostname').read().strip()
     # get sub nodes
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     if args.yaml:
         yaml = args.yaml
     else:
-        yaml = "~/default_cluster.yaml"
+        yaml = "/home/mzvyagin/default_cluster.yaml"
     if args.cluster:
         cluster = args.cluster
     else:
