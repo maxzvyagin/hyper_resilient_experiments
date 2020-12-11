@@ -10,6 +10,7 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     nodefile = os.environ['COBALT_NODEFILE']
     f = open(nodefile, "r")
     nodes = f.readlines()
+    print(nodes)
     f.close()
     num_workers = len(nodes)
     worker_nodes = []
