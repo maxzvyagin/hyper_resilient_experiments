@@ -11,19 +11,19 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     f = open(nodefile, "r")
     nodes = f.readlines()
     num_workers = len(nodes)
+    worker_nodes = []
     for x in nodes:
         if host in x:
             nodes.remove(x)
-    workers = ""
-    authorization = '{ssh_user: mzvyagin}'
-    print("INCORRECT IMPLEMENTATION FOR NUM WORKERS")
+        else:
+            worker_nodes.append(x.strip())
+    workers = str(worker_nodes)
     lines = f'''
         cluster_name: default
         provider:
             type: local
             head_ip: {host}
             worker_ips: {workers}
-        auth: {authorization}
         min_workers = {num_workers}
         max_workers = {num_workers}
         setup_commands:
