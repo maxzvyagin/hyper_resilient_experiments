@@ -105,6 +105,8 @@ def model_attack(model, model_type, attack_type, config):
         attack = fb.attacks.BoundaryAttack()
     elif attack_type == "spatial":
         attack = fb.attacks.SpatialAttack()
+    elif attack_type == "deepfool":
+        attack = fb.attacks.LinfDeepFoolAttack()
     epsilons = [
         0.0,
         0.0002,

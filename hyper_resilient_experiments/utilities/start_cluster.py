@@ -1,6 +1,7 @@
 """Utility script used to start up a ray tune cluster on """
 import os
 import argparse
+import sys
 
 def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="default"):
     # get head node
@@ -13,6 +14,9 @@ def start_cluster(yaml="/home/mzvyagin/default_cluster.yaml", cluster_name="defa
     print(nodes)
     f.close()
     num_workers = len(nodes)
+    if num_workers <= 1:
+        print("FAILURE: could not create cluster file as $COBALT_NODEFILE lists 1 or fewer workers. Review and try agian.")
+        sys.exit()
     # remove the login node from worker list
     nodes.pop(0)
     worker_nodes = []

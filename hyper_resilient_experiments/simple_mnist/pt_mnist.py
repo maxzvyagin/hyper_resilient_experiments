@@ -81,7 +81,11 @@ def mnist_pt_objective(config):
     torch.manual_seed(0)
     #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     model = NumberNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
+    try:
+        trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
+    except:
+        print("WARNING: training on CPU only, GPU[0] not found.")
+        trainer = pl.Trainer(max_epochs=config['epochs'])
     # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='ddp')
     # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=4, auto_select_gpus=True)
     # trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[8, 9, 10, 11], distributed_backend='ddp')
