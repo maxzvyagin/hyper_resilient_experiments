@@ -9,7 +9,7 @@ import os
 import sys
 from tensorflow import keras
 from hyper_resilient_experiments.segmentation.UNet.tensorflow_unet import make_tensorflow_unet
-from hyper_resilient_experiments.segmentation.gis_preprocess import tf_gis_test_train_split
+# from hyper_resilient_experiments.segmentation.gis_preprocess import tf_gis_test_train_split
 
 
 # from segmentation.UNet.tensorflow_unet import TensorFlow_UNet_Model
