@@ -12,7 +12,7 @@ from hyper_resilient_experiments.segmentation.UNet.tensorflow_unet import make_t
 from hyper_resilient_experiments.segmentation.gis_preprocess import tf_gis_test_train_split
 
 
-from segmentation.UNet.tensorflow_unet import TensorFlow_UNet_Model
+# from hyper_resilient_experiments.UNet.tensorflow_unet import TensorFlow_UNet_Model
 # from model import unet
 
 # import os
