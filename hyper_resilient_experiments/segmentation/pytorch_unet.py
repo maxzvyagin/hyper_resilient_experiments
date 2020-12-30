@@ -1,5 +1,6 @@
 ### PyTorch UNet with Resnet 34 Backbone
 # import segmentation_models_pytorch as smp
+from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
 import pytorch_lightning as pl
 import torch
 import torchvision
@@ -12,7 +13,7 @@ import argparse
 
 from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
 
-from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
+
 from torch.utils.data import DataLoader
 
 import faulthandler; faulthandler.enable()
