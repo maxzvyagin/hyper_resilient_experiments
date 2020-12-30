@@ -168,7 +168,6 @@ def gis_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    faulthandler.enable('error.txt')
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch')
     args = parser.parse_args()
