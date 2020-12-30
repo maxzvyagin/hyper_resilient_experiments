@@ -36,6 +36,7 @@ class PyTorch_UNet(pl.LightningModule):
             self.criterion = nn.BCEWithLogitsLoss()
         else:
             self.criterion = nn.CrossEntropyLoss()
+            self.criterion = nn.CrossEntropyLoss()
         self.test_loss = None
         self.test_accuracy = None
         self.test_iou = None
