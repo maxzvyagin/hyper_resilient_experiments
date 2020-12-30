@@ -403,7 +403,7 @@ numpy_msavi = np.vectorize(msavi)
 #     return augmented_samples
 
 
-def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False):
     """ Return PT GIS Datasets with Train Test Split"""
 
     if not img_and_shps:
