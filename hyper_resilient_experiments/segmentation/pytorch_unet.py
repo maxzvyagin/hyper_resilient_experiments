@@ -12,7 +12,7 @@ import argparse
 
 from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
 
-# from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
+from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
 import faulthandler
@@ -177,4 +177,4 @@ if __name__ == "__main__":
         batch_size = 4
     test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1}
     #res = segmentation_pt_objective(test_config)
-    res = segmentation_pt_objective(test_config, dataset="gis")
+    # res = segmentation_pt_objective(test_config, dataset="gis")
