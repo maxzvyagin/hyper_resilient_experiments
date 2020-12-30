@@ -168,13 +168,13 @@ def gis_pt_objective(config):
 
 if __name__ == "__main__":
     print("Hello")
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('-b', '--batch')
-    # args = parser.parse_args()
-    # if args.batch:
-    #     batch_size = args.batch
-    # else:
-    #     batch_size = 4
-    # test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1}
-    # #res = segmentation_pt_objective(test_config)
-    # res = segmentation_pt_objective(test_config, dataset="gis")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-b', '--batch')
+    args = parser.parse_args()
+    if args.batch:
+        batch_size = args.batch
+    else:
+        batch_size = 4
+    test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1}
+    #res = segmentation_pt_objective(test_config)
+    res = segmentation_pt_objective(test_config, dataset="gis")
