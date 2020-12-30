@@ -15,6 +15,8 @@ from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_U
 from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
 from torch.utils.data import DataLoader
 
+import faulthandler
+
 # from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
 
 
@@ -166,6 +168,7 @@ def gis_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
+    faulthandler.enable('error.txt')
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch')
     args = parser.parse_args()
