@@ -19,7 +19,7 @@ from hyper_resilient_experiments.segmentation.UNet.tensorflow_unet import make_t
 
 
 def cityscapes_tf_objective(config, classes=30):
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+    # os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     b = int(config['batch_size'])
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
@@ -112,4 +112,5 @@ if __name__ == "__main__":
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     # res = cityscapes_tf_objective(test_config)
     # print(res[0])
+    cityscapes_tf_objective(test_config)
     res = gis_tf_objective(test_config)
