@@ -56,26 +56,26 @@ def gis_tf_objective(config, classes=1):
     tf.random.set_seed(0)
     keras.backend.set_image_data_format('channels_last')
     b = int(config['batch_size'])
-    strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
-                                                       "/gpu:6", "/gpu:7"])
-    with strategy.scope():
+    # strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1", "/gpu:2", "/gpu:3", "/gpu:4", "/gpu:5",
+    #                                                    "/gpu:6", "/gpu:7"])
+    # with strategy.scope():
         # model = keras.models.Sequential()
         # model.add(make_tensorflow_unet(4, 1))
         # model.add(keras.layers.Dense(1, activation="sigmoid"))
-        model = sm.Unet('resnet34', activation="sigmoid")
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'])
-        model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
-                      metrics=['accuracy'])
+    model = sm.Unet('resnet34', activation="sigmoid", input_shape=(256, 256, 4), encoder_weights=None)
+    opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
+    model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
+                  metrics=['accuracy'])
     # fit model on gis data
     (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-    print(len(x_train))
-    print(len(x_test))
-    options = tf.data.Options()
-    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b, drop_remainder=True)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b, drop_remainder=True)
-    res = model.fit(train, epochs=config['epochs'], batch_size=b)
-    res_test = model.evaluate(test)
+    # print(len(x_train))
+    # print(len(x_test))
+    # options = tf.data.Options()
+    # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b, drop_remainder=True)
+    # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b, drop_remainder=True)
+    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b)
+    res_test = model.evaluate(x_test, y_test)
     return res_test[1], model
 
 
@@ -108,7 +108,7 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1}
+    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     # res = cityscapes_tf_objective(test_config)
     # print(res[0])
     res = gis_tf_objective(test_config)
