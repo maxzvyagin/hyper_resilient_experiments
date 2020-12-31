@@ -1,182 +1,234 @@
-### PyTorch UNet with Resnet 34 Backbone
-# import segmentation_models_pytorch as smp
-import pytorch_lightning as pl
-import torch
-import torchvision
-from torch import nn
-import statistics
-import numpy as np
 import os
-import sys
-import argparse
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
-
-from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split
-from torch.utils.data import DataLoader
-
-import faulthandler
-
-# from hyper_resilient_experiments.segmentation.UNet.pytorch_unet import PyTorch_UNet_Model
+import cv2
+import keras
+import numpy as np
+import matplotlib.pyplot as plt
 
 
-def custom_transform(img):
-    return torchvision.transforms.ToTensor(np.array(img))
+DATA_DIR = './data/CamVid/'
+
+# load repo with data if it is not exists
+if not os.path.exists(DATA_DIR):
+    print('Loading data...')
+    os.system('git clone https://github.com/alexgkendall/SegNet-Tutorial ./data')
+    print('Done!')
+
+x_train_dir = os.path.join(DATA_DIR, 'train')
+y_train_dir = os.path.join(DATA_DIR, 'trainannot')
+
+x_valid_dir = os.path.join(DATA_DIR, 'val')
+y_valid_dir = os.path.join(DATA_DIR, 'valannot')
+
+x_test_dir = os.path.join(DATA_DIR, 'test')
+y_test_dir = os.path.join(DATA_DIR, 'testannot')
 
 
-### definition of PyTorch Lightning module in order to run everything
-class PyTorch_UNet(pl.LightningModule):
-    def __init__(self, config, classes, dataset='cityscapes', in_channels=3):
-        super(PyTorch_UNet, self).__init__()
-        self.config = config
+import segmentation_models as sm
+
+BACKBONE = 'efficientnetb3'
+BATCH_SIZE = 8
+CLASSES = ['car']
+LR = 0.0001
+EPOCHS = 40
+
+preprocess_input = sm.get_preprocessing(BACKBONE)
+
+
+# helper function for data visualization
+def visualize(**images):
+    """PLot images in one row."""
+    n = len(images)
+    plt.figure(figsize=(16, 5))
+    for i, (name, image) in enumerate(images.items()):
+        plt.subplot(1, n, i + 1)
+        plt.xticks([])
+        plt.yticks([])
+        plt.title(' '.join(name.split('_')).title())
+        plt.imshow(image)
+    plt.show()
+
+
+# helper function for data visualization
+def denormalize(x):
+    """Scale image to range 0..1 for correct plot"""
+    x_max = np.percentile(x, 98)
+    x_min = np.percentile(x, 2)
+    x = (x - x_min) / (x_max - x_min)
+    x = x.clip(0, 1)
+    return x
+
+
+# classes for data loading and preprocessing
+class Dataset:
+    """CamVid Dataset. Read images, apply augmentation and preprocessing transformations.
+
+    Args:
+        images_dir (str): path to images folder
+        masks_dir (str): path to segmentation masks folder
+        class_values (list): values of classes to extract from segmentation mask
+        augmentation (albumentations.Compose): data transfromation pipeline
+            (e.g. flip, scale, etc.)
+        preprocessing (albumentations.Compose): data preprocessing
+            (e.g. noralization, shape manipulation, etc.)
+
+    """
+
+    CLASSES = ['sky', 'building', 'pole', 'road', 'pavement',
+               'tree', 'signsymbol', 'fence', 'car',
+               'pedestrian', 'bicyclist', 'unlabelled']
+
+    def __init__(
+            self,
+            images_dir,
+            masks_dir,
+            classes=None,
+            augmentation=None,
+            preprocessing=None,
+    ):
+        self.ids = os.listdir(images_dir)
+        self.images_fps = [os.path.join(images_dir, image_id) for image_id in self.ids]
+        self.masks_fps = [os.path.join(masks_dir, image_id) for image_id in self.ids]
+
+        # convert str names to class values on masks
+        self.class_values = [self.CLASSES.index(cls.lower()) for cls in classes]
+
+        self.augmentation = augmentation
+        self.preprocessing = preprocessing
+
+    def __getitem__(self, i):
+
+        # read data
+        image = cv2.imread(self.images_fps[i])
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mask = cv2.imread(self.masks_fps[i], 0)
+
+        # extract certain classes from mask (e.g. cars)
+        masks = [(mask == v) for v in self.class_values]
+        mask = np.stack(masks, axis=-1).astype('float')
+
+        # add background if mask is not binary
+        if mask.shape[-1] != 1:
+            background = 1 - mask.sum(axis=-1, keepdims=True)
+            mask = np.concatenate((mask, background), axis=-1)
+
+        # apply augmentations
+        if self.augmentation:
+            sample = self.augmentation(image=image, mask=mask)
+            image, mask = sample['image'], sample['mask']
+
+        # apply preprocessing
+        if self.preprocessing:
+            sample = self.preprocessing(image=image, mask=mask)
+            image, mask = sample['image'], sample['mask']
+
+        return image, mask
+
+    def __len__(self):
+        return len(self.ids)
+
+
+class Dataloder(keras.utils.Sequence):
+    """Load data from dataset and form batches
+
+    Args:
+        dataset: instance of Dataset class for image loading and preprocessing.
+        batch_size: Integet number of images in batch.
+        shuffle: Boolean, if `True` shuffle image indexes each epoch.
+    """
+
+    def __init__(self, dataset, batch_size=1, shuffle=False):
         self.dataset = dataset
-        # sigmoid is part of BCE with logits loss
-        self.model = PyTorch_UNet_Model(in_channels, classes)
-        if dataset == "gis":
-            self.criterion = nn.BCEWithLogitsLoss()
-        else:
-            self.criterion = nn.CrossEntropyLoss()
-            self.criterion = nn.CrossEntropyLoss()
-        self.test_loss = None
-        self.test_accuracy = None
-        self.test_iou = None
-        self.accuracy = pl.metrics.Accuracy()
-        #self.iou = pl.metrics.functional.classification.iou
-        if self.dataset == "gis":
-            self.train_set, self.test_set = pt_gis_train_test_split()
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.indexes = np.arange(len(dataset))
 
-    def train_dataloader(self):
-        if self.dataset == 'cityscapes':
-            # return DataLoader(torchvision.datasets.Cityscapes(
-            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
-            #     transform=torchvision.transforms.ToTensor(),
-            #     target_transform=torchvision.transforms.ToTensor()),
-            #     batch_size=int(self.config['batch_size']), num_workers=5)
-            return DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
-        elif self.dataset == "voc":
-            return DataLoader(torchvision.datasets.VOCSegmentation(
-                "/home/mzvyagin/datasets/", image_set='train',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
-        else:
-            return DataLoader(self.train_set, batch_size=int(self.config['batch_size']), num_workers=10)
+        self.on_epoch_end()
 
-    def test_dataloader(self):
-        if self.dataset == 'cityscapes':
-            # return DataLoader(torchvision.datasets.Cityscapes(
-            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
-            #     transform=torchvision.transforms.ToTensor(),
-            #     target_transform=torchvision.transforms.ToTensor()),
-            #     batch_size=int(self.config['batch_size']), num_workers=5)
-            return DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
-        elif self.dataset == "voc":
-            return DataLoader(torchvision.datasets.VOCSegmentation(
-                "/home/mzvyagin/datasets/", image_set='val', download=True,
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
-        else:
-            return DataLoader(self.test_set, batch_size=int(self.config['batch_size']), num_workers=5)
+    def __getitem__(self, i):
 
-    def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
-        return optimizer
+        # collect batch data
+        start = i * self.batch_size
+        stop = (i + 1) * self.batch_size
+        data = []
+        for j in range(start, stop):
+            data.append(self.dataset[j])
 
-    def forward(self, x):
-        return self.model(x)
+        # transpose list of lists
+        batch = [np.stack(samples, axis=0) for samples in zip(*data)]
 
-    def training_step(self, train_batch, batch_idx):
-        x, y = train_batch
-        return {'forward': self.forward(x), 'expected': y}
+        return batch
 
-    def training_step_end(self, outputs):
-        # only use when  on dp
-        if self.dataset == "gis":
-            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
-        else:
-            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
-        logs = {'train_loss': loss}
-        return {'loss': loss, 'logs': logs}
+    def __len__(self):
+        """Denotes the number of batches per epoch"""
+        return len(self.indexes) // self.batch_size
 
-    def test_step(self, test_batch, batch_idx):
-        x, y = test_batch
-        return {'forward': self.forward(x), 'expected': y}
+    def on_epoch_end(self):
+        """Callback function to shuffle indexes each epoch"""
+        if self.shuffle:
+            self.indexes = np.random.permutation(self.indexes)
 
-    def test_step_end(self, outputs):
-        if self.dataset == "gis":
-            loss = self.criterion(outputs['forward'].squeeze(1), outputs['expected'])
-            accuracy = self.accuracy(outputs['forward'].squeeze(1), outputs['expected'])
-            # iou = self.iou(outputs['forward'].squeeze(1), outputs['expected'])
-        else:
-            loss = self.criterion(outputs['forward'], outputs['expected'].long().squeeze(1))
-            accuracy = self.accuracy(outputs['forward'], outputs['expected'].squeeze(1))
-            # iou = self.iou(outputs['forward'], outputs['expected'].squeeze(1))
-        logs = {'test_loss': loss, 'test_accuracy': accuracy}
-        return {'test_loss': loss, 'logs': logs, 'test_accuracy': accuracy}
+# define network parameters
+n_classes = 1 if len(CLASSES) == 1 else (len(CLASSES) + 1)  # case for binary and multiclass segmentation
+activation = 'sigmoid' if n_classes == 1 else 'softmax'
 
-    def test_epoch_end(self, outputs):
-        loss = []
-        for x in outputs:
-            loss.append(float(x['test_loss']))
-        avg_loss = statistics.mean(loss)
-        tensorboard_logs = {'test_loss': avg_loss}
-        self.test_loss = avg_loss
-        accuracy = []
-        for x in outputs:
-            accuracy.append(float(x['test_accuracy']))
-        avg_accuracy = statistics.mean(accuracy)
-        self.test_accuracy = avg_accuracy
-        # iou = []
-        # for x in outputs:
-        #     iou.append(float(x['test_iou']))
-        # avg_iou = statistics.mean(iou)
-        # self.test_iou = avg_iou
-        return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
+#create model
+model = sm.Unet(BACKBONE, classes=n_classes, activation=activation)
+
+optim = keras.optimizers.Adam(LR)
+
+# Segmentation models losses can be combined together by '+' and scaled by integer or float factor
+dice_loss = sm.losses.DiceLoss()
+focal_loss = sm.losses.BinaryFocalLoss() if n_classes == 1 else sm.losses.CategoricalFocalLoss()
+total_loss = dice_loss + (1 * focal_loss)
+
+# actulally total_loss can be imported directly from library, above example just show you how to manipulate with losses
+# total_loss = sm.losses.binary_focal_dice_loss # or sm.losses.categorical_focal_dice_loss
+
+metrics = [sm.metrics.IOUScore(threshold=0.5), sm.metrics.FScore(threshold=0.5)]
+
+# compile keras model with defined optimozer, loss and metrics
+model.compile(optim, total_loss, metrics)
+
+# Dataset for train images
+train_dataset = Dataset(
+    x_train_dir,
+    y_train_dir,
+    classes=CLASSES,
+    augmentation=get_training_augmentation(),
+    preprocessing=get_preprocessing(preprocess_input),
+)
+
+# Dataset for validation images
+valid_dataset = Dataset(
+    x_valid_dir,
+    y_valid_dir,
+    classes=CLASSES,
+    augmentation=get_validation_augmentation(),
+    preprocessing=get_preprocessing(preprocess_input),
+)
+
+train_dataloader = Dataloder(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+valid_dataloader = Dataloder(valid_dataset, batch_size=1, shuffle=False)
+
+# check shapes for errors
+assert train_dataloader[0][0].shape == (BATCH_SIZE, 320, 320, 3)
+assert train_dataloader[0][1].shape == (BATCH_SIZE, 320, 320, n_classes)
+
+# define callbacks for learning rate scheduling and best checkpoints saving
+callbacks = [
+    keras.callbacks.ModelCheckpoint('./best_model.h5', save_weights_only=True, save_best_only=True, mode='min'),
+    keras.callbacks.ReduceLROnPlateau(),
+]
 
 
-def segmentation_pt_objective(config, dataset="cityscapes"):
-    # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
-    torch.manual_seed(0)
-    if dataset == "cityscapes":
-        model = PyTorch_UNet(config, classes=30)
-    elif dataset == "voc":
-        model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=3)
-    else:
-        model = PyTorch_UNet(config, classes=1, dataset=dataset, in_channels=4)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], distributed_backend='dp')
-    trainer.fit(model)
-    trainer.test(model)
-    return model.test_accuracy, model.model
-
-
-def cityscapes_pt_objective(config):
-    return segmentation_pt_objective(config, dataset="cityscapes")
-
-
-def gis_pt_objective(config):
-    return segmentation_pt_objective(config, dataset="gis")
-
-
-### two different objective functions, one for cityscapes and one for GIS
-
-if __name__ == "__main__":
-    print("Hello")
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--batch')
-    args = parser.parse_args()
-    if args.batch:
-        batch_size = args.batch
-    else:
-        batch_size = 4
-    test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1}
-    #res = segmentation_pt_objective(test_config)
-    res = segmentation_pt_objective(test_config, dataset="gis")
+# train model
+history = model.fit_generator(
+    train_dataloader,
+    steps_per_epoch=len(train_dataloader),
+    epochs=EPOCHS,
+    callbacks=callbacks,
+    validation_data=valid_dataloader,
+    validation_steps=len(valid_dataloader),
+)
