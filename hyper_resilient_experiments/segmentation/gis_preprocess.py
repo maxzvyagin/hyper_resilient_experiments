@@ -476,8 +476,8 @@ def pt_to_tf(x):
     """ Converts a pytorch tensor to a tensorflow tensor and returns it"""
     n = x.numpy()
     n = np.swapaxes(n, 0, -1)
-    t = tf.convert_to_tensor(n)
-    return t
+    # t = tf.convert_to_tensor(n)
+    return n
 
 
 def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
