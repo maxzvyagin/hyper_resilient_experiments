@@ -179,7 +179,7 @@ if __name__ == "__main__":
     print("Hello")
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch')
-    parser.add_argument('-l', '--lambda_files')
+    parser.add_argument('-l', '--lambda_files', action='store_true')
     args = parser.parse_args()
     if args.batch:
         batch_size = args.batch
