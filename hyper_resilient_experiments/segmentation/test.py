@@ -16,4 +16,4 @@ model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
 opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
 model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
               metrics=['accuracy'])
-model.train(train, epochs=config['epochs'], batch_size=4)
+model.train(x_train, y_train, epochs=config['epochs'], batch_size=4)
