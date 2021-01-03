@@ -18,7 +18,6 @@ from torch.utils.data import DataLoader
 
 import faulthandler; faulthandler.enable()
 
-global LAMBDA_FILESYSTEM
 LAMBDA_FILESYSTEM = False
 
 def custom_transform(img):
