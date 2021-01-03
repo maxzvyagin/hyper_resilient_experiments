@@ -50,7 +50,7 @@ class PyTorch_UNet(pl.LightningModule):
         else:
             files = None
         if self.dataset == "gis":
-            self.train_set, self.test_set = pt_gis_train_test_split(files=files)
+            self.train_set, self.test_set = pt_gis_train_test_split(img_and_shps=files)
 
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
@@ -150,7 +150,7 @@ class PyTorch_UNet(pl.LightningModule):
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
-def segmentation_pt_objective(config, dataset="cityscapes", lambda_system=False):
+def segmentation_pt_objective(config, dataset="cityscapes"):
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.manual_seed(0)
     if dataset == "cityscapes":
@@ -169,8 +169,8 @@ def cityscapes_pt_objective(config):
     return segmentation_pt_objective(config, dataset="cityscapes")
 
 
-def gis_pt_objective(config, lambda_system=False):
-    return segmentation_pt_objective(config, dataset="gis", lambda_system=lambda_system)
+def gis_pt_objective(config):
+    return segmentation_pt_objective(config, dataset="gis")
 
 
 ### two different objective functions, one for cityscapes and one for GIS
