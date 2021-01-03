@@ -63,10 +63,10 @@ def gis_tf_objective(config, classes=1):
         # model = keras.models.Sequential()
         # model.add(make_tensorflow_unet(4, 1))
         # model.add(keras.layers.Dense(1, activation="sigmoid"))
-    model = sm.Unet('resnet34', activation="sigmoid", input_shape=(256, 256, 4), encoder_weights=None)
-    # model = tf.keras.Sequential()
-    # model.add(make_tensorflow_unet(4, 1))
-    # model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
+    # model = sm.Unet('resnet34', activation="sigmoid", input_shape=(256, 256, 4), encoder_weights=None)
+    model = tf.keras.Sequential()
+    model.add(make_tensorflow_unet(4, 1))
+    model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                   metrics=['accuracy'])
@@ -84,7 +84,7 @@ def gis_tf_objective(config, classes=1):
     # options = tf.data.Options()
     # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b, drop_remainder=True)
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b, drop_remainder=True)
+    # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b, drop_remainder=True)
     # test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b, drop_remainder=True)
 
     res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b)
