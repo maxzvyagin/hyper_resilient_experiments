@@ -18,6 +18,9 @@ from torch.utils.data import DataLoader
 
 import faulthandler; faulthandler.enable()
 
+global LAMBDA_FILESYSTEM
+LAMBDA_FILESYSTEM = False
+
 def custom_transform(img):
     return torchvision.transforms.ToTensor(np.array(img))
 
@@ -40,8 +43,16 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
         #self.iou = pl.metrics.functional.classification.iou
+        global LAMBDA_FILESYSTEM
+        if LAMBDA_FILESYSTEM:
+            files = [("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+              "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+             ("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+              "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+        else:
+            files = None
         if self.dataset == "gis":
-            self.train_set, self.test_set = pt_gis_train_test_split()
+            self.train_set, self.test_set = pt_gis_train_test_split(files=files)
 
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
@@ -141,7 +152,7 @@ class PyTorch_UNet(pl.LightningModule):
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
-def segmentation_pt_objective(config, dataset="cityscapes"):
+def segmentation_pt_objective(config, dataset="cityscapes", lambda_system=False):
     # os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.manual_seed(0)
     if dataset == "cityscapes":
@@ -160,8 +171,8 @@ def cityscapes_pt_objective(config):
     return segmentation_pt_objective(config, dataset="cityscapes")
 
 
-def gis_pt_objective(config):
-    return segmentation_pt_objective(config, dataset="gis")
+def gis_pt_objective(config, lambda_system=False):
+    return segmentation_pt_objective(config, dataset="gis", lambda_system=lambda_system)
 
 
 ### two different objective functions, one for cityscapes and one for GIS
@@ -170,11 +181,15 @@ if __name__ == "__main__":
     print("Hello")
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch')
+    parser.add_argument('-l', '--lambda_files')
     args = parser.parse_args()
     if args.batch:
         batch_size = args.batch
     else:
         batch_size = 4
+    if args.lambda_files:
+        global LAMBDA_FILESYSTEM
+        LAMBDA_FILESYSTEM = True
     test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     #res = segmentation_pt_objective(test_config)
     res = segmentation_pt_objective(test_config, dataset="gis")
