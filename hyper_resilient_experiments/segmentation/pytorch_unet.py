@@ -186,7 +186,6 @@ if __name__ == "__main__":
     else:
         batch_size = 4
     if args.lambda_files:
-        global LAMBDA_FILESYSTEM
         LAMBDA_FILESYSTEM = True
     test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     #res = segmentation_pt_objective(test_config)
