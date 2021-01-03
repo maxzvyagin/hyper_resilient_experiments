@@ -42,7 +42,6 @@ class PyTorch_UNet(pl.LightningModule):
         self.test_iou = None
         self.accuracy = pl.metrics.Accuracy()
         #self.iou = pl.metrics.functional.classification.iou
-        global LAMBDA_FILESYSTEM
         if LAMBDA_FILESYSTEM:
             files = [("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
               "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
