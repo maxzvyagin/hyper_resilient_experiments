@@ -9,8 +9,9 @@ import os
 import sys
 from tensorflow import keras
 from hyper_resilient_experiments.segmentation.UNet.tensorflow_unet import make_tensorflow_unet
+from argparse import ArgumentParser
 
-
+LAMBDA_FILESYSTEM = False
 
 # from hyper_resilient_experiments.UNet.tensorflow_unet import TensorFlow_UNet_Model
 # from model import unet
@@ -70,7 +71,14 @@ def gis_tf_objective(config, classes=1):
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
                   metrics=['accuracy'])
     # fit model on gis data
-    (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
+    if LAMBDA_FILESYSTEM:
+        files = [("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+                  "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+                 ("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+                  "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+    else:
+        files = None
+    (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split(img_and_shps=files)
     # print(len(x_train))
     # print(len(x_test))
     # options = tf.data.Options()
@@ -111,6 +119,11 @@ def get_cityscapes():
 
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument('-l', '--lambda_fs', action='store_true')
+    args = parser.parse_args()
+    if args.lambda_fs:
+        LAMBDA_FILESYSTEM = True
     test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     # res = cityscapes_tf_objective(test_config)
     # print(res[0])

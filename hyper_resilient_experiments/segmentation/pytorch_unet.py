@@ -176,7 +176,6 @@ def gis_pt_objective(config):
 ### two different objective functions, one for cityscapes and one for GIS
 
 if __name__ == "__main__":
-    print("Hello")
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--batch')
     parser.add_argument('-l', '--lambda_files', action='store_true')
