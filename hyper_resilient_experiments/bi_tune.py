@@ -29,6 +29,7 @@ MNIST = True
 
 
 def model_attack(model, model_type, attack_type, config):
+    print(NUM_CLASSES)
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
