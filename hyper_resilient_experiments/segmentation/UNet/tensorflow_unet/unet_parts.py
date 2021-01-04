@@ -13,15 +13,15 @@ class DoubleConv(keras.layers.Layer):
             mid_channels = out_channels
         if first:
             self.double_conv = keras.models.Sequential([
-                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu"),
+                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu", padding="same"),
                 keras.layers.BatchNormalization(),
-                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu")
+                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu", padding="same")
             ])
         else:
             self.double_conv = keras.models.Sequential([
-                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu"),
+                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu", padding="same"),
                 keras.layers.BatchNormalization(),
-                keras.layers.Conv2D(filters=out_channels, kernel_size=3, activation="relu")
+                keras.layers.Conv2D(filters=out_channels, kernel_size=3, activation="relu", padding="same")
             ])
 
     def call(self, x):
