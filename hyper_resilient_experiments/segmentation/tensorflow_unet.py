@@ -8,7 +8,7 @@ import tensorflow_datasets as tfds
 import os
 import sys
 from tensorflow import keras
-from hyper_resilient_experiments.segmentation.UNet.tensorflow_unet import make_tensorflow_unet
+from hyper_resilient_experiments.segmentation.UNet import TensorFlow_UNet_Model
 from argparse import ArgumentParser
 
 LAMBDA_FILESYSTEM = False
