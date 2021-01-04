@@ -15,7 +15,7 @@ class DoubleConv(keras.layers.Layer):
             self.double_conv = keras.models.Sequential([
                 keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu"),
                 keras.layers.BatchNormalization(),
-                keras.layers.Conv2D(filters=out_channels, kernel_size=3, activation="relu")
+                keras.layers.Conv2D(filters=mid_channels, kernel_size=3, activation="relu")
             ])
         else:
             self.double_conv = keras.models.Sequential([
