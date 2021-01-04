@@ -9,7 +9,7 @@ import spaceray
 from ray import tune
 
 def max_diff_train(config):
-    pt_test_acc, pt_model = PT_MODEL(config)
+    pt_test_acc, pt_model = pytorch_alexnet.cifar100_pt_objective(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     pt_test_results = [pt_test_acc]
@@ -19,7 +19,7 @@ def max_diff_train(config):
     pt_test_results.append(pt_acc)
     del pt_model
     torch.cuda.empty_cache()
-    tf_test_acc, tf_model = TF_MODEL(config)
+    tf_test_acc, tf_model = tensorflow_alexnet.cifar100_tf_objective(config)
     search_results['tf_test_acc'] = tf_test_acc
     tf_test_results = [tf_test_acc]
     tf_acc = model_attack(tf_model, "tf", attack_type, config)
