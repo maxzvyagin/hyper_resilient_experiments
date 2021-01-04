@@ -8,6 +8,9 @@ import torch
 import spaceray
 from ray import tune
 
+global NUM_CLASSES
+NUM_CLASSES = 100
+
 def max_diff_train(config):
     pt_test_acc, pt_model = pytorch_alexnet.cifar100_pt_objective(config)
     pt_model.eval()
