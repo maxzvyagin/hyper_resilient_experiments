@@ -103,6 +103,7 @@ def model_attack(model, model_type, attack_type, config):
         attack = fb.attacks.SaltAndPepperNoiseAttack()
     elif attack_type == "boundary":
         attack = fb.attacks.BoundaryAttack()
+    # NOTE: Doesn't look like spatial is being supported by the devs anymore, not sure if should be using
     elif attack_type == "spatial":
         attack = fb.attacks.SpatialAttack()
     elif attack_type == "deepfool":

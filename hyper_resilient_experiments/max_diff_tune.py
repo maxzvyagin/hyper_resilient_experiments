@@ -13,17 +13,18 @@ def max_diff_train(config):
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     pt_test_results = [pt_test_acc]
-    # if not NO_FOOL:
-    #     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-    #         pt_acc = model_attack(pt_model, "pt", attack_type, config)
-    #         search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-    #         pt_test_results.append(pt_acc)
-    # to avoid weird CUDA OOM errors
+    attack_type = 'deepfool'
+    pt_acc = model_attack(pt_model, "pt", attack_type, config)
+    search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    pt_test_results.append(pt_acc)
     del pt_model
     torch.cuda.empty_cache()
     tf_test_acc, tf_model = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     tf_test_results = [tf_test_acc]
+    tf_acc = model_attack(tf_model, "tf", attack_type, config)
+    search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
+    tf_test_results.append(tf_acc)
     # if not NO_FOOL:
     #     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
     #         tf_acc = model_attack(tf_model, "tf", attack_type, config)
