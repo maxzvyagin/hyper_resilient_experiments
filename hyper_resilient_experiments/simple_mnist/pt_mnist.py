@@ -5,6 +5,19 @@ import torch
 import statistics
 import os
 
+class CustomSequential(nn.Sequential):
+    def __init__(self, config):
+        self.model = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(784, 128),
+            nn.ReLU(),
+            nn.Dropout(config['dropout']),
+            nn.Linear(128, 10))
+    def forward(self, input):
+        return self.model(input)
+
+    def predict(self, input):
+        return self.model(input)
 
 class NumberNet(pl.LightningModule):
     def __init__(self, config):
