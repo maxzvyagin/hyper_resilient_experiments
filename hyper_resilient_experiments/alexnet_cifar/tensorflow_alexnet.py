@@ -52,7 +52,7 @@ class TensorFlow_AlexNet:
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
         self.model.compile(optimizer=opt,
                            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                           metrics=['accuracy'])
+                           metrics=['accuracy'], run_eagerly=True)
         self.config = config
 
     def fit(self):
