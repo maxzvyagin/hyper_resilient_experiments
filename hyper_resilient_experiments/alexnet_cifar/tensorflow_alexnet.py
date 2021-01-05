@@ -84,5 +84,5 @@ def cifar10_tf_objective(config):
     return accuracy, model.model
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 500, 'learning_rate': .000001, 'epochs': 20, 'dropout': 0.9}
+    test_config = {'batch_size': 500, 'learning_rate': .000001, 'epochs': 20, 'dropout': 0.9, 'adam_epsilon':10**-9}
     res = cifar10_tf_objective(test_config)
