@@ -5,7 +5,7 @@ import torch
 import statistics
 import os
 
-class CustomSequential(nn.Sequential):
+class CustomSequential(nn.Module):
     def __init__(self, config):
         self.model = nn.Sequential(
             nn.Flatten(),
