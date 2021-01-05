@@ -28,31 +28,31 @@ NO_FOOL = False
 MNIST = True
 
 
-def model_attack(model, model_type, attack_type, config):
-    print(NUM_CLASSES)
+def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
+    print(num_classes)
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
         # cifar
-        if NUM_CLASSES == 100:
+        if num_classes == 100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
-        elif NUM_CLASSES == 10 and not MNIST:
+        elif num_classes == 10 and not MNIST:
             data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                            transform=torchvision.transforms.ToTensor(),
                                                            target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
         # cityscapes
-        elif NUM_CLASSES == 30:
+        elif num_classes == 30:
             data = DataLoader(torchvision.datasets.Cityscapes(
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(config['batch_size']))
         # gis
-        elif NUM_CLASSES == 1:
+        elif num_classes == 1:
             train_set, test_set = pt_gis_train_test_split()
             data = DataLoader(test_set, batch_size=int(config['batch_size']))
         else:
@@ -68,18 +68,18 @@ def model_attack(model, model_type, attack_type, config):
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
         # cifar
-        if NUM_CLASSES == 100:
+        if num_classes == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
-        elif NUM_CLASSES == 10 and not MNIST:
+        elif num_classes == 10 and not MNIST:
             train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
         # cityscapes
-        elif NUM_CLASSES == 30:
+        elif num_classes == 30:
             (x_train, y_train), (x_test, y_test) = get_cityscapes()
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # gis
-        elif NUM_CLASSES == 1:
+        elif num_classes == 1:
             (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # mnist

@@ -17,7 +17,7 @@ def max_diff_train(config):
     search_results = {'pt_test_acc': pt_test_acc}
     pt_test_results = [pt_test_acc]
     attack_type = 'deepfool'
-    pt_acc = model_attack(pt_model, "pt", attack_type, config)
+    pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=100)
     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     pt_test_results.append(pt_acc)
     del pt_model
@@ -25,7 +25,7 @@ def max_diff_train(config):
     tf_test_acc, tf_model = tensorflow_alexnet.cifar100_tf_objective(config)
     search_results['tf_test_acc'] = tf_test_acc
     tf_test_results = [tf_test_acc]
-    tf_acc = model_attack(tf_model, "tf", attack_type, config)
+    tf_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=100)
     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
     tf_test_results.append(tf_acc)
     # if not NO_FOOL:
