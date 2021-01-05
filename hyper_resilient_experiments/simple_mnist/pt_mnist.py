@@ -4,6 +4,7 @@ import torchvision
 import torch
 import statistics
 import os
+import numpy as np
 
 class CustomSequential(nn.Module):
     def __init__(self, config):
@@ -15,9 +16,13 @@ class CustomSequential(nn.Module):
             nn.Dropout(config['dropout']),
             nn.Linear(128, 10))
     def forward(self, input):
+        if isinstance(input, np.ndarray):
+            input = torch.from_numpy(input)
         return self.model(input)
 
     def predict(self, input):
+        if isinstance(input, np.ndarray):
+            input = torch.from_numpy(input)
         return self.model(input)
 
 class NumberNet(pl.LightningModule):
