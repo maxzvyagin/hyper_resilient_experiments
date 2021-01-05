@@ -9,6 +9,7 @@ from tensorflow.compat.v1 import InteractiveSession
 
 class TensorFlow_AlexNet:
     def __init__(self, config, ten=False):
+        tf.keras.backend.set_image_data_format('channels_last')
         tf.random.set_seed(0)
         b = int(config['batch_size'])
         if ten:
@@ -34,13 +35,13 @@ class TensorFlow_AlexNet:
         # self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="valid"),
-            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="valid"),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="valid"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="valid"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="valid"),
-            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="valid"),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="valid"),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
+            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
             keras.layers.Flatten(),
             keras.layers.Dense(4096, activation='relu'),
             keras.layers.Dropout(config['dropout']),
