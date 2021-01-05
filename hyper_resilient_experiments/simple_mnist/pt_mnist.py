@@ -22,13 +22,7 @@ class CustomSequential(nn.Sequential):
 class NumberNet(pl.LightningModule):
     def __init__(self, config):
         super().__init__()
-        self.model = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(784, 128),
-            nn.ReLU(),
-            nn.Dropout(config['dropout']),
-            nn.Linear(128, 10))
-        ## nn.Softmax())
+        self.model = CustomSequential(config)
         # not including softmax because it's included in the Cross Entropy Loss Function
         self.criterion = nn.CrossEntropyLoss()
         self.config = config
