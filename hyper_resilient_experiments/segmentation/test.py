@@ -21,8 +21,8 @@ train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(config['bat
 # model = tf.keras.Sequential()
 # model.add(make_tensorflow_unet(4, 1))
 # model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
-# model = TensorFlow_UNet_Model(4, 1)
-model = sm.Unet('resnet34', input_shape=(256, 256, 4), encoder_weights=None)
+model = TensorFlow_UNet_Model(4, 1)
+# model = sm.Unet('resnet34', input_shape=(256, 256, 4), encoder_weights=None)
 opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
 model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
               metrics=['accuracy'], run_eagerly=True)
