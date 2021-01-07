@@ -51,4 +51,4 @@ if __name__ == "__main__":
     # print(NUM_CLASSES)
     args = parser.parse_args()
     bitune_parse_arguments(args)
-    spaceray.run_experiment(args, max_diff_train, cpu=8)
+    spaceray.run_experiment(args, max_diff_train, cpu=4)
