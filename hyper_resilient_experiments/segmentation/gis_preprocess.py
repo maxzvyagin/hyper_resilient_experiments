@@ -459,10 +459,8 @@ def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_
 
 class PT_GISDataset(Dataset):
     """Generates a dataset for Pytorch of image and labelled mask."""
-
-    # need to be given a list of tuple consisting of filepaths, (img, shp) to get pairs of windows for training
     def __init__(self, data_list):
-        # can be initialized from a list of samples instead of from files
+        # can be initialized from a list of samples
         self.samples = data_list
 
     def __len__(self):
