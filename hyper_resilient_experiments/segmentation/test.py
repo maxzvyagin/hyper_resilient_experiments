@@ -3,6 +3,10 @@ from hyper_resilient_experiments.segmentation.gis_preprocess import tf_gis_test_
 from hyper_resilient_experiments.segmentation.UNet import TensorFlow_UNet_Model
 import segmentation_models as sm
 
+def tf_gis_gen(x, y):
+    for i in len(x):
+        yield x[i], y[i]
+
 tf.keras.backend.set_image_data_format('channels_last')
 
 config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
@@ -14,9 +18,10 @@ files = None
 #                  ("/scratch/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
 #                   "/scratch/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
 (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split(img_and_shps=files)
+gen = tf_gis_gen(x_train, y_train)
+train = tf.data.Dataset.from_generator(gen).batch(config['batch_size'])
 # train = tf.data.experimental.load('tf_gis_dataset', tf.TensorSpec((4, 256, 256, 1), dtype=tf.dtypes.float32))
 # creating a tf Dataset with this batch size takes _forever_
-# train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(config['batch_size'])
 # train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(config['batch_size'])
 # model = tf.keras.Sequential()
 # model.add(make_tensorflow_unet(4, 1))
