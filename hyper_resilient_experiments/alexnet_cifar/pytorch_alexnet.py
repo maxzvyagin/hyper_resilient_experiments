@@ -45,24 +45,24 @@ class PyTorch_AlexNet(pl.LightningModule):
             return DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=True,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=5)
+                              batch_size=int(self.config['batch_size']), num_workers=4)
         else:
             return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=5)
+                              batch_size=int(self.config['batch_size']), num_workers=4)
 
     def test_dataloader(self):
         if self.ten:
             return DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=5)
+                              batch_size=int(self.config['batch_size']), num_workers=4)
         else:
             return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=5)
+                              batch_size=int(self.config['batch_size']), num_workers=4)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
