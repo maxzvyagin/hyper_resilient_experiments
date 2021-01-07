@@ -36,7 +36,6 @@ min_workers: {num_workers}
 max_workers: {num_workers}
 setup_commands:
     - source ~/.bashrc
-    - conda activate dl
         '''
     f = open(yaml, "w+")
     f.write(lines)
