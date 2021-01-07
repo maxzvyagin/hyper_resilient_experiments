@@ -35,7 +35,8 @@ auth: {authorization}
 min_workers: {num_workers}
 max_workers: {num_workers}
 setup_commands:
-    - source ~/.bashrc; conda activate dl; pip install ray==1.1.0
+    - source ~/.bashrc
+    - conda activate dl
         '''
     f = open(yaml, "w+")
     f.write(lines)
