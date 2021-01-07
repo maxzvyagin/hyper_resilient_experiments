@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
-    print(NUM_CLASSES)
+    # print(NUM_CLASSES)
     args = parser.parse_args()
     bitune_parse_arguments(args)
     spaceray.run_experiment(args, max_diff_train)
