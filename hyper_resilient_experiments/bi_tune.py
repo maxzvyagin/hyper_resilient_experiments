@@ -222,4 +222,4 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     args = parser.parse_args()
-    spaceray.run_experiment(args, multi_train, ray_dir="~/hyperres")
+    spaceray.run_experiment(args, multi_train, ray_dir="~/hyperres", cpu=8)
