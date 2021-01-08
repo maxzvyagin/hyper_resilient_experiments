@@ -26,7 +26,7 @@ NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
 MNIST = True
-
+MAX_DIFF = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -155,8 +155,20 @@ def multi_train(config):
             pt_acc = model_attack(tf_model, "tf", attack_type, config)
             search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
-    all_results = list(search_results.values())
-    average_res = float(statistics.mean(all_results))
+    if not MAX_DIFF:
+        all_results = list(search_results.values())
+        average_res = float(statistics.mean(all_results))
+    else:
+        pt_results = []
+        tf_results = []
+        for key, value in search_results.items():
+            if "pt" in key:
+                pt_results.append(value)
+            else:
+                tf_results.append(value)
+        pt_ave = float(statistics.mean(pt_results))
+        tf_ave = float(statistics.mean(tf_results))
+        average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
@@ -167,7 +179,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -213,6 +225,10 @@ def bitune_parse_arguments(args):
     else:
         TRIALS = int(args.trials)
 
+    if args.max_diff:
+        MAX_DIFF = True
+        print("NOTE: Training using Max Diff approach")
+
 if __name__ == "__main__":
     faulthandler.enable()
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
@@ -221,5 +237,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
+    parser.add_argument('-d', "--max_diff", action="store_true")
     args = parser.parse_args()
     spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
