@@ -2,7 +2,6 @@
 from hyper_resilient_experiments.segmentation.gis_preprocess import tf_gis_test_train_split
 import os
 os.environ['SM_FRAMEWORK'] = 'tf.keras'
-import segmentation_models as sm
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
@@ -65,7 +64,7 @@ def gis_tf_objective(config, classes=1):
         # model.add(keras.layers.Dense(1, activation="sigmoid"))
     # model = sm.Unet('resnet34', activation="sigmoid", input_shape=(256, 256, 4), encoder_weights=None)
     model = tf.keras.Sequential()
-    model.add(make_tensorflow_unet(4, 1))
+    model.add(TensorFlow_UNet_Model(4, 1))
     model.add(tf.keras.layers.Dense(1, activation=tf.nn.log_softmax))
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
     model.compile(optimizer=opt, loss=tf.keras.losses.BinaryCrossentropy(from_logits=False),
