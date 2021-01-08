@@ -5,7 +5,10 @@ import spaceray
 from ray import tune
 
 def objective(config):
-    return np.random.rand()
+    average_res = np.random.rand()
+    search_results['average_res'] = average_res
+    tune.report(**search_results)
+    return search_results
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
