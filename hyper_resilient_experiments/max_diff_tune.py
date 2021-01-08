@@ -21,6 +21,7 @@ def max_diff_train(config):
     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     pt_test_results.append(pt_acc)
     del pt_model
+
     torch.cuda.empty_cache()
     tf_test_acc, tf_model = tensorflow_alexnet.cifar100_tf_objective(config)
     search_results['tf_test_acc'] = tf_test_acc
@@ -28,12 +29,7 @@ def max_diff_train(config):
     tf_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=100)
     search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
     tf_test_results.append(tf_acc)
-    # if not NO_FOOL:
-    #     for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-    #         tf_acc = model_attack(tf_model, "tf", attack_type, config)
-    #         search_results["tf" + "_" + attack_type + "_" + "accuracy"] = tf_acc
-    #         tf_test_results.append(tf_acc)
-    # take average of each
+
     pt_ave = sum(pt_test_results)/len(pt_test_results)
     tf_ave = sum(tf_test_results)/len(tf_test_results)
     average_res = abs(pt_ave-tf_ave)
