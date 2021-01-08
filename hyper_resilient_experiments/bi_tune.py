@@ -2,7 +2,7 @@ from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-#from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
+from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import argparse
 import ray
 from ray import tune
@@ -142,7 +142,7 @@ def multi_train(config):
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
-        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
+        for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(pt_model, "pt", attack_type, config)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
@@ -151,7 +151,7 @@ def multi_train(config):
     tf_test_acc, tf_model = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
-        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
+        for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(tf_model, "tf", attack_type, config)
             search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
