@@ -7,7 +7,8 @@ from ray import tune
 def objective(config):
     return np.random.randint()
 
-parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
     parser.add_argument("-m", "--model")
