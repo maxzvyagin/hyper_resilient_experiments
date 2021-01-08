@@ -5,7 +5,7 @@ import spaceray
 from ray import tune
 
 def objective(config):
-    return np.random.randint()
+    return np.random.rand()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
