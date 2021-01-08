@@ -5,6 +5,7 @@ import spaceray
 from ray import tune
 
 def objective(config):
+    search_results = {}
     average_res = np.random.rand()
     search_results['average_res'] = average_res
     tune.report(**search_results)
