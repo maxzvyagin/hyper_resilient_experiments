@@ -186,6 +186,6 @@ if __name__ == "__main__":
         batch_size = 4
     if args.lambda_files:
         LAMBDA_FILESYSTEM = True
-    test_config = {'batch_size': 900, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 500, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     #res = segmentation_pt_objective(test_config)
     res = segmentation_pt_objective(test_config, dataset="gis")
