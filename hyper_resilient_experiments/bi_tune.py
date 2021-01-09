@@ -28,7 +28,8 @@ NO_FOOL = False
 MNIST = True
 MAX_DIFF = False
 
-def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES, args):
+
+def model_attack(model, model_type, attack_type, config, args, num_classes=NUM_CLASSES):
     print(num_classes)
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -168,7 +169,7 @@ def multi_train(config):
                 tf_results.append(value)
         pt_ave = float(statistics.mean(pt_results))
         tf_ave = float(statistics.mean(tf_results))
-        average_res = abs(pt_ave-tf_ave)
+        average_res = abs(pt_ave - tf_ave)
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
@@ -176,6 +177,7 @@ def multi_train(config):
         print("Couldn't report Tune results. Continuing.")
         pass
     return search_results
+
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
@@ -228,6 +230,7 @@ def bitune_parse_arguments(args):
     if args.max_diff:
         MAX_DIFF = True
         print("NOTE: Training using Max Diff approach")
+
 
 if __name__ == "__main__":
     faulthandler.enable()
