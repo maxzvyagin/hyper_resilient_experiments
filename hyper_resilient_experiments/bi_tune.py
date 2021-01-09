@@ -28,32 +28,31 @@ NO_FOOL = False
 MNIST = True
 MAX_DIFF = False
 
-
-def model_attack(model, model_type, attack_type, config, args, num_classes=NUM_CLASSES):
+def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
         # cifar
-        if args.model == "alexnet_cifar100":
+        if num_classes == 100:
             data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
-        elif args.model == "alexnet_cifar10":
+        elif num_classes == 10 and not MNIST:
             data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                            transform=torchvision.transforms.ToTensor(),
                                                            target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
         # cityscapes
-        elif args.model == "segmentation_cityscapes":
+        elif num_classes == 30:
             data = DataLoader(torchvision.datasets.Cityscapes(
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(config['batch_size']))
         # gis
-        elif args.model == "segmentation_gis":
+        elif num_classes == 1:
             train_set, test_set = pt_gis_train_test_split()
             data = DataLoader(test_set, batch_size=int(config['batch_size']))
         else:
@@ -69,18 +68,18 @@ def model_attack(model, model_type, attack_type, config, args, num_classes=NUM_C
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
         # cifar
-        if args.model == "alexnet_cifar100":
+        if num_classes == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
-        elif args.model == "alexnet_cifar10":
+        elif num_classes == 10 and not MNIST:
             train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
         # cityscapes
-        elif args.model == "segmentation_cityscapes":
+        elif num_classes == 30:
             (x_train, y_train), (x_test, y_test) = get_cityscapes()
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # gis
-        elif args.model == "segmentation_gis":
+        elif num_classes == 1:
             (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # mnist
@@ -139,12 +138,14 @@ def model_attack(model, model_type, attack_type, config, args, num_classes=NUM_C
 
 def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
+    global NUM_CLASSES
+    print(NUM_CLASSES)
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(pt_model, "pt", attack_type, config)
+            pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
     del pt_model
@@ -153,7 +154,7 @@ def multi_train(config):
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(tf_model, "tf", attack_type, config)
+            pt_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=NUM_CLASSES)
             search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
     if not MAX_DIFF:
@@ -169,7 +170,7 @@ def multi_train(config):
                 tf_results.append(value)
         pt_ave = float(statistics.mean(pt_results))
         tf_ave = float(statistics.mean(tf_results))
-        average_res = abs(pt_ave - tf_ave)
+        average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
@@ -177,7 +178,6 @@ def multi_train(config):
         print("Couldn't report Tune results. Continuing.")
         pass
     return search_results
-
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
@@ -230,7 +230,6 @@ def bitune_parse_arguments(args):
     if args.max_diff:
         MAX_DIFF = True
         print("NOTE: Training using Max Diff approach")
-
 
 if __name__ == "__main__":
     faulthandler.enable()
