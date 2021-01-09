@@ -196,7 +196,7 @@ def bitune_parse_arguments(args):
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
             NUM_CLASSES = 30
         elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_pbjective
+            PT_MODEL = pytorch_unet.gis_pt_objective
             TF_MODEL = tensorflow_unet.gis_tf_objective
             NUM_CLASSES = 1
         elif args.model == "mnist_nofool":
