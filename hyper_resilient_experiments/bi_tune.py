@@ -1,7 +1,8 @@
+from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
-#from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
+from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 import argparse
 import ray
 from ray import tune
@@ -14,7 +15,6 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
 import faulthandler
@@ -26,7 +26,7 @@ NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
 MNIST = True
-
+MAX_DIFF = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -138,12 +138,14 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
 
 def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
+    global NUM_CLASSES
+    print(NUM_CLASSES)
     pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
-        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-            pt_acc = model_attack(pt_model, "pt", attack_type, config)
+        for attack_type in ['gaussian', 'deepfool']:
+            pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
     del pt_model
@@ -151,12 +153,24 @@ def multi_train(config):
     tf_test_acc, tf_model = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
-        for attack_type in ['uniform', 'gaussian', 'saltandpepper', 'spatial']:
-            pt_acc = model_attack(tf_model, "tf", attack_type, config)
+        for attack_type in ['gaussian', 'deepfool']:
+            pt_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=NUM_CLASSES)
             search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
-    all_results = list(search_results.values())
-    average_res = float(statistics.mean(all_results))
+    if not MAX_DIFF:
+        all_results = list(search_results.values())
+        average_res = float(statistics.mean(all_results))
+    else:
+        pt_results = []
+        tf_results = []
+        for key, value in search_results.items():
+            if "pt" in key:
+                pt_results.append(value)
+            else:
+                tf_results.append(value)
+        pt_ave = float(statistics.mean(pt_results))
+        tf_ave = float(statistics.mean(tf_results))
+        average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
@@ -167,7 +181,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -184,7 +198,7 @@ def bitune_parse_arguments(args):
             TF_MODEL = tensorflow_unet.cityscapes_tf_objective
             NUM_CLASSES = 30
         elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_pbjective
+            PT_MODEL = pytorch_unet.gis_pt_objective
             TF_MODEL = tensorflow_unet.gis_tf_objective
             NUM_CLASSES = 1
         elif args.model == "mnist_nofool":
@@ -213,6 +227,10 @@ def bitune_parse_arguments(args):
     else:
         TRIALS = int(args.trials)
 
+    if args.max_diff:
+        MAX_DIFF = True
+        print("NOTE: Training using Max Diff approach")
+
 if __name__ == "__main__":
     faulthandler.enable()
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
@@ -221,5 +239,8 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
+    parser.add_argument('-d', "--max_diff", action="store_true")
     args = parser.parse_args()
-    spaceray.run_experiment(args, multi_train, ray_dir="~/hyperres")
+    bitune_parse_arguments(args)
+    # print(PT_MODEL)
+    spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)

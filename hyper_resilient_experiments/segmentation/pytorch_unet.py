@@ -63,15 +63,15 @@ class PyTorch_UNet(pl.LightningModule):
                 "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
+                batch_size=int(self.config['batch_size']), num_workers=4)
         elif self.dataset == "voc":
             return DataLoader(torchvision.datasets.VOCSegmentation(
                 "/home/mzvyagin/datasets/", image_set='train',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
+                batch_size=int(self.config['batch_size']), num_workers=4)
         else:
-            return DataLoader(self.train_set, batch_size=int(self.config['batch_size']), num_workers=10)
+            return DataLoader(self.train_set, batch_size=int(self.config['batch_size']), num_workers=4)
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
@@ -84,15 +84,15 @@ class PyTorch_UNet(pl.LightningModule):
                 "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
+                batch_size=int(self.config['batch_size']), num_workers=4)
         elif self.dataset == "voc":
             return DataLoader(torchvision.datasets.VOCSegmentation(
                 "/home/mzvyagin/datasets/", image_set='val', download=True,
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(self.config['batch_size']), num_workers=5)
+                batch_size=int(self.config['batch_size']), num_workers=4)
         else:
-            return DataLoader(self.test_set, batch_size=int(self.config['batch_size']), num_workers=5)
+            return DataLoader(self.test_set, batch_size=int(self.config['batch_size']), num_workers=4)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
@@ -186,6 +186,6 @@ if __name__ == "__main__":
         batch_size = 4
     if args.lambda_files:
         LAMBDA_FILESYSTEM = True
-    test_config = {'batch_size': 16, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     #res = segmentation_pt_objective(test_config)
     res = segmentation_pt_objective(test_config, dataset="gis")
