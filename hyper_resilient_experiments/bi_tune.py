@@ -239,5 +239,6 @@ if __name__ == "__main__":
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
     args = parser.parse_args()
+    bitune_parse_arguments()
     print(PT_MODEL)
     # spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
