@@ -125,7 +125,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.lambda_fs:
         LAMBDA_FILESYSTEM = True
-    test_config = {'batch_size': 1000, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10**-9}
     # res = cityscapes_tf_objective(test_config)
     # print(res[0])
     # cityscapes_tf_objective(test_config)
