@@ -16,7 +16,7 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
-import backwards_spaceray
+from . import backwards_spaceray
 import faulthandler
 
 # Default constants
@@ -243,4 +243,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)
-    spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+    backwards_spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
