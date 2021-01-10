@@ -174,3 +174,5 @@ if __name__ == "__main__":
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
     args = parser.parse_args()
+    test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
+    gis_multi_train()
