@@ -16,7 +16,7 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
-from . import backwards_spaceray
+import backwards_spaceray
 import faulthandler
 
 # Default constants
