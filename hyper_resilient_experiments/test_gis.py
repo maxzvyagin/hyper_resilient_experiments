@@ -166,13 +166,5 @@ def gis_multi_train(config):
     return search_results
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
-                                     "specify output csv file name.")
-    parser.add_argument("-o", "--out", required=True)
-    parser.add_argument("-m", "--model")
-    parser.add_argument("-t", "--trials")
-    parser.add_argument("-j", "--json")
-    parser.add_argument('-d', "--max_diff", action="store_true")
-    args = parser.parse_args()
     test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
-    gis_multi_train()
+    gis_multi_train(test_config)
