@@ -19,7 +19,7 @@ from hyper_resilient_experiments.segmentation.tensorflow_unet import get_citysca
 import spaceray
 import faulthandler
 
-def gis_model_attack(model, model_type, attack_type, config, num_classes=1):
+def gis_model_attack(model, model_type, attack_type, config, num_classes=30):
     print(num_classes)
     MNIST = 0
     if model_type == "pt":
@@ -130,17 +130,16 @@ def gis_model_attack(model, model_type, attack_type, config, num_classes=1):
 
 def gis_multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
-    # pt_test_acc, pt_model =  pytorch_unet.gis_pt_objective(config)
-    # pt_model.eval()
-    # search_results = {'pt_test_acc': pt_test_acc}
-    # for attack_type in ['gaussian', 'deepfool']:
-    #     pt_acc = gis_model_attack(pt_model, "pt", attack_type, config, num_classes=1)
-    #     search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-    # # to avoid weird CUDA OOM errors
-    # del pt_model
-    # torch.cuda.empty_cache()
-    search_results = {}
-    tf_test_acc, tf_model = tensorflow_unet.gis_tf_objective(config)
+    pt_test_acc, pt_model =  pytorch_unet.cityscapes_pt_objective(config)
+    pt_model.eval()
+    search_results = {'pt_test_acc': pt_test_acc}
+    for attack_type in ['gaussian', 'deepfool']:
+        pt_acc = gis_model_attack(pt_model, "pt", attack_type, config, num_classes=1)
+        search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    # to avoid weird CUDA OOM errors
+    del pt_model
+    torch.cuda.empty_cache()
+    tf_test_acc, tf_model = tensorflow_unet.cityscapes_tf_objective(config)
     search_results['tf_test_acc'] = tf_test_acc
     for attack_type in ['gaussian', 'deepfool']:
         pt_acc = gis_model_attack(tf_model, "tf", attack_type, config, num_classes=1)
@@ -167,5 +166,5 @@ def gis_multi_train(config):
     return search_results
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
+    test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
     gis_multi_train(test_config)
