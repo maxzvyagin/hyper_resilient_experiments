@@ -166,5 +166,5 @@ def gis_multi_train(config):
     return search_results
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
+    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
     gis_multi_train(test_config)
