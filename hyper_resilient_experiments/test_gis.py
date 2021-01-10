@@ -130,7 +130,7 @@ def gis_model_attack(model, model_type, attack_type, config, num_classes=30):
 
 def gis_multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
-    pt_test_acc, pt_model =  pytorch_unet.cityscapes_pt_objective(config)
+    pt_test_acc, pt_model = pytorch_unet.cityscapes_pt_objective(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     for attack_type in ['gaussian', 'deepfool']:

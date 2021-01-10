@@ -54,16 +54,16 @@ class PyTorch_UNet(pl.LightningModule):
 
     def train_dataloader(self):
         if self.dataset == 'cityscapes':
-            # return DataLoader(torchvision.datasets.Cityscapes(
-            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
-            #     transform=torchvision.transforms.ToTensor(),
-            #     target_transform=torchvision.transforms.ToTensor()),
-            #     batch_size=int(self.config['batch_size']), num_workers=5)
             return DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
+                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=4)
+            # return DataLoader(torchvision.datasets.Cityscapes(
+            #     "/home/mzvyagin/datasets/", split='train', mode='fine', target_type='semantic',
+            #     transform=torchvision.transforms.ToTensor(),
+            #     target_transform=torchvision.transforms.ToTensor()),
+            #     batch_size=int(self.config['batch_size']), num_workers=4)
         elif self.dataset == "voc":
             return DataLoader(torchvision.datasets.VOCSegmentation(
                 "/home/mzvyagin/datasets/", image_set='train',
@@ -75,16 +75,16 @@ class PyTorch_UNet(pl.LightningModule):
 
     def test_dataloader(self):
         if self.dataset == 'cityscapes':
-            # return DataLoader(torchvision.datasets.Cityscapes(
-            #     "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
-            #     transform=torchvision.transforms.ToTensor(),
-            #     target_transform=torchvision.transforms.ToTensor()),
-            #     batch_size=int(self.config['batch_size']), num_workers=5)
             return DataLoader(torchvision.datasets.Cityscapes(
-                "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
+                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='val', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
                 target_transform=torchvision.transforms.ToTensor()),
                 batch_size=int(self.config['batch_size']), num_workers=4)
+            # return DataLoader(torchvision.datasets.Cityscapes(
+            #     "/home/mzvyagin/datasets/", split='val', mode='fine', target_type='semantic',
+            #     transform=torchvision.transforms.ToTensor(),
+            #     target_transform=torchvision.transforms.ToTensor()),
+            #     batch_size=int(self.config['batch_size']), num_workers=4)
         elif self.dataset == "voc":
             return DataLoader(torchvision.datasets.VOCSegmentation(
                 "/home/mzvyagin/datasets/", image_set='val', download=True,

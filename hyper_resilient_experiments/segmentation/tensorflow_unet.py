@@ -29,17 +29,15 @@ def cityscapes_tf_objective(config, classes=30):
     #                                                    "/gpu:6", "/gpu:7"])
     # with strategy.scope():
     model = tf.keras.Sequential()
-    model.add(make_tensorflow_unet(3, 30))
-    model.add(tf.keras.layers.Dense(30, activation=tf.nn.log_softmax))
+    model.add(TensorFlow_UNet_Model(3, 30))
+    model.add(tf.keras.layers.Dense(classes, activation=tf.nn.log_softmax))
     opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
     model.compile(optimizer=opt, loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                   metrics=['accuracy'])
     # fit model on cityscapes data
-    options = tf.data.Options()
-    options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
     (x_train, y_train), (x_test, y_test) = get_cityscapes()
-    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).with_options(options).batch(b)
-    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).with_options(options).batch(b)
+    train = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(b)
+    test = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(b)
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
     # train = train.with_options(options).batch(b)
@@ -95,10 +93,10 @@ def get_cityscapes():
     """ Returns test, train split of Cityscapes data"""
     # first try loading from cache object, otherwise load from scratch
 
-    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-    #                         data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
     train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-                            data_dir='/home/mzvyagin/datasets/')
+                            data_dir='/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/')
+    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+    #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
     train_x = [pair['image_left'] for pair in train]
     train_y = [pair['segmentation_label'] for pair in train]
