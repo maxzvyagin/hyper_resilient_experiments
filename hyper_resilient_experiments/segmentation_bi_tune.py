@@ -1,3 +1,4 @@
+"""Implementation of Bi Tune testing for segmentation tasks which cannot be used with normal FoolBox library"""
 from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
@@ -31,7 +32,7 @@ MAX_DIFF = False
 FASHION = False
 MIN_RESILIENCY = False
 
-def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
+def segmentation_model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
     global FASHION
     print(FASHION)
@@ -83,8 +84,6 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
             data = list(test.batch(int(config['batch_size'])))
         elif FASHION:
             (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
-            f = lambda i: tf.expand_dims(i, -1)
-            x_test = f(x_test)
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         elif num_classes == 10 and not MNIST:
             train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
@@ -151,7 +150,7 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
     return np.array(accuracy_list).mean()
 
 
-def multi_train(config):
+def segmentation_multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
     global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF
     print(NUM_CLASSES)
@@ -160,7 +159,7 @@ def multi_train(config):
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
+            pt_acc = segmentation_model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
     del pt_model
@@ -208,52 +207,18 @@ def multi_train(config):
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
     global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
-    if not args.model:
-        print("NOTE: Defaulting to MNIST model training...")
-        args.model = "mnist"
+    if args.model == "segmentation_cityscapes":
+        PT_MODEL = pytorch_unet.cityscapes_pt_objective
+        TF_MODEL = tensorflow_unet.cityscapes_tf_objective
+        NUM_CLASSES = 30
+    elif args.model == "segmentation_gis":
+        PT_MODEL = pytorch_unet.gis_pt_objective
+        TF_MODEL = tensorflow_unet.gis_tf_objective
+        NUM_CLASSES = 1
     else:
-        if args.model == "alexnet_cifar100":
-            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "gan":
-            print("Error: GAN not implemented.")
-            sys.exit()
-        elif args.model == "segmentation_cityscapes":
-            PT_MODEL = pytorch_unet.cityscapes_pt_objective
-            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 30
-        elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_objective
-            TF_MODEL = tensorflow_unet.gis_tf_objective
-            NUM_CLASSES = 1
-        elif args.model == "mnist_nofool":
-            NO_FOOL = True
-        elif args.model == "cifar100_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "alexnet_cifar10":
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "cifar10_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "fashion":
-            PT_MODEL = fashion_pytorch_alexnet.fashion_pt_objective
-            TF_MODEL = fashion_tensorflow_alexnet.fashion_tf_objective
-            MNIST = False
-            FASHION = True
-        else:
-            print("\n ERROR: Unknown model type. Please try again. "
-                  "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
-            sys.exit()
+        print("\n ERROR: Unknown model type. Please try again. "
+              "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
+        sys.exit()
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
     else:
