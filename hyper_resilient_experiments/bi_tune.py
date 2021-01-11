@@ -3,6 +3,7 @@ import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
+from hyper_resilient_experiments.alexnet_fashion import fashion_pytorch_alexnet, fashion_tensorflow_alexnet
 import argparse
 import ray
 from ray import tune
@@ -27,6 +28,7 @@ TRIALS = 25
 NO_FOOL = False
 MNIST = True
 MAX_DIFF = False
+FASHION = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -39,6 +41,11 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
                               batch_size=int(config['batch_size']))
+        elif FASHION:
+            data = DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=False,
+                                                        transform=torchvision.transforms.ToTensor(),
+                                                        target_transform=None, download=True),
+                          batch_size=int(config['batch_size']))
         elif num_classes == 10 and not MNIST:
             data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                            transform=torchvision.transforms.ToTensor(),
@@ -71,6 +78,9 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
         if num_classes == 100:
             train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
+        elif FASHION:
+            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         elif num_classes == 10 and not MNIST:
             train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
             data = list(test.batch(int(config['batch_size'])))
@@ -218,6 +228,12 @@ def bitune_parse_arguments(args):
             PT_MODEL = pytorch_alexnet.cifar10_pt_objective
             TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
             NUM_CLASSES = 10
+            MNIST = False
+        elif args.model == "fashion":
+            PT_MODEL = fashion_pytorch_alexnet.fashion_pt_objective
+            TF_MODEL = fashion_tensorflow_alexnet.fashion_tf_objective
+            MNIST = False
+            FASHION = True
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
