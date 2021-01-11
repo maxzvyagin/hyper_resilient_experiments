@@ -29,6 +29,7 @@ NO_FOOL = False
 MNIST = True
 MAX_DIFF = False
 FASHION = False
+MIN_RESILIENCY = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -172,6 +173,8 @@ def multi_train(config):
     if not MAX_DIFF:
         all_results = list(search_results.values())
         average_res = float(statistics.mean(all_results))
+    elif MIN_RESILIENCY:
+
     else:
         pt_results = []
         tf_results = []
@@ -193,7 +196,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -249,6 +252,10 @@ def bitune_parse_arguments(args):
         MAX_DIFF = True
         print("NOTE: Training using Max Diff approach")
 
+    if args.minimize_resiliency:
+        MIN_RESILIENCY = True
+        print("NOTE: Training using Min Resiliency approach")
+
 if __name__ == "__main__":
     faulthandler.enable()
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
@@ -258,6 +265,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
+    parser.add_argument('-r', '--minimize_resiliency', action="store_truee")
     parser.add_argument('-l', '--on_lambda', action="store_true")
     args = parser.parse_args()
     bitune_parse_arguments(args)
