@@ -6,7 +6,7 @@ import os
 
 class Fashion_TensorFlow_AlexNet:
     def __init__(self, config):
-        tf.keras.backend.set_image_data_format('channels_last')
+        #tf.keras.backend.set_image_data_format('channels_last')
         tf.random.set_seed(0)
         b = int(config['batch_size'])
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.fashion_mnist.load_data()
