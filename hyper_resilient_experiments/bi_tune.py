@@ -174,7 +174,7 @@ def multi_train(config):
         all_results = list(search_results.values())
         average_res = float(statistics.mean(all_results))
     elif MIN_RESILIENCY:
-
+        pass
     else:
         pt_results = []
         tf_results = []
