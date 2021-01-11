@@ -6,13 +6,16 @@ import os
 
 class Fashion_TensorFlow_AlexNet:
     def __init__(self, config):
-        #tf.keras.backend.set_image_data_format('channels_last')
+        tf.keras.backend.set_image_data_format('channels_last')
         tf.random.set_seed(0)
         b = int(config['batch_size'])
         (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.fashion_mnist.load_data()
+        f = lambda i: tf.expand_dims(i, -1)
+        self.x_train = f(self.x_train)
+        self.x_test = f(self.x_test)
         classes = 10
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(28, 28)),
+            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(28, 28, 1)),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
             keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
