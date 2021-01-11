@@ -256,7 +256,11 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
+    parser.add_argument('-l', '--on_lambda', action="store_true")
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)
-    spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+    if args.on_lambda:
+        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8)
+    else:
+        spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
