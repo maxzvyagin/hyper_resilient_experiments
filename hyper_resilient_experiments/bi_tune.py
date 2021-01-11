@@ -265,7 +265,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
-    parser.add_argument('-r', '--minimize_resiliency', action="store_truee")
+    parser.add_argument('-r', '--minimize_resiliency', action="store_true")
     parser.add_argument('-l', '--on_lambda', action="store_true")
     args = parser.parse_args()
     bitune_parse_arguments(args)
