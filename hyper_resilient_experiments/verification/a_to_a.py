@@ -22,6 +22,7 @@ import spaceray
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
 TF_MODEL = tf_mnist.mnist_tf_objective
+MODEL_SELECT = "pt"
 NUM_CLASSES = 10
 TRIALS = 25
 NO_FOOL = False
@@ -150,52 +151,40 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
     return np.array(accuracy_list).mean()
 
 
-def multi_train(config):
+def double_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
-    global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF
-    print(NUM_CLASSES)
-    pt_test_acc, pt_model = PT_MODEL(config)
-    pt_model.eval()
-    search_results = {'pt_test_acc': pt_test_acc}
-    if not NO_FOOL:
-        for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
-            search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-    # to avoid weird CUDA OOM errors
-    del pt_model
-    torch.cuda.empty_cache()
-    tf_test_acc, tf_model = TF_MODEL(config)
-    search_results['tf_test_acc'] = tf_test_acc
-    if not NO_FOOL:
-        for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=NUM_CLASSES)
-            search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
-    # save results
-    if not MAX_DIFF:
-        all_results = list(search_results.values())
-        average_res = float(statistics.mean(all_results))
-    elif MIN_RESILIENCY:
-        test_results = []
-        resiliency_results = []
-        for key, value in search_results.items():
-            if "test" in key:
-                test_results.append(value)
-            else:
-                resiliency_results.append(value)
-        test_ave = float(statistics.mean(test_results))
-        res_ave = float(statistics.mean(resiliency_results))
-        average_res = abs(test_ave-res_ave)
+    global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF, MODEL_SELECT
+    pt = False
+    if MODEL_SELECT == "pt":
+        selected_model = PT_MODEL
+        pt = True
     else:
-        pt_results = []
-        tf_results = []
-        for key, value in search_results.items():
-            if "pt" in key:
-                pt_results.append(value)
-            else:
-                tf_results.append(value)
-        pt_ave = float(statistics.mean(pt_results))
-        tf_ave = float(statistics.mean(tf_results))
-        average_res = abs(pt_ave-tf_ave)
+        selected_model = TF_MODEL
+    model, test_acc = selected_model(config)
+    if pt:
+        model.eval()
+    search_results = {'framework': MODEL_SELECT}
+    search_results = {'test_acc': test_acc}
+    if not NO_FOOL:
+        for attack_type in ['gaussian', 'deepfool']:
+            pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    # to avoid weird CUDA OOM errors
+    if pt:
+        del model
+        torch.cuda.empty_cache()
+    model, test_acc = selected_model(config)
+    if pt:
+        model.eval()
+    search_results = {'framework': MODEL_SELECT}
+    search_results = {'test_acc': test_acc}
+    if not NO_FOOL:
+        for attack_type in ['gaussian', 'deepfool']:
+            pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy"] = pt_acc
+    # save results
+    all_results = list(search_results.values())
+    average_res = float(statistics.mean(all_results))
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
@@ -206,7 +195,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, MODEL_SELECT
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -258,6 +247,14 @@ def bitune_parse_arguments(args):
     else:
         TRIALS = int(args.trials)
 
+    if args.framework == "pt":
+        pass
+    elif args.framework == "tf":
+        MODEL_SELECT = "tf"
+    else:
+        print("UKNOWN Model Framework. Please try again. Select pt or tf.")
+        sys.exit()
+
     if args.max_diff:
         MAX_DIFF = True
         print("NOTE: Training using Max Diff approach")
@@ -276,10 +273,11 @@ if __name__ == "__main__":
     parser.add_argument('-d', "--max_diff", action="store_true")
     parser.add_argument('-r', '--minimize_resiliency', action="store_true")
     parser.add_argument('-l', '--on_lambda', action="store_true")
+    parser.add_argument('-f', '--framework', required=True)
     args = parser.parse_args()
     bitune_parse_arguments(args)
-    # print(PT_MODEL)
+    # print(PT_MODEL
     if args.on_lambda:
-        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8)
+        spaceray.run_experiment(args, double_train, ray_dir="~/raylogs", cpu=8)
     else:
-        spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+        spaceray.run_experiment(args, double_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)

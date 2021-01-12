@@ -19,7 +19,9 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
-import faulthandler
+
+import imgaug as ia
+import imgaug.augmenters as iaa
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -33,30 +35,16 @@ FASHION = False
 MIN_RESILIENCY = False
 
 def segmentation_model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
-    print(num_classes)
-    global FASHION
-    print(FASHION)
+    """Salt and pepper augmentation of segmentation images, return accuracy - difference between that and normal is
+    a measure of resiliency"""
+    ia.seed(0)
+    aug = iaa.SaltAndPepper(0.1)
+
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        # cifar
-        if num_classes == 100:
-            data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
-                                                            transform=torchvision.transforms.ToTensor(),
-                                                            target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
-        elif FASHION:
-            data = DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=False,
-                                                        transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=int(config['batch_size']))
-        elif num_classes == 10 and not MNIST:
-            data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
-                                                           transform=torchvision.transforms.ToTensor(),
-                                                           target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
         # cityscapes
-        elif num_classes == 30:
+        if num_classes == 30:
             data = DataLoader(torchvision.datasets.Cityscapes(
                 "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
                 transform=torchvision.transforms.ToTensor(),
@@ -66,30 +54,16 @@ def segmentation_model_attack(model, model_type, attack_type, config, num_classe
         elif num_classes == 1:
             train_set, test_set = pt_gis_train_test_split()
             data = DataLoader(test_set, batch_size=int(config['batch_size']))
-        else:
-            data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
-                                                         transform=torchvision.transforms.ToTensor(),
-                                                         target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
         images, labels = [], []
         for sample in data:
             images.append(sample[0].to(device))
             labels.append(sample[1].to(device))
+        images = aug(images)
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
-        # cifar
-        if num_classes == 100:
-            train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(int(config['batch_size'])))
-        elif FASHION:
-            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
-        elif num_classes == 10 and not MNIST:
-            train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(int(config['batch_size'])))
         # cityscapes
-        elif num_classes == 30:
+        if num_classes == 30:
             (x_train, y_train), (x_test, y_test) = get_cityscapes()
             data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
         # gis
@@ -105,6 +79,7 @@ def segmentation_model_attack(model, model_type, attack_type, config, num_classe
             fixed_image = (np.array(sample[0]) / 255.0).astype('float32')
             images.append(tf.convert_to_tensor(fixed_image))
             labels.append(sample[1])
+        images = aug(images)
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
         sys.exit()
@@ -233,7 +208,6 @@ def bitune_parse_arguments(args):
         print("NOTE: Training using Min Resiliency approach")
 
 if __name__ == "__main__":
-    faulthandler.enable()
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
@@ -247,6 +221,6 @@ if __name__ == "__main__":
     bitune_parse_arguments(args)
     # print(PT_MODEL)
     if args.on_lambda:
-        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8)
+        spaceray.run_experiment(args, segmentation_multi_train, ray_dir="~/raylogs", cpu=8)
     else:
-        spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+        spaceray.run_experiment(args, segmentation_multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
