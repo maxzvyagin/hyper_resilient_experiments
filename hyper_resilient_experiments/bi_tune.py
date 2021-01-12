@@ -172,9 +172,11 @@ def multi_train(config):
             search_results["tf" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # save results
     if not MAX_DIFF:
+        # if training simply to maximize accuracy across the board
         all_results = list(search_results.values())
         average_res = float(statistics.mean(all_results))
     elif MIN_RESILIENCY:
+        # training to maximize difference between test accuracy and test resiliency
         test_results = []
         resiliency_results = []
         for key, value in search_results.items():
@@ -186,6 +188,7 @@ def multi_train(config):
         res_ave = float(statistics.mean(resiliency_results))
         average_res = abs(test_ave-res_ave)
     else:
+        # training to maximize difference between frameworks
         pt_results = []
         tf_results = []
         for key, value in search_results.items():
@@ -276,10 +279,12 @@ if __name__ == "__main__":
     parser.add_argument('-d', "--max_diff", action="store_true")
     parser.add_argument('-r', '--minimize_resiliency', action="store_true")
     parser.add_argument('-l', '--on_lambda', action="store_true")
+    parser.add_argument('-n', '--start_space')
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)
     if args.on_lambda:
-        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8)
+        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=args.start_space)
     else:
-        spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+        spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8,
+                                start_space=args.start_space)
