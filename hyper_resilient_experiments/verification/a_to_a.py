@@ -160,28 +160,27 @@ def double_train(config):
         pt = True
     else:
         selected_model = TF_MODEL
-    model, test_acc = selected_model(config)
+    test_acc, model = selected_model(config)
     if pt:
         model.eval()
     search_results = {'framework': MODEL_SELECT}
-    search_results = {'test_acc': test_acc}
+    search_results['test_acc1'] = test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
-            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy"] = pt_acc
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy1"] = pt_acc
     # to avoid weird CUDA OOM errors
     if pt:
         del model
         torch.cuda.empty_cache()
-    model, test_acc = selected_model(config)
+    test_acc, model = selected_model(config)
     if pt:
         model.eval()
-    search_results = {'framework': MODEL_SELECT}
-    search_results = {'test_acc': test_acc}
+    search_results['test_acc2'] = test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
-            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy"] = pt_acc
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy2"] = pt_acc
     # save results
     all_results = list(search_results.values())
     average_res = float(statistics.mean(all_results))
