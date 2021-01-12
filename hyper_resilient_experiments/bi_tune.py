@@ -284,7 +284,7 @@ if __name__ == "__main__":
     bitune_parse_arguments(args)
     # print(PT_MODEL)
     if args.on_lambda:
-        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=args.start_space)
+        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=int(args.start_space))
     else:
         spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8,
-                                start_space=args.start_space)
+                                start_space=int(args.start_space))
