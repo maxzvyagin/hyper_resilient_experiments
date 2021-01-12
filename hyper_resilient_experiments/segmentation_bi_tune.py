@@ -34,6 +34,10 @@ MAX_DIFF = False
 FASHION = False
 MIN_RESILIENCY = False
 
+
+def pt_perturbed(dataset):
+    """"""
+
 def segmentation_model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     """Salt and pepper augmentation of segmentation images, return accuracy - difference between that and normal is
     a measure of resiliency"""

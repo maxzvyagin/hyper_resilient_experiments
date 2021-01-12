@@ -13,9 +13,9 @@ import pickle
 from os import path
 import sys
 import random
-# import imgaug as ia
-# import imgaug.augmenters as iaa
-# from imgaug.augmentables.segmaps import SegmentationMapsOnImage
+import imgaug as ia
+import imgaug.augmenters as iaa
+from imgaug.augmentables.segmaps import SegmentationMapsOnImage
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
@@ -376,31 +376,31 @@ def msavi(red, infrared):
 numpy_msavi = np.vectorize(msavi)
 
 
-# def augment_dataset(dataset):
-#     # generate augmented samples of dataset
-#     ia.seed(1)
-#     # flip from left to right
-#     seq = iaa.Sequential([iaa.Fliplr()])
-#     augmented_samples = []
-#     for sample in dataset:
-#         img = sample['image'].numpy()
-#         img = np.moveaxis(img, 0, -1)
-#         seg = SegmentationMapsOnImage(sample['mask'].numpy().astype(bool), shape=img.shape)
-#         i, s = seq(image=img, segmentation_maps=seg)
-#         s = torch.FloatTensor(s.get_arr().copy())
-#         i = torch.FloatTensor(np.moveaxis(i, -1, 0).copy())
-#         augmented_samples.append((i, s))
-#     # do the same thing but flip images upside down
-#     seq = iaa.Sequential([iaa.Flipud()])
-#     for sample in dataset:
-#         img = sample['image'].numpy()
-#         img = np.moveaxis(img, 0, -1)
-#         seg = SegmentationMapsOnImage(sample['mask'].numpy().astype(bool), shape=img.shape)
-#         i, s = seq(image=img, segmentation_maps=seg)
-#         s = torch.FloatTensor(s.get_arr().copy())
-#         i = torch.FloatTensor(np.moveaxis(i, -1, 0).copy())
-#         augmented_samples.append((i, s))
-#     return augmented_samples
+def augment_dataset(dataset):
+    # generate augmented samples of dataset
+    ia.seed(0)
+    # flip from left to right
+    seq = iaa.Sequential([iaa.Fliplr()])
+    augmented_samples = []
+    for sample in dataset:
+        img = sample['image'].numpy()
+        img = np.moveaxis(img, 0, -1)
+        seg = SegmentationMapsOnImage(sample['mask'].numpy().astype(bool), shape=img.shape)
+        i, s = seq(image=img, segmentation_maps=seg)
+        s = torch.FloatTensor(s.get_arr().copy())
+        i = torch.FloatTensor(np.moveaxis(i, -1, 0).copy())
+        augmented_samples.append((i, s))
+    # do the same thing but flip images upside down
+    seq = iaa.Sequential([iaa.Flipud()])
+    for sample in dataset:
+        img = sample['image'].numpy()
+        img = np.moveaxis(img, 0, -1)
+        seg = SegmentationMapsOnImage(sample['mask'].numpy().astype(bool), shape=img.shape)
+        i, s = seq(image=img, segmentation_maps=seg)
+        s = torch.FloatTensor(s.get_arr().copy())
+        i = torch.FloatTensor(np.moveaxis(i, -1, 0).copy())
+        augmented_samples.append((i, s))
+    return augmented_samples
 
 
 def pt_gis_train_test_split(img_and_shps=None, image_type="full_channel", large_image=False):
