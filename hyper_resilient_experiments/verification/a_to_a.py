@@ -278,10 +278,12 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--minimize_resiliency', action="store_true")
     parser.add_argument('-l', '--on_lambda', action="store_true")
     parser.add_argument('-f', '--framework', required=True)
+    parser.add_argument('-n', '--start_space')
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL
     if args.on_lambda:
-        spaceray.run_experiment(args, double_train, ray_dir="~/raylogs", cpu=8)
+        spaceray.run_experiment(args, double_train, ray_dir="~/raylogs", cpu=8, start_space=int(args.start_space))
     else:
-        spaceray.run_experiment(args, double_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8)
+        spaceray.run_experiment(args, double_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8,
+                                start_space=int(args.start_space))
