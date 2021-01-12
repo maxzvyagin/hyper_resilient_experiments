@@ -163,12 +163,14 @@ def double_train(config):
     test_acc, model = selected_model(config)
     if pt:
         model.eval()
+    first_model_results = [test_acc]
     search_results = {'framework': MODEL_SELECT}
     search_results['test_acc1'] = test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
-            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy1"] = pt_acc
+            acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy1"] = acc
+            first_model_results.append(acc)
     # to avoid weird CUDA OOM errors
     if pt:
         del model
@@ -176,14 +178,17 @@ def double_train(config):
     test_acc, model = selected_model(config)
     if pt:
         model.eval()
+    second_model_results = [test_acc]
     search_results['test_acc2'] = test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
-            pt_acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
-            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy2"] = pt_acc
+            acc = model_attack(model, MODEL_SELECT, attack_type, config, num_classes=NUM_CLASSES)
+            search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy2"] = acc
+            second_model_results.append(acc)
     # save results
-    all_results = list(search_results.values())
-    average_res = float(statistics.mean(all_results))
+    first_ave = float(statistics.mean(first_model_results))
+    second_ave = float(statistics.mean(second_model_results))
+    average_res = abs(first_ave - second_ave)
     search_results['average_res'] = average_res
     try:
         tune.report(**search_results)
