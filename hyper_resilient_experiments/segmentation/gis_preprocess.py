@@ -574,7 +574,7 @@ def perturbed_pt_gis_test_data(img_and_shps=None, image_type="full_channel", lar
         else:
             train, test = pt_gis_train_test_split(img_and_shps, image_type, large_image)
             ia.seed(0)
-            aug = iaa.SaltAndPepper(0.1)
+            aug = iaa.SaltAndPepper(0.75, per_channel=True)
             for sample in test:
                 sample['image'] = aug(images=sample['image'].numpy())
             cache_object = open(name, "wb")

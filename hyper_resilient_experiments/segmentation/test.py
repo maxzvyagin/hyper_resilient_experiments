@@ -3,15 +3,29 @@ from hyper_resilient_experiments.segmentation.gis_preprocess import (tf_gis_test
                                                                      perturbed_tf_gis_test_data,
                                                                      perturbed_pt_gis_test_data)
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
-
+from torch.utils.data import DataLoader
+import from pl.metrics import Accuracy
+import statistics
 
 if __name__ == "__main__":
     test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
     # res = cityscapes_tf_objective(test_config)
     # print(res[0])
     # cityscapes_tf_objective(test_config)
-    res = tensorflow_unet.gis_tf_objective(test_config)
-    x_test, y_test = perturbed_tf_gis_test_data()
-    test_acc = res[1].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
-    print(res[0])
-    print(test_acc)
+    # res = tensorflow_unet.gis_tf_objective(test_config)
+    # x_test, y_test = perturbed_tf_gis_test_data()
+    # test_acc = res[1].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
+    # print(res[0])
+    # print(test_acc)
+
+    print("PyTorch Model evaluation...")
+    acc, pt_model = pytorch_unet.gis_pt_objective(test_config)
+    test = perturbed_pt_gis_test_data()
+    testloader = DataLoader(test, batch_size=int(test_config['batch_size']))
+    accs = []
+    for sample in testloader:
+        out = pt_model(sample[0])
+        sample_acc = Accuracy(out.squeeze(1), out[1])
+        accs.append(sample_acc)
+    print("AVERAGE ACCURACY:")
+    print(statistics.mean(accs))

@@ -142,11 +142,6 @@ class PyTorch_UNet(pl.LightningModule):
             accuracy.append(float(x['test_accuracy']))
         avg_accuracy = statistics.mean(accuracy)
         self.test_accuracy = avg_accuracy
-        # iou = []
-        # for x in outputs:
-        #     iou.append(float(x['test_iou']))
-        # avg_iou = statistics.mean(iou)
-        # self.test_iou = avg_iou
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
