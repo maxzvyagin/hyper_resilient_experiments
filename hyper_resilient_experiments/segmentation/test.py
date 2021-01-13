@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from pytorch_lightning.metrics import Accuracy
 import statistics
 import torch
+from tqdm import tqdm
 
 if __name__ == "__main__":
     test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
     accs = []
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    for sample in testloader:
+    for sample in tqdm(testloader):
         cuda_in = sample[0].to(device)
         out = pt_model(cuda_in)
         label = sample[1].to(device)
