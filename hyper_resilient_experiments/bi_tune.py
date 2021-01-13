@@ -33,10 +33,13 @@ ONLY_CPU = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
-    global FASHION
+    global FASHION, ONLY_CPU
     print(FASHION)
     if model_type == "pt":
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        if ONLY_CPU:
+            device = torch.device("cpu")
+        else:
+            device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
         # cifar
         if num_classes == 100:
