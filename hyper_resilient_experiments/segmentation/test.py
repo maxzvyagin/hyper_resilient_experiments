@@ -12,6 +12,6 @@ if __name__ == "__main__":
     # cityscapes_tf_objective(test_config)
     res = tensorflow_unet.gis_tf_objective(test_config)
     x_test, y_test = perturbed_tf_gis_test_data()
-    test_acc = res[0].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
+    test_acc = res[1].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
     print(res[0])
     print(test_acc)
