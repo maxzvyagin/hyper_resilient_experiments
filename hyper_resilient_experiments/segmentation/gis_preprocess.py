@@ -546,7 +546,7 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
     return (x_train, y_train), (x_test, y_test)
 
 
-def perturbed_pt_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False):
+def perturbed_pt_gis_test_data(img_and_shps=None, image_type="full_channel", large_image=False):
     if not img_and_shps:
         img_and_shps = [
             ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
@@ -565,8 +565,8 @@ def perturbed_pt_gis_test_train_split(img_and_shps=None, image_type="full_channe
         if path.exists(name):
             try:
                 cache_object = open(name, "rb")
-                train, test = pickle.load(cache_object)
-                return PT_GISDataset(train), PT_GISDataset(test)
+                test = pickle.load(cache_object)
+                return test
             except:
                 print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
                 sys.exit()
@@ -577,9 +577,12 @@ def perturbed_pt_gis_test_train_split(img_and_shps=None, image_type="full_channe
             aug = iaa.SaltAndPepper(0.1)
             for sample in test:
                 sample['image'] = aug(sample['image'].numpy())
+            cache_object = open(name, "wb")
+            pickle.dump(test, cache_object)
             return test
 
-def perturbed_tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
+
+def perturbed_tf_gis_test_data(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     if not img_and_shps:
         img_and_shps = [
             ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
