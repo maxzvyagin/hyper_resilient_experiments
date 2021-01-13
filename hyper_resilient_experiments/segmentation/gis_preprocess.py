@@ -380,7 +380,7 @@ def augment_dataset(dataset):
     # generate augmented samples of dataset
     ia.seed(0)
     # flip from left to right
-    seq = iaa.Sequential([iaa.Fliplr()])
+    aug = iaa.SaltAndPepper(0.1)
     augmented_samples = []
     for sample in dataset:
         img = sample['image'].numpy()
@@ -389,7 +389,7 @@ def augment_dataset(dataset):
         i, s = seq(image=img, segmentation_maps=seg)
         s = torch.FloatTensor(s.get_arr().copy())
         i = torch.FloatTensor(np.moveaxis(i, -1, 0).copy())
-        augmented_samples.append((i, s))
+        augmented_samples.append((i, sample['mask']))
     # do the same thing but flip images upside down
     seq = iaa.Sequential([iaa.Flipud()])
     for sample in dataset:
@@ -545,6 +545,40 @@ def tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_
     pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
     return (x_train, y_train), (x_test, y_test)
 
+
+def perturbed_pt_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False):
+    if not img_and_shps:
+        img_and_shps = [
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2012_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2012_merge.shp"),
+            ("/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Imagery/vhr_2014_refl.img",
+             "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/Ephemeral_Channels/Reference/reference_2014_merge.shp")]
+
+    samples = []
+    for pair in img_and_shps:
+        name = "/tmp/mzvyagin/"
+        name += "salt_and_pepper_gis_data"
+        name += image_type
+        if large_image:
+            name += "large_image"
+        name += "PTdataset.pkl"
+        if path.exists(name):
+            try:
+                cache_object = open(name, "rb")
+                train, test = pickle.load(cache_object)
+                return PT_GISDataset(train), PT_GISDataset(test)
+            except:
+                print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
+                sys.exit()
+        # process each pair and generate the windows
+        else:
+            train, test = pt_gis_train_test_split(img_and_shps, image_type, large_image)
+            ia.seed(0)
+            aug = iaa.SaltAndPepper(0.1)
+            for sample in test:
+                sample['image'] = aug(sample['image'].numpy())
+            return test
+
 def perturbed_tf_gis_test_train_split(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
     if not img_and_shps:
         img_and_shps = [
@@ -573,8 +607,7 @@ def perturbed_tf_gis_test_train_split(img_and_shps=None, image_type="full_channe
         (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split(img_and_shps, image_type, large_image)
         ia.seed(0)
         aug = iaa.SaltAndPepper(0.1)
-        x_train = aug(x_train)
         x_test = aug(x_test)
         cache_object = open(name, "wb")
         pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
-        return (x_train, y_train), (x_test, y_test)
+        return (x_test, y_test)
