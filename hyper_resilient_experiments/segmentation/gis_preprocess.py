@@ -579,10 +579,9 @@ def perturbed_pt_gis_test_data(img_and_shps=None, image_type="full_channel", lar
             for sample in test:
                 augmented_image = aug(images=sample[0].numpy())
                 new_samples.append((torch.from_numpy(augmented_image), sample[1]))
-            new_sample_dataset = PT_GISDataset(new_samples)
             cache_object = open(name, "wb")
-            pickle.dump(new_sample_dataset, cache_object)
-            return new_sample_dataset
+            pickle.dump(new_samples, cache_object)
+            return new_samples
 
 
 def perturbed_tf_gis_test_data(img_and_shps=None, image_type="full_channel", large_image=False, theta=True):
