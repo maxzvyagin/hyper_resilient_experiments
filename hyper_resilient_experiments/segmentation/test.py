@@ -1,7 +1,8 @@
 import tensorflow as tf
 from hyper_resilient_experiments.segmentation.gis_preprocess import (tf_gis_test_train_split, pt_gis_train_test_split,
                                                                      perturbed_tf_gis_test_data,
-                                                                     perturbed_pt_gis_test_data)
+                                                                     perturbed_pt_gis_test_data,
+                                                                     PT_GISDataset)
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 from torch.utils.data import DataLoader
 from pytorch_lightning.metrics import Accuracy
@@ -21,8 +22,9 @@ if __name__ == "__main__":
     print("PyTorch Model evaluation...")
     acc, pt_model = pytorch_unet.gis_pt_objective(test_config)
     test = perturbed_pt_gis_test_data()
-    testloader = DataLoader(test, batch_size=int(test_config['batch_size']))
-    testloader.to('cuda')
+    test.to('cuda')
+    test_set = PT_GISDataset(test)
+    testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
     accs = []
     for sample in testloader:
         out = pt_model(sample[0])
