@@ -34,5 +34,7 @@ if __name__ == "__main__":
         label = sample[1].to(device)
         sample_acc = Accuracy(out.squeeze(1), label)
         accs.append(sample_acc)
+        cuda_in.to('cpu')
+        label.to('cpu')
     print("AVERAGE ACCURACY:")
     print(statistics.mean(accs))
