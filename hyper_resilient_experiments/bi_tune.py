@@ -158,7 +158,11 @@ def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
     global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF, ONLY_CPU
     print(NUM_CLASSES)
-    pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
+    try:
+        pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
+    except:
+        print("WARNING: implementation not completed for using only CPU.")
+        pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
@@ -168,7 +172,10 @@ def multi_train(config):
     # to avoid weird CUDA OOM errors
     del pt_model
     torch.cuda.empty_cache()
-    tf_test_acc, tf_model = TF_MODEL(config, only_cpu=ONLY_CPU)
+    try:
+        tf_test_acc, tf_model = TF_MODEL(config, only_cpu=ONLY_CPU)
+    except:
+        tf_test_acc, tf_model = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
