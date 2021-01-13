@@ -575,8 +575,10 @@ def perturbed_pt_gis_test_data(img_and_shps=None, image_type="full_channel", lar
             train, test = pt_gis_train_test_split(img_and_shps, image_type, large_image)
             ia.seed(0)
             aug = iaa.SaltAndPepper(0.75, per_channel=True)
+            new_samples = []
             for sample in test:
-                sample['image'] = aug(images=sample['image'].numpy())
+                augmented_image = aug(images=sample[0].numpy())
+                new_samples.append((torch.from_numpy(augmented_image), sample[1]))
             cache_object = open(name, "wb")
             pickle.dump(test, cache_object)
             return test
