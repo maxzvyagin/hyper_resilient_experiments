@@ -24,7 +24,7 @@ if __name__ == "__main__":
     acc, pt_model = pytorch_unet.gis_pt_objective(test_config)
     test = perturbed_pt_gis_test_data()
     test_set = PT_GISDataset(test)
-    testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']), pin_memory=True)
+    testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
     accs = []
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     for sample in testloader:
