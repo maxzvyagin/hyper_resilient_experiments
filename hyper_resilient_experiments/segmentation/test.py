@@ -22,9 +22,9 @@ if __name__ == "__main__":
     print("PyTorch Model evaluation...")
     acc, pt_model = pytorch_unet.gis_pt_objective(test_config)
     test = perturbed_pt_gis_test_data()
-    test.to('cuda')
     test_set = PT_GISDataset(test)
     testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
+    testloader.to('cuda')
     accs = []
     for sample in testloader:
         out = pt_model(sample[0])
