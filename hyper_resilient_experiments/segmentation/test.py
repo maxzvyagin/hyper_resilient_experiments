@@ -4,7 +4,7 @@ from hyper_resilient_experiments.segmentation.gis_preprocess import (tf_gis_test
                                                                      perturbed_pt_gis_test_data)
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
 from torch.utils.data import DataLoader
-import from pl.metrics import Accuracy
+from pl.metrics import Accuracy
 import statistics
 
 if __name__ == "__main__":
