@@ -29,6 +29,7 @@ MNIST = True
 MAX_DIFF = False
 FASHION = False
 MIN_RESILIENCY = False
+ONLY_CPU = False
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -152,9 +153,9 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
 
 def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
-    global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF
+    global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF, ONLY_CPU
     print(NUM_CLASSES)
-    pt_test_acc, pt_model = PT_MODEL(config)
+    pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
@@ -164,7 +165,7 @@ def multi_train(config):
     # to avoid weird CUDA OOM errors
     del pt_model
     torch.cuda.empty_cache()
-    tf_test_acc, tf_model = TF_MODEL(config)
+    tf_test_acc, tf_model = TF_MODEL(config, only_cpu=ONLY_CPU)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
@@ -209,7 +210,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, ONLY_CPU
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -269,6 +270,9 @@ def bitune_parse_arguments(args):
         MIN_RESILIENCY = True
         print("NOTE: Training using Min Resiliency approach")
 
+    if args.only_cpu:
+        ONLY_CPU = True
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
@@ -280,6 +284,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--minimize_resiliency', action="store_true")
     parser.add_argument('-l', '--on_lambda', action="store_true")
     parser.add_argument('-n', '--start_space')
+    parser.add_argument('-c', '--only_cpu', action='store_true')
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)

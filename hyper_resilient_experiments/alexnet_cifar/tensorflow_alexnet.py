@@ -65,10 +65,12 @@ class TensorFlow_AlexNet:
         res_test = self.model.evaluate(self.x_test, self.y_test)
         return res_test[1]
 
-def cifar100_tf_objective(config):
+def cifar100_tf_objective(config, only_cpu=False):
     # gpu_config = ConfigProto()
     # gpu_config.gpu_options.allow_growth = True
     # session = InteractiveSession(config=gpu_config)
+    if only_cpu:
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     model = TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()

@@ -106,11 +106,14 @@ class PyTorch_AlexNet(pl.LightningModule):
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
-def cifar100_pt_objective(config, ten=False):
+def cifar100_pt_objective(config, ten=False, only_cpu=False):
     #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
     torch.manual_seed(0)
     model = PyTorch_AlexNet(config)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
+    if only_cpu:
+        trainer = pl.Trainer(max_epochs=config['epochs'])
+    else:
+        trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model

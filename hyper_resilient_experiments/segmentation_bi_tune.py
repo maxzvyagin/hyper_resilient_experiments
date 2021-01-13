@@ -1,5 +1,7 @@
 """Implementation of Bi Tune testing for segmentation tasks which cannot be used with normal FoolBox library"""
-from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train_test_split, tf_gis_test_train_split
+from hyper_resilient_experiments.segmentation.gis_preprocess import (pt_gis_train_test_split, tf_gis_test_train_split,
+                                                                     perturbed_tf_gis_test_train_split,
+                                                                     )
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
 from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
@@ -34,11 +36,13 @@ MAX_DIFF = False
 FASHION = False
 MIN_RESILIENCY = False
 
+
+def pt_perturbed(dataset):
+    """"""
+
 def segmentation_model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     """Salt and pepper augmentation of segmentation images, return accuracy - difference between that and normal is
     a measure of resiliency"""
-    ia.seed(0)
-    aug = iaa.SaltAndPepper(0.1)
 
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
