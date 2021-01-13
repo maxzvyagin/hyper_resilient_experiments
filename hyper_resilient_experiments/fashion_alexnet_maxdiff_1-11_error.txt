@@ -1,0 +1,36 @@
+Unable to complete trials in space 14... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 15... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 16... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 17... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 18... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 19... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 20... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 21... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 22... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 23... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 24... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 25... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 26... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 27... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 28... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 29... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 30... Exception below.'Optimizer' object has no attribute 'get_result'
+
+Unable to complete trials in space 31... Exception below.'Optimizer' object has no attribute 'get_result'
+
