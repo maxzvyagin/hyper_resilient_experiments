@@ -1,6 +1,6 @@
 """Implementation of Bi Tune testing for segmentation tasks which cannot be used with normal FoolBox library"""
 from hyper_resilient_experiments.segmentation.gis_preprocess import (pt_gis_train_test_split, tf_gis_test_train_split,
-                                                                     perturbed_tf_gis_test_train_split,
+                                                                     perturbed_pt_gis_test_data, perturbed_tf_gis_test_data
                                                                      )
 import sys
 from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
