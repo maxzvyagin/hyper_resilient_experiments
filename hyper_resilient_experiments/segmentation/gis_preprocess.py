@@ -602,7 +602,7 @@ def perturbed_tf_gis_test_data(img_and_shps=None, image_type="full_channel", lar
         try:
             cache_object = open(name, "rb")
             (x_train, y_train), (x_test, y_test) = pickle.load(cache_object)
-            return (x_train, y_train), (x_test, y_test)
+            return (x_test, y_test)
         except:
             print("ERROR: could not load from cache file. Please try removing " + name + " and try again.")
             sys.exit()
