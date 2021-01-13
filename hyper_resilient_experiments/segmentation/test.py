@@ -7,6 +7,7 @@ from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_un
 from torch.utils.data import DataLoader
 from pytorch_lightning.metrics import Accuracy
 import statistics
+import torch
 
 if __name__ == "__main__":
     test_config = {'batch_size': 50, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
@@ -25,9 +26,12 @@ if __name__ == "__main__":
     test_set = PT_GISDataset(test)
     testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']), pin_memory=True)
     accs = []
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     for sample in testloader:
-        out = pt_model(sample[0])
-        sample_acc = Accuracy(out.squeeze(1), out[1])
+        cuda_in = sample[0].to(device)
+        out = pt_model(cuda_in)
+        label = sample[1].to(device)
+        sample_acc = Accuracy(out.squeeze(1), label)
         accs.append(sample_acc)
     print("AVERAGE ACCURACY:")
     print(statistics.mean(accs))
