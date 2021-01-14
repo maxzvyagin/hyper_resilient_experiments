@@ -26,15 +26,14 @@ if __name__ == "__main__":
     test = perturbed_pt_gis_test_data()
     test_set = PT_GISDataset(test)
     testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
-    accs = []
+    accuracy = Accuracy()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     for sample in tqdm(testloader):
         cuda_in = sample[0].to(device)
         out = pt_model(cuda_in)
         label = sample[1].to(device)
-        sample_acc = Accuracy(out.squeeze(1), label).item()
-        accs.append(sample_acc)
+        accuracy(out.squeeze(1), label).item()
         cuda_in = cuda_in.detach()
         label = label.detach()
     print("AVERAGE ACCURACY:")
-    print(statistics.mean(accs))
+    print(accuracy.compute())
