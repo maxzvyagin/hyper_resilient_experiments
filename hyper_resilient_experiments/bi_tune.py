@@ -303,7 +303,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)
-    global OPTIMIZE_MODE
+    print(OPTIMIZE_MODE)
     if args.on_lambda:
         spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=int(args.start_space),
                                 mode=OPTIMIZE_MODE)
