@@ -35,7 +35,7 @@ MIN_RESILIENCY = False
 def pt_perturbed(dataset):
     """"""
 
-def segmentation_model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
+def segmentation_model_attack(model, model_type, config, num_classes=NUM_CLASSES):
     """Salt and pepper augmentation of segmentation images, return accuracy - difference between that and normal is
     a measure of resiliency"""
 
@@ -53,7 +53,7 @@ def segmentation_model_attack(model, model_type, attack_type, config, num_classe
             accuracy(output, sample[1])
             # cuda_in = cuda_in.detach()
             # label = label.detach()
-        return accuracy.compute()
+        return accuracy.compute().item()
     elif model_type == "tf":
         x_test, y_test = perturbed_tf_gis_test_data()
         test_acc = model.evaluate(x_test, y_test, batch_size=config['batch_size'])
