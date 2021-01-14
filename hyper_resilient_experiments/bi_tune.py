@@ -30,6 +30,7 @@ MAX_DIFF = False
 FASHION = False
 MIN_RESILIENCY = False
 ONLY_CPU = False
+OPTIMIZE_MODE = "max"
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
@@ -199,7 +200,7 @@ def multi_train(config):
         res_ave = float(statistics.mean(resiliency_results))
         average_res = test_ave-res_ave
     else:
-        # training to maximize difference between frameworks
+        # training to maximize difference between frameworks - unless minimize mode is used
         pt_results = []
         tf_results = []
         for key, value in search_results.items():
@@ -220,7 +221,7 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, ONLY_CPU
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, ONLY_CPU, OPTIMIZE_MODE
     if not args.model:
         print("NOTE: Defaulting to MNIST model training...")
         args.model = "mnist"
@@ -283,6 +284,9 @@ def bitune_parse_arguments(args):
     if args.only_cpu:
         ONLY_CPU = True
 
+    if args.minimize_mode:
+        OPTIMIZE_MODE = "min"
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
@@ -295,11 +299,14 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--on_lambda', action="store_true")
     parser.add_argument('-n', '--start_space')
     parser.add_argument('-c', '--only_cpu', action='store_true')
+    parser.add_argument('--minimize_mode', action="store_true")
     args = parser.parse_args()
     bitune_parse_arguments(args)
     # print(PT_MODEL)
+    global OPTIMIZE_MODE
     if args.on_lambda:
-        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=int(args.start_space))
+        spaceray.run_experiment(args, multi_train, ray_dir="~/raylogs", cpu=8, start_space=int(args.start_space),
+                                mode=OPTIMIZE_MODE)
     else:
         spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8,
-                                start_space=int(args.start_space))
+                                start_space=int(args.start_space), mode=OPTIMIZE_MODE)
