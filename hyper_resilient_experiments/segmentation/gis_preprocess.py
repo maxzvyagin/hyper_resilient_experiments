@@ -574,7 +574,7 @@ def perturbed_pt_gis_test_data(img_and_shps=None, image_type="full_channel", lar
         else:
             train, test = pt_gis_train_test_split(img_and_shps, image_type, large_image)
             ia.seed(0)
-            aug = iaa.SaltAndPepper(0.75, per_channel=True)
+            aug = iaa.SaltAndPepper(0.25, per_channel=True)
             new_samples = []
             for sample in test:
                 augmented_image = aug(images=sample[0].numpy())
@@ -611,7 +611,7 @@ def perturbed_tf_gis_test_data(img_and_shps=None, image_type="full_channel", lar
     else:
         (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split(img_and_shps, image_type, large_image)
         ia.seed(0)
-        aug = iaa.SaltAndPepper(0.75, per_channel=True)
+        aug = iaa.SaltAndPepper(0.25, per_channel=True)
         x_test = aug(images=x_test)
         cache_object = open(name, "wb")
         pickle.dump(((x_train, y_train), (x_test, y_test)), cache_object)
