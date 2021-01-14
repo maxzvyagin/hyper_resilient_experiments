@@ -197,7 +197,7 @@ def multi_train(config):
                 resiliency_results.append(value)
         test_ave = float(statistics.mean(test_results))
         res_ave = float(statistics.mean(resiliency_results))
-        average_res = abs(test_ave-res_ave)
+        average_res = test_ave-res_ave
     else:
         # training to maximize difference between frameworks
         pt_results = []

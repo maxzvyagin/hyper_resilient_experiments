@@ -12,14 +12,11 @@ from tqdm import tqdm
 
 if __name__ == "__main__":
     test_config = {'batch_size': 4, 'learning_rate': .001, 'epochs': 1, 'adam_epsilon': 10 ** -9}
-    # res = cityscapes_tf_objective(test_config)
-    # print(res[0])
-    # cityscapes_tf_objective(test_config)
-    # res = tensorflow_unet.gis_tf_objective(test_config)
-    # x_test, y_test = perturbed_tf_gis_test_data()
-    # test_acc = res[1].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
-    # print(res[0])
-    # print(test_acc)
+    res = tensorflow_unet.gis_tf_objective(test_config)
+    x_test, y_test = perturbed_tf_gis_test_data()
+    test_acc = res[1].evaluate(x_test, y_test, batch_size=test_config['batch_size'])
+    print(res[0])
+    print(test_acc)
 
     print("PyTorch Model evaluation...")
     acc, pt_model = pytorch_unet.gis_pt_objective(test_config)
