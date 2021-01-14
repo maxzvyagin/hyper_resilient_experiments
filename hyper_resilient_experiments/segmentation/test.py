@@ -31,7 +31,8 @@ if __name__ == "__main__":
     for sample in tqdm(testloader):
         cuda_in = sample[0].to(device)
         out = pt_model(cuda_in)
-        accuracy(out.squeeze(1), sample[1])
+        output = out.to('cpu').squeeze(1)
+        accuracy(output, sample[1])
         # cuda_in = cuda_in.detach()
         # label = label.detach()
     print("AVERAGE ACCURACY:")
