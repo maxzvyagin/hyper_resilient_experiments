@@ -13,7 +13,7 @@ def concatenate_results(dir):
                 first = False
                 full_df = df
             else:
-                full_df.append(df)
+                full_df = full_df.append(df)
                 print(len(full_df))
 
     full_df.to_csv(dir+"/all_results.csv")
