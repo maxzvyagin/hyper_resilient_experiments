@@ -118,18 +118,7 @@ def segmentation_multi_train(config):
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
     global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
-    if args.model == "segmentation_cityscapes":
-        PT_MODEL = pytorch_unet.cityscapes_pt_objective
-        TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-        NUM_CLASSES = 30
-    elif args.model == "segmentation_gis":
-        PT_MODEL = pytorch_unet.gis_pt_objective
-        TF_MODEL = tensorflow_unet.gis_tf_objective
-        NUM_CLASSES = 1
-    else:
-        print("\n ERROR: Unknown model type. Please try again. "
-              "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
-        sys.exit()
+
     if not args.trials:
         print("NOTE: Defaulting to 25 trials per scikit opt space...")
     else:
@@ -147,7 +136,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Start bi model tuning with hyperspace and resiliency testing, "
                                      "specify output csv file name.")
     parser.add_argument("-o", "--out", required=True)
-    parser.add_argument("-m", "--model")
     parser.add_argument("-t", "--trials")
     parser.add_argument("-j", "--json")
     parser.add_argument('-d', "--max_diff", action="store_true")
