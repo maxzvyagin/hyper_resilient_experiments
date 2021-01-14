@@ -1,12 +1,9 @@
 """Implementation of Bi Tune testing for segmentation tasks which cannot be used with normal FoolBox library"""
-from hyper_resilient_experiments.segmentation.gis_preprocess import (pt_gis_train_test_split, tf_gis_test_train_split,
+from hyper_resilient_experiments.segmentation.gis_preprocess import (PT_GISDataset,
                                                                      perturbed_pt_gis_test_data, perturbed_tf_gis_test_data
                                                                      )
 import sys
-from hyper_resilient_experiments.simple_mnist import pt_mnist, tf_mnist
-from hyper_resilient_experiments.alexnet_cifar import pytorch_alexnet, tensorflow_alexnet
 from hyper_resilient_experiments.segmentation import pytorch_unet, tensorflow_unet
-from hyper_resilient_experiments.alexnet_fashion import fashion_pytorch_alexnet, fashion_tensorflow_alexnet
 import argparse
 import ray
 from ray import tune
@@ -21,14 +18,12 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
-
-import imgaug as ia
-import imgaug.augmenters as iaa
+from pytorch_lightning.metrics import Accuracy
 
 # Default constants
-PT_MODEL = pt_mnist.mnist_pt_objective
-TF_MODEL = tf_mnist.mnist_tf_objective
-NUM_CLASSES = 10
+PT_MODEL = pytorch_unet.gis_pt_objective
+TF_MODEL = tensorflow_unet.gis_tf_objective
+NUM_CLASSES = 1
 TRIALS = 25
 NO_FOOL = False
 MNIST = True
@@ -46,24 +41,19 @@ def segmentation_model_attack(model, model_type, attack_type, config, num_classe
 
     if model_type == "pt":
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        # cityscapes
-        if num_classes == 30:
-            data = DataLoader(torchvision.datasets.Cityscapes(
-                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(config['batch_size']))
-        # gis
-        elif num_classes == 1:
-            train_set, test_set = pt_gis_train_test_split()
-            data = DataLoader(test_set, batch_size=int(config['batch_size']))
-        images, labels = [], []
-        for sample in data:
-            images.append(sample[0].to(device))
-            labels.append(sample[1].to(device))
-        images = aug(images)
-        # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
+        test = perturbed_pt_gis_test_data()
+        test_set = PT_GISDataset(test)
+        testloader = DataLoader(test_set, batch_size=int(test_config['batch_size']))
+        accuracy = Accuracy()
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        for sample in tqdm(testloader):
+            cuda_in = sample[0].to(device)
+            out = model(cuda_in)
+            output = out.to('cpu').squeeze(1)
+            accuracy(output, sample[1])
+            # cuda_in = cuda_in.detach()
+            # label = label.detach()
+        return accuracy.compute()
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
         # cityscapes

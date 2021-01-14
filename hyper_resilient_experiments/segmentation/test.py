@@ -36,4 +36,4 @@ if __name__ == "__main__":
         # cuda_in = cuda_in.detach()
         # label = label.detach()
     print("AVERAGE ACCURACY:")
-    print(accuracy.compute())
+    print(accuracy.compute()[0])
