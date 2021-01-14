@@ -14,6 +14,7 @@ def concatenate_results(dir):
                 full_df = df
             else:
                 full_df.append(df)
+                print(len(full_df))
 
     full_df.to_csv(dir+"/all_results.csv")
 
