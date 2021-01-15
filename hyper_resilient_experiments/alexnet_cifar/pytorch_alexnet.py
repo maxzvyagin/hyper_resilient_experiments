@@ -45,24 +45,24 @@ class PyTorch_AlexNet(pl.LightningModule):
             return DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=True,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=4)
+                              batch_size=int(self.config['batch_size']), num_workers=4, shuffle=False)
         else:
             return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=True,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=4)
+                              batch_size=int(self.config['batch_size']), num_workers=4, shuffle=False)
 
     def test_dataloader(self):
         if self.ten:
             return DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=4)
+                              batch_size=int(self.config['batch_size']), num_workers=4, shuffle=False)
         else:
             return DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
                                                             transform=torchvision.transforms.ToTensor(),
                                                             target_transform=None, download=True),
-                              batch_size=int(self.config['batch_size']), num_workers=4)
+                              batch_size=int(self.config['batch_size']), num_workers=4, shuffle=False)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
@@ -108,20 +108,22 @@ class PyTorch_AlexNet(pl.LightningModule):
 
 def cifar100_pt_objective(config, ten=False, only_cpu=False):
     #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
-    torch.manual_seed(0)
+    # torch.manual_seed(0)
+    pl.seed_everything(0)
     model = PyTorch_AlexNet(config)
     if only_cpu:
-        trainer = pl.Trainer(max_epochs=config['epochs'])
+        trainer = pl.Trainer(max_epochs=config['epochs'], deterministic=True)
     else:
-        trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
+        trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], deterministic=True)
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model
 
 def cifar10_pt_objective(config):
-    torch.manual_seed(0)
+    pl.seed_everything(0)
+    # torch.manual_seed(0)
     model = PyTorch_AlexNet(config, classes=10, ten=True)
-    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
+    trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], deterministic=True)
     trainer.fit(model)
     trainer.test(model)
     return model.test_accuracy, model.model
