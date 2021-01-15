@@ -62,7 +62,7 @@ class TensorFlow_AlexNet:
                            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                            metrics=['accuracy'])
         self.config = config
- 
+
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']), shuffle=False)
