@@ -37,20 +37,24 @@ class TensorFlow_AlexNet:
         # self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3),
-                                kernel_initializer=''),
+                                kernel_initializer='he_uniform'),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
-            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
-            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
             keras.layers.Flatten(),
-            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(classes, activation=None)
+            keras.layers.Dense(classes, activation=None, kernel_initializer='he_uniform')
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
@@ -58,7 +62,7 @@ class TensorFlow_AlexNet:
                            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                            metrics=['accuracy'])
         self.config = config
-
+ 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']), shuffle=False)
