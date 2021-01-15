@@ -17,6 +17,8 @@ class TensorFlow_AlexNet:
             classes = 10
         else:
             (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.cifar100.load_data()
+            self.x_train = self.x_train/255
+            self.x_test = self.x_test/255
             classes = 100
         # options = tf.data.Options()
         # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
@@ -34,7 +36,8 @@ class TensorFlow_AlexNet:
         # self.train = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train)).batch(b)
         # self.test_set = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test)).batch(b)
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3)),
+            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(32, 32, 3),
+                                kernel_initializer=''),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
             keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
@@ -58,11 +61,11 @@ class TensorFlow_AlexNet:
 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-                             batch_size=int(self.config['batch_size']))
+                             batch_size=int(self.config['batch_size']), shuffle=False)
         return res
 
     def test(self):
-        res_test = self.model.evaluate(self.x_test, self.y_test)
+        res_test = self.model.evaluate(self.x_test, self.y_test, batch_size=int(self.config['batch_size']))
         return res_test[1]
 
 def cifar100_tf_objective(config, only_cpu=False):
