@@ -172,9 +172,9 @@ def double_train(config):
             search_results[MODEL_SELECT + "_" + attack_type + "_" + "accuracy1"] = acc
             first_model_results.append(acc)
     # to avoid weird CUDA OOM errors
-    if pt:
-        del model
-        torch.cuda.empty_cache()
+    # if pt:
+    #     del model
+    #     torch.cuda.empty_cache()
     test_acc, model = selected_model(config)
     if pt:
         model.eval()
