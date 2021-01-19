@@ -57,19 +57,12 @@ def get_caltech():
     # first try loading from cache object, otherwise load from scratch
 
     train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
-    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
-    #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
-    train_x = [pair['image']/255.0 for pair in train]
-    train_y = [float(pair['label']) for pair in train]
-    # train_x, train_y = [], []
-    # for i in train:
-    #     train_x.append(i['image_left'].numpy() / 255)
-    #     train_y.append(i['segmentation_label'].numpy() / 255)
-    # test_x, test_y = [], []
+    train_x = [pair['image']/255 for pair in train]
+    train_y = [pair['label'] for pair in train]
     test = list(test)
-    test_x = [pair['image']/255.0 for pair in test]
-    test_y = [float(pair['label']) for pair in test]
+    test_x = [pair['image']/255 for pair in test]
+    test_y = [pair['label'] for pair in test]
     return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
