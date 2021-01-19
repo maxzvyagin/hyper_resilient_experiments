@@ -2,7 +2,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import os
-
+import tensorflow_datasets as tfds
 
 class Fashion_TensorFlow_AlexNet:
     def __init__(self, config):
@@ -52,6 +52,30 @@ def fashion_tf_objective(config):
     accuracy = model.test()
     return accuracy, model.model
 
+def get_cityscapes():
+    """ Returns test, train split of Cityscapes data"""
+    # first try loading from cache object, otherwise load from scratch
+
+    train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
+    # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
+    #                         data_dir='/home/mzvyagin/datasets/')
+    train = list(train)
+    train_x = [pair['image_left'] for pair in train]
+    train_y = [pair['segmentation_label'] for pair in train]
+    train_x = list(map(lambda x: x.numpy() / 255.0, train_x))
+    # train_x, train_y = [], []
+    # for i in train:
+    #     train_x.append(i['image_left'].numpy() / 255)
+    #     train_y.append(i['segmentation_label'].numpy() / 255)
+    # test_x, test_y = [], []
+    test = list(test)
+    test_x = [pair['image_left'] for pair in test]
+    test_y = [pair['segmentation_label'] for pair in test]
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), test_x))
+    # for i in test:
+    #     test_x.append(i['image_left'].numpy() / 255)
+    #     test_y.append(i['segmentation_label'].numpy() / 255)
+    return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
     test_config = {'batch_size': 64, 'learning_rate': .000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
