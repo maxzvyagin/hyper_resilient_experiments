@@ -52,16 +52,22 @@ def fashion_tf_objective(config):
     accuracy = model.test()
     return accuracy, model.model
 
+def standardize_shape(i):
+    s = i.shape
+    x_min = ((s[0]-200)//2)-1
+    y_min = ((s[1]-300)//2)-1
+    return (i[x_min:x_min+200][y_min:y_min+300][:]/255)
+
 def get_caltech():
     """ Returns test, train split of Caltech data"""
     # first try loading from cache object, otherwise load from scratch
 
     train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
     train = list(train)
-    train_x = [pair['image']/255 for pair in train]
+    train_x = [standardize_shape(pair['image']) for pair in train]
     train_y = [pair['label'] for pair in train]
     test = list(test)
-    test_x = [pair['image']/255 for pair in test]
+    test_x = [standardize_shape(pair['image']) for pair in test]
     test_y = [pair['label'] for pair in test]
     return (train_x, train_y), (test_x, test_y)
 
