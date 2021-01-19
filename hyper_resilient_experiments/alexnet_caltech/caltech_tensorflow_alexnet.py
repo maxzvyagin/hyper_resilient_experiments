@@ -71,8 +71,10 @@ def get_caltech():
     test = list(test)
     test_x = [pair['image'] for pair in test]
     test_y = [pair['label'] for pair in test]
-    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), train_x))
-    test_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), test_x))
+    train_x = list(map(lambda x: x.numpy() / 255.0, train_x))
+    test_x = list(map(lambda x: x.numpy() / 255.0, test_x))
+    train_y = list(map(lambda x: x.numpy(), train_y))
+    test_y, list(map(lambda x: x.numpy(), test_y))
     # for i in test:
     #     test_x.append(i['image_left'].numpy() / 255)
     #     test_y.append(i['segmentation_label'].numpy() / 255)
