@@ -13,7 +13,7 @@ class Fashion_TensorFlow_AlexNet:
         f = lambda i: tf.expand_dims(i, -1)
         self.x_train = f(self.x_train)
         self.x_test = f(self.x_test)
-        classes = 101
+        classes = 200
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(28, 28, 1)),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
@@ -62,7 +62,7 @@ def get_caltech():
     """ Returns test, train split of Caltech data"""
     # first try loading from cache object, otherwise load from scratch
 
-    train, test = tfds.load('stanford_dogs', split=['train', 'test'], shuffle_files=False)
+    train, test = tfds.load('caltech_birds2011', split=['train', 'test'], shuffle_files=False)
     train = list(train)
     train_x = [pair['image']/255 for pair in train]
     train_y = [pair['label'] for pair in train]
