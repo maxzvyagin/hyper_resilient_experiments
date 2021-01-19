@@ -35,7 +35,7 @@ class Fashion_TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
+        res = self.model.fit(self.x_train, self.x_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
         return res
 
