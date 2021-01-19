@@ -71,10 +71,8 @@ def get_caltech():
     test = list(test)
     test_x = [pair['image'] for pair in test]
     test_y = [pair['label'] for pair in test]
-    train_x = list(map(lambda x: x.numpy() / 255.0, train_x))
-    test_x = list(map(lambda x: x.numpy() / 255.0, test_x))
-    train_y = list(map(lambda x: x.numpy(), train_y))
-    test_y, list(map(lambda x: x.numpy(), test_y))
+    train_x = list(map(lambda x: x / 255.0, train_x))
+    test_x = list(map(lambda x: x / 255.0, test_x))
     return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
