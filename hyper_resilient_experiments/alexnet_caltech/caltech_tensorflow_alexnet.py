@@ -12,7 +12,7 @@ class Fashion_TensorFlow_AlexNet:
         (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         classes = 101
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu'),
+            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(244, 244, 3)),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
             keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
