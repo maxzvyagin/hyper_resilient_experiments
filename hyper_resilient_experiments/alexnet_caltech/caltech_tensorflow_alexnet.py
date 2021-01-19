@@ -13,7 +13,7 @@ class Fashion_TensorFlow_AlexNet:
         f = lambda i: tf.expand_dims(i, -1)
         self.x_train = f(self.x_train)
         self.x_test = f(self.x_test)
-        classes = 200
+        classes = 101
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu'),
             keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
