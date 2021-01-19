@@ -35,7 +35,7 @@ class Fashion_TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(self.x_train, self.x_train, epochs=self.config['epochs'],
+        res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
         return res
 
@@ -59,10 +59,10 @@ def get_caltech():
     train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
     train = list(train)
     train_x = [standardize(pair['image']) for pair in train]
-    train_y = [pair['label'] for pair in train]
+    train_y = [pair['label'].numpy() for pair in train]
     test = list(test)
     test_x = [standardize(pair['image']) for pair in test]
-    test_y = [pair['label'] for pair in test]
+    test_y = [pair['label'].numpy() for pair in test]
     return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
