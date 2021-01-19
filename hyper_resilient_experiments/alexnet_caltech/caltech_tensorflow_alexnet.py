@@ -62,12 +62,12 @@ def get_caltech():
     """ Returns test, train split of Caltech data"""
     # first try loading from cache object, otherwise load from scratch
 
-    train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
+    train, test = tfds.load('stanford_dogs', split=['train', 'test'], shuffle_files=False)
     train = list(train)
-    train_x = [standardize_shape(pair['image']) for pair in train]
+    train_x = [pair['image']/255 for pair in train]
     train_y = [pair['label'] for pair in train]
     test = list(test)
-    test_x = [standardize_shape(pair['image']) for pair in test]
+    test_x = [pair['image']/255 for pair in test]
     test_y = [pair['label'] for pair in test]
     return (train_x, train_y), (test_x, test_y)
 
