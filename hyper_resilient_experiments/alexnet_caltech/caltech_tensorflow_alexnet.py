@@ -9,7 +9,7 @@ class Fashion_TensorFlow_AlexNet:
         tf.keras.backend.set_image_data_format('channels_last')
         tf.random.set_seed(0)
         b = int(config['batch_size'])
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.caltech101.load_data()
+        (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         # f = lambda i: tf.expand_dims(i, -1)
         # self.x_train = f(self.x_train)
         # self.x_test = f(self.x_test)
@@ -52,16 +52,16 @@ def fashion_tf_objective(config):
     accuracy = model.test()
     return accuracy, model.model
 
-def get_cityscapes():
-    """ Returns test, train split of Cityscapes data"""
+def get_caltech():
+    """ Returns test, train split of Caltech data"""
     # first try loading from cache object, otherwise load from scratch
 
     train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
     # train, test = tfds.load('cityscapes', split=['train', 'test'], shuffle_files=False,
     #                         data_dir='/home/mzvyagin/datasets/')
     train = list(train)
-    train_x = [pair['image_left'] for pair in train]
-    train_y = [pair['segmentation_label'] for pair in train]
+    train_x = [pair['image'] for pair in train]
+    train_y = [pair['label'] for pair in train]
     train_x = list(map(lambda x: x.numpy() / 255.0, train_x))
     # train_x, train_y = [], []
     # for i in train:
@@ -69,9 +69,10 @@ def get_cityscapes():
     #     train_y.append(i['segmentation_label'].numpy() / 255)
     # test_x, test_y = [], []
     test = list(test)
-    test_x = [pair['image_left'] for pair in test]
-    test_y = [pair['segmentation_label'] for pair in test]
-    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), test_x))
+    test_x = [pair['image'] for pair in test]
+    test_y = [pair['label'] for pair in test]
+    train_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), train_x))
+    test_x = list(map(lambda x: tf.convert_to_tensor(x.numpy() / 255.0), test_x))
     # for i in test:
     #     test_x.append(i['image_left'].numpy() / 255)
     #     test_y.append(i['segmentation_label'].numpy() / 255)
