@@ -138,3 +138,7 @@ if __name__ == "__main__":
         batch = 64
     test_config = {'batch_size': batch, 'learning_rate': .001, 'epochs': 1, 'dropout': 0.5}
     res = cifar100_pt_objective(test_config)
+    res2 = cifar10_pt_objective(test_config)
+    print("CIFAR 100: "+str(res[0]))
+    print("CIFAR 10: "+str(res2[0]) )
+
