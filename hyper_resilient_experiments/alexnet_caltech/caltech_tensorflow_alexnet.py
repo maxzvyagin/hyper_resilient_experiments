@@ -75,9 +75,6 @@ def get_caltech():
     test_x = list(map(lambda x: x.numpy() / 255.0, test_x))
     train_y = list(map(lambda x: x.numpy(), train_y))
     test_y, list(map(lambda x: x.numpy(), test_y))
-    # for i in test:
-    #     test_x.append(i['image_left'].numpy() / 255)
-    #     test_y.append(i['segmentation_label'].numpy() / 255)
     return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
