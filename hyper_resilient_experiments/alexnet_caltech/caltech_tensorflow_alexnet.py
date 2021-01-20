@@ -7,7 +7,7 @@ import numpy as np
 
 class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
-        tf.debugging.enable_check_numerics()
+        # tf.debugging.enable_check_numerics()
         tf.keras.backend.set_image_data_format('channels_last')
         ### DIFFERENT RANDOM SEED###
         tf.random.set_seed(100)
