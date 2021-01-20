@@ -50,7 +50,7 @@ def fashion_tf_objective(config):
     return accuracy, model.model
 
 def standardize(i):
-    return tf.image.resize(i, (224, 224))/255
+    return (tf.image.resize(i, (224, 224))/255).numpy()
 
 def get_caltech():
     """ Returns test, train split of Caltech data"""
@@ -59,10 +59,10 @@ def get_caltech():
     train, test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
     train = list(train)
     train_x = [standardize(pair['image']) for pair in train]
-    train_y = [pair['label'].numpy() for pair in train]
+    train_y = [pair['label'].numpy().item() for pair in train]
     test = list(test)
     test_x = [standardize(pair['image']) for pair in test]
-    test_y = [pair['label'].numpy() for pair in test]
+    test_y = [pair['label'].numpy().item() for pair in test]
     return (train_x, train_y), (test_x, test_y)
 
 if __name__ == "__main__":
