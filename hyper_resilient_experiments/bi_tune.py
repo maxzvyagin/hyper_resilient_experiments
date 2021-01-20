@@ -18,6 +18,8 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
+from ray.tune.integration.wandb import wandb_mixin
+
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -153,7 +155,6 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
             robust_accuracy = 1 - success.numpy().astype(float).flatten().mean(axis=-1)
         accuracy_list.append(robust_accuracy)
     return np.array(accuracy_list).mean()
-
 
 def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
