@@ -68,5 +68,5 @@ def get_caltech():
     return (np.array(train_x), np.array(train_y)), (np.array(test_x), np.array(test_y))
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 32, 'learning_rate': .001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 32, 'learning_rate': .00000000000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
     res = fashion_tf_objective(test_config)

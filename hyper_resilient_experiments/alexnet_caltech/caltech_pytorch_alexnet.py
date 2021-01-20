@@ -6,11 +6,12 @@ from torch.utils.data import DataLoader
 import statistics
 import os
 import argparse
+from hyper_resilient_experiments.alexnet_caltech.caltech_tensorflow_alexnet import get_caltech
 
 
-class Fashion_PyTorch_AlexNet(pl.LightningModule):
+class Caltech_PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=10):
-        super(Fashion_PyTorch_AlexNet, self).__init__()
+        super(Caltech_PyTorch_AlexNet, self).__init__()
         self.config = config
         self.model = nn.Sequential(
             nn.Conv2d(1, 64, kernel_size=11, stride=4, padding=5),
@@ -38,6 +39,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         self.test_loss = None
         self.test_accuracy = None
         self.accuracy = pl.metrics.Accuracy()
+
 
     def train_dataloader(self):
         return DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=True,
@@ -93,10 +95,9 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         return {'avg_test_loss': avg_loss, 'log': tensorboard_logs, 'avg_test_accuracy': avg_accuracy}
 
 
-def fashion_pt_objective(config, ten=False):
-    #os.environ['CUDA_VISIBLE_DEVICES'] = '0,1,2,3'
+def caltech_pt_objective(config):
     torch.manual_seed(0)
-    model = Fashion_PyTorch_AlexNet(config)
+    model = Caltech_PyTorch_AlexNet(config)
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
     trainer.fit(model)
     trainer.test(model)
@@ -112,4 +113,4 @@ if __name__ == "__main__":
     else:
         batch = 64
     test_config = {'batch_size': batch, 'learning_rate': .0001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
-    res = fashion_pt_objective(test_config)
+    res = caltech_pt_objective(test_config)
