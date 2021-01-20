@@ -5,10 +5,11 @@ import os
 import tensorflow_datasets as tfds
 import numpy as np
 
-class Fashion_TensorFlow_AlexNet:
+class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
         tf.keras.backend.set_image_data_format('channels_last')
-        tf.random.set_seed(0)
+        ### DIFFERENT RANDOM SEED###
+        tf.random.set_seed(100)
         b = int(config['batch_size'])
         (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         classes = 101
@@ -45,7 +46,7 @@ class Fashion_TensorFlow_AlexNet:
         return res_test[1]
 
 def fashion_tf_objective(config):
-    model = Fashion_TensorFlow_AlexNet(config)
+    model = Caltech_TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
     return accuracy, model.model
