@@ -176,8 +176,9 @@ def multi_train(config):
     try:
         tf_test_acc, tf_model = TF_MODEL(config, only_cpu=ONLY_CPU)
     except:
-        tf_test_acc, tf_model = TF_MODEL(config)
+        tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
+    search_results['tf_training_history'] = tf_training_history
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=NUM_CLASSES)

@@ -13,6 +13,7 @@ class Fashion_TensorFlow_AlexNet:
         f = lambda i: tf.expand_dims(i, -1)
         self.x_train = f(self.x_train)
         self.x_test = f(self.x_test)
+        self.training_loss_history = None
         classes = 10
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(28, 28, 1)),
@@ -40,6 +41,7 @@ class Fashion_TensorFlow_AlexNet:
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
+        self.training_loss_history = res.history['loss']
         return res
 
     def test(self):
@@ -50,7 +52,7 @@ def fashion_tf_objective(config):
     model = Fashion_TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
-    return accuracy, model.model
+    return accuracy, model.model, model.training_loss_history
 
 
 if __name__ == "__main__":
