@@ -178,7 +178,6 @@ def multi_train(config):
     except:
         tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
-    search_results['tf_training_history'] = tf_training_history
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
             pt_acc = model_attack(tf_model, "tf", attack_type, config, num_classes=NUM_CLASSES)
@@ -213,6 +212,7 @@ def multi_train(config):
         tf_ave = float(statistics.mean(tf_results))
         average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
+    search_results['tf_training_history'] = tf_training_history
     try:
         tune.report(**search_results)
     except:
