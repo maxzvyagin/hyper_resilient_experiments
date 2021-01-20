@@ -7,12 +7,13 @@ import numpy as np
 
 class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
+        tf.debugging.enable_check_numerics()
         tf.keras.backend.set_image_data_format('channels_last')
         ### DIFFERENT RANDOM SEED###
         tf.random.set_seed(100)
         b = int(config['batch_size'])
-        # (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
-        self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
+        (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
+        # self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
         classes = 101
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(224, 224, 3),
@@ -43,15 +44,15 @@ class Caltech_TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        # res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-        #                      batch_size=int(self.config['batch_size']))
-        res = self.model.fit(self.train, epochs=self.config['epochs'],
+        res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']))
+        # res = self.model.fit(self.train, epochs=self.config['epochs'],
+        #                      batch_size=int(self.config['batch_size']))
         return res
 
     def test(self):
-        # res_test = self.model.evaluate(self.x_test, self.y_test)
-        res_test = self.model.evaluate(self.test)
+        res_test = self.model.evaluate(self.x_test, self.y_test)
+        # res_test = self.model.evaluate(self.test)
         return res_test[1]
 
 def fashion_tf_objective(config):
