@@ -32,7 +32,7 @@ class Caltech_TensorFlow_AlexNet:
             keras.layers.Dropout(config['dropout']),
             keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(classes, activation=None, kernel_initializer='he_uniform')
+            keras.layers.Dense(classes, activation='relu', kernel_initializer='he_uniform')
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
