@@ -14,20 +14,25 @@ class Caltech_TensorFlow_AlexNet:
         (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         classes = 101
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(224, 224, 3)),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
-            keras.layers.Conv2D(filters=256, kernel_size=(5,5), strides=1, activation='relu', padding="same"),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
-            keras.layers.Conv2D(filters=384, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
-            keras.layers.Conv2D(filters=256, kernel_size=(3,3), strides=1, activation='relu', padding="same"),
-            keras.layers.MaxPool2D(pool_size=(3,3), strides=(2, 2), padding="same"),
+            keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(224, 224, 3),
+                                kernel_initializer='he_uniform'),
+            keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding="same"),
+            keras.layers.Conv2D(filters=256, kernel_size=(5, 5), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding="same"),
+            keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.Conv2D(filters=384, kernel_size=(3, 3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.Conv2D(filters=256, kernel_size=(3, 3), strides=1, activation='relu', padding="same",
+                                kernel_initializer='he_uniform'),
+            keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding="same"),
             keras.layers.Flatten(),
-            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(4096, activation='relu'),
+            keras.layers.Dense(4096, activation='relu', kernel_initializer='he_uniform'),
             keras.layers.Dropout(config['dropout']),
-            keras.layers.Dense(classes, activation=None)
+            keras.layers.Dense(classes, activation=None, kernel_initializer='he_uniform')
         ])
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
@@ -68,5 +73,5 @@ def get_caltech():
     return (np.array(train_x), np.array(train_y)), (np.array(test_x), np.array(test_y))
 
 if __name__ == "__main__":
-    test_config = {'batch_size': 32, 'learning_rate': .00000000000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 32, 'learning_rate': .000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
     res = fashion_tf_objective(test_config)
