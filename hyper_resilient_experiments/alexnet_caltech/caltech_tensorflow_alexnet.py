@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow import keras
 import os
 import tensorflow_datasets as tfds
+import numpy as np
 
 class Fashion_TensorFlow_AlexNet:
     def __init__(self, config):
@@ -63,7 +64,7 @@ def get_caltech():
     test = list(test)
     test_x = [standardize(pair['image']) for pair in test]
     test_y = [pair['label'].numpy().item() for pair in test]
-    return (train_x, train_y), (test_x, test_y)
+    return (np.array(train_x), np.array(train_y)), (np.array(test_x), np.array(test_y))
 
 if __name__ == "__main__":
     test_config = {'batch_size': 1, 'learning_rate': .000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
