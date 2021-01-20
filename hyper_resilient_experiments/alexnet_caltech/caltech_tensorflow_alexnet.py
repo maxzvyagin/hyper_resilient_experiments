@@ -14,6 +14,7 @@ class Caltech_TensorFlow_AlexNet:
         b = int(config['batch_size'])
         (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         self.x_train = self.x_train[1:]
+        self.y_train = self.y_train[1:]
         # self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
         classes = 101
         self.model = keras.models.Sequential([
