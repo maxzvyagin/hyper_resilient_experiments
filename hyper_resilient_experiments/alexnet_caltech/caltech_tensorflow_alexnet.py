@@ -16,7 +16,7 @@ class Caltech_TensorFlow_AlexNet:
         # self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
         classes = 101
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(224, 224, 3),
+            keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(300, 200, 3),
                                 kernel_initializer='he_uniform'),
             keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding="same"),
             keras.layers.Conv2D(filters=256, kernel_size=(5, 5), strides=1, activation='relu', padding="same",
