@@ -64,7 +64,7 @@ def fashion_tf_objective(config):
     return accuracy, model.model
 
 def standardize(i):
-    return (tf.image.resize(i, (224, 224))).numpy()
+    return tf.image.resize_with_crop_or_pad(i, 300, 200).numpy()
 
 def get_caltech():
     """ Returns test, train split of Caltech data"""
