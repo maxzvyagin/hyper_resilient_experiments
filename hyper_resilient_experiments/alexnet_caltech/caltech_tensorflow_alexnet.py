@@ -37,7 +37,7 @@ class Caltech_TensorFlow_AlexNet:
             keras.layers.Dense(classes, activation='relu', kernel_initializer='he_uniform')
         ])
 
-        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
+        opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'], clipvalue=0.5)
         self.model.compile(optimizer=opt,
                            loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                            metrics=['accuracy'])
