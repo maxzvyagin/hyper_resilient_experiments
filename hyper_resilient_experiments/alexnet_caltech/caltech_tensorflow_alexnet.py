@@ -82,5 +82,5 @@ def get_caltech():
 
 if __name__ == "__main__":
     # os.environ['CUDA_VISIBLE_DEVICES'] = "-1"
-    test_config = {'batch_size': 1, 'learning_rate': .000001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': 1, 'learning_rate': .001, 'epochs': 100, 'dropout': 0.5, 'adam_epsilon': 10**-9}
     res = fashion_tf_objective(test_config)
