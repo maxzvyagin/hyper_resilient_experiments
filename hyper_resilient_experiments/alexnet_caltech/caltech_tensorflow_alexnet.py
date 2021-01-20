@@ -62,6 +62,9 @@ def fashion_tf_objective(config):
     return accuracy, model.model
 
 def standardize(i):
+    new = (tf.image.resize_with_crop_or_pad(i, 300, 200)).numpy()
+    if np.all(new==0):
+        print("Found an all zero")
     return (tf.image.resize_with_crop_or_pad(i, 300, 200)).numpy()
 
 def get_caltech():
