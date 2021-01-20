@@ -39,7 +39,7 @@ class Caltech_TensorFlow_AlexNet:
 
         opt = tf.keras.optimizers.Adam(learning_rate=config['learning_rate'], epsilon=config['adam_epsilon'])
         self.model.compile(optimizer=opt,
-                           loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                           loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                            metrics=['accuracy'])
         self.config = config
 
