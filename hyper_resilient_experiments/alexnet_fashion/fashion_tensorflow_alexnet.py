@@ -2,6 +2,8 @@
 import tensorflow as tf
 from tensorflow import keras
 import os
+import pickle
+import numpy as np
 
 
 class Fashion_TensorFlow_AlexNet:
@@ -9,9 +11,13 @@ class Fashion_TensorFlow_AlexNet:
         tf.keras.backend.set_image_data_format('channels_last')
         tf.random.set_seed(0)
         b = int(config['batch_size'])
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.fashion_mnist.load_data()
+        # (self.x_train, self.y_train), (self.x_test, self.y_test) = keras.datasets.fashion_mnist.load_data()
+        f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
+        data = pickle.load(f)
+        (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         f = lambda i: tf.expand_dims(i, -1)
         self.x_train = f(self.x_train)
+        self.x_val = f(self.x_val)
         self.x_test = f(self.x_test)
         self.training_loss_history = None
         classes = 10
@@ -40,7 +46,7 @@ class Fashion_TensorFlow_AlexNet:
 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-                             batch_size=int(self.config['batch_size']))
+                             batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val))
         self.training_loss_history = res.history['loss']
         return res
 

@@ -223,6 +223,9 @@ def multi_train(config):
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
     # wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
+    data = [[x, y] for (x, y) in zip(tf_training_history, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "training_loss"])
+    wandb.log({"my_custom_plot_id": wandb.plot.line(table, "epochs", "training_loss", title="TF Training Loss")})
     for x in tf_training_history:
         wandb.log({'tf_training_history': x})
     try:
