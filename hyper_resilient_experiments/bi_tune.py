@@ -181,11 +181,11 @@ def multi_train(config):
     # torch.cuda.empty_cache()
     if ONLY_CPU:
         try:
-            tf_test_acc, tf_model, tf_training_history = TF_MODEL(config, only_cpu=ONLY_CPU)
+            tf_test_acc, tf_model, tf_training_history, tf_val_loss, tf_val_acc = TF_MODEL(config, only_cpu=ONLY_CPU)
         except:
-            tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
+            tf_test_acc, tf_model, tf_training_history, tf_val_loss, tf_val_acc = TF_MODEL(config)
     else:
-        tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
+        tf_test_acc, tf_model, tf_training_history, tf_val_loss, tf_val_acc = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
         for attack_type in ['gaussian', 'deepfool']:
@@ -225,9 +225,15 @@ def multi_train(config):
     # wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
     data = [[x, y] for (x, y) in zip(tf_training_history, list(range(config['epochs'])))]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])
-    wandb.log({"my_custom_plot_id": wandb.plot.line(table, "epochs", "training_loss", title="TF Training Loss")})
-    for x in tf_training_history:
-        wandb.log({'tf_training_history': x})
+    wandb.log({"TF Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="TF Training Loss")})
+    data = [[x, y] for (x, y) in zip(tf_val_loss, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "validation loss"])
+    wandb.log({"TF Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="TF Validation Loss")})
+    data = [[x, y] for (x, y) in zip(tf_val_acc, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
+    wandb.log({"TF Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy", title="TF Validation Accuracy")})
+    # for x in tf_training_history:
+    #     wandb.log({'tf_training_history': x})
     try:
         tune.report(**search_results)
     except:

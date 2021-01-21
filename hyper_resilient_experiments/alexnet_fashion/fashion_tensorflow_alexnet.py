@@ -21,6 +21,8 @@ class Fashion_TensorFlow_AlexNet:
         # self.x_val = transform(self.x_val)
         # self.x_test = transform(self.x_test)
         self.training_loss_history = None
+        self.val_loss_history = None
+        self.val_acc_history = None
         classes = 10
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11,11), strides=4, activation='relu', input_shape=(28, 28, 1)),
@@ -49,6 +51,8 @@ class Fashion_TensorFlow_AlexNet:
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val))
         self.training_loss_history = res.history['loss']
+        self.val_loss_history = res.history['val_loss']
+        self.val_acc_history = res.history['val_accuracy']
         return res
 
     def test(self):
@@ -59,7 +63,7 @@ def fashion_tf_objective(config):
     model = Fashion_TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
-    return accuracy, model.model, model.training_loss_history
+    return accuracy, model.model, model.training_loss_history, model.val_loss_history, model.val_acc_history
 
 
 if __name__ == "__main__":
