@@ -44,6 +44,10 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
+        # tracking metrics
+        self.training_loss_history = []
+        self.validation_loss_history = []
+        self.validation_acc_history = []
 
     def train_dataloader(self):
         return DataLoader(NP_Dataset(self.x_train, self.y_train),
@@ -72,6 +76,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         # only use when  on dp
         loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
+        self.training_loss_history.append(loss)
         return {'loss': loss, 'logs': logs}
 
     def validation_step(self, val_batch, batch_idx):
@@ -82,6 +87,8 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         loss = self.criterion(outputs['forward'], outputs['expected'])
         accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         logs = {'validation_loss': loss, 'validation_accuracy': accuracy}
+        self.validation_loss_history.append(loss)
+        self.validation_acc_history.append(accuracy)
         return {'validation_loss': loss, 'logs': logs, 'validation_accuracy': accuracy}
 
     def test_step(self, test_batch, batch_idx):

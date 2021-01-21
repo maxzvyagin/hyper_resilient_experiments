@@ -4,6 +4,7 @@ from tensorflow import keras
 import os
 import tensorflow_datasets as tfds
 import numpy as np
+import pickle
 
 class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
@@ -12,8 +13,14 @@ class Caltech_TensorFlow_AlexNet:
         ### DIFFERENT RANDOM SEED###
         tf.random.set_seed(100)
         b = int(config['batch_size'])
-        (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
+        # (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         # self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
+        self.training_loss_history = None
+        self.val_acc_history = None
+        self.val_loss_history = None
+        f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/caltech_splits.pkl', 'rb')
+        data = pickle.load(f)
+        (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         classes = 102
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(300, 200, 3),
@@ -45,9 +52,11 @@ class Caltech_TensorFlow_AlexNet:
 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-                             batch_size=int(self.config['batch_size']))
-        # res = self.model.fit(self.train, epochs=self.config['epochs'],
-        #                      batch_size=int(self.config['batch_size']))
+                             batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val),
+                             shuffle=False)
+        self.training_loss_history = res.history['loss']
+        self.val_loss_history = res.history['val_loss']
+        self.val_acc_history = res.history['val_accuracy']
         return res
 
     def test(self):
@@ -59,7 +68,7 @@ def fashion_tf_objective(config):
     model = Caltech_TensorFlow_AlexNet(config)
     model.fit()
     accuracy = model.test()
-    return accuracy, model.model
+    return accuracy, model.model, model.training_loss_history, model.val_loss_history, model.val_acc_history
 
 def standardize(i):
     new = (tf.image.resize_with_crop_or_pad(i, 300, 200)/255).numpy()

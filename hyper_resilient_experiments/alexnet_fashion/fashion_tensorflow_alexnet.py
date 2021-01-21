@@ -49,7 +49,8 @@ class Fashion_TensorFlow_AlexNet:
 
     def fit(self):
         res = self.model.fit(self.x_train, self.y_train, epochs=self.config['epochs'],
-                             batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val))
+                             batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val),
+                             shuffle=False)
         self.training_loss_history = res.history['loss']
         self.val_loss_history = res.history['val_loss']
         self.val_acc_history = res.history['val_accuracy']
