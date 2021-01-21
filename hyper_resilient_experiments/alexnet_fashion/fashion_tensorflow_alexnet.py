@@ -15,10 +15,11 @@ class Fashion_TensorFlow_AlexNet:
         f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
-        f = lambda i: tf.expand_dims(i, -1)
-        self.x_train = f(self.x_train)
-        self.x_val = f(self.x_val)
-        self.x_test = f(self.x_test)
+        f.close()
+        transform = lambda i: np.expand_dims(i, -1)
+        self.x_train = transform(self.x_train)
+        self.x_val = transform(self.x_val)
+        self.x_test = transform(self.x_test)
         self.training_loss_history = None
         classes = 10
         self.model = keras.models.Sequential([
