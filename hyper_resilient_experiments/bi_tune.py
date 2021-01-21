@@ -222,8 +222,7 @@ def multi_train(config):
         average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
-    wandb.log(tf_training_history=tf_training_history)
-    wandb.log(test=True)
+    wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
     try:
         tune.report(**search_results)
     except:
