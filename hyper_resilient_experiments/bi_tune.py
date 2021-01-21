@@ -160,10 +160,13 @@ def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
     global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF, ONLY_CPU
     print(NUM_CLASSES)
-    try:
-        pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
-    except:
-        print("WARNING: implementation not completed for using only CPU.")
+    if ONLY_CPU:
+        try:
+            pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
+        except:
+            print("WARNING: implementation not completed for using only CPU. Using GPU.")
+            pt_test_acc, pt_model = PT_MODEL(config)
+    else:
         pt_test_acc, pt_model = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
@@ -172,11 +175,14 @@ def multi_train(config):
             pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
-    del pt_model
-    torch.cuda.empty_cache()
-    try:
-        tf_test_acc, tf_model = TF_MODEL(config, only_cpu=ONLY_CPU)
-    except:
+    # del pt_model
+    # torch.cuda.empty_cache()
+    if ONLY_CPU:
+        try:
+            tf_test_acc, tf_model, tf_training_history = TF_MODEL(config, only_cpu=ONLY_CPU)
+        except:
+            tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
+    else:
         tf_test_acc, tf_model, tf_training_history = TF_MODEL(config)
     search_results['tf_test_acc'] = tf_test_acc
     if not NO_FOOL:
@@ -219,6 +225,7 @@ def multi_train(config):
     except:
         print("Couldn't report Tune results. Continuing.")
         pass
+    tune.report(testtest=15)
     return search_results
 
 def bitune_parse_arguments(args):
