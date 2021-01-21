@@ -225,7 +225,6 @@ def multi_train(config):
     except:
         print("Couldn't report Tune results. Continuing.")
         pass
-    tune.report(testtest=15)
     return search_results
 
 def bitune_parse_arguments(args):
