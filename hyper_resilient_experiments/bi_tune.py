@@ -322,4 +322,5 @@ if __name__ == "__main__":
                                 mode=OPTIMIZE_MODE)
     else:
         spaceray.run_experiment(args, multi_train, ray_dir="/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/raylogs", cpu=8,
-                                start_space=int(args.start_space), mode=OPTIMIZE_MODE)
+                                start_space=int(args.start_space), mode=OPTIMIZE_MODE, project='hyper_sensitive',
+                                group='bi_tune')
