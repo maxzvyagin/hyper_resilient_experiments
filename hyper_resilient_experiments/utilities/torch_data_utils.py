@@ -12,5 +12,5 @@ class NP_Dataset(Dataset):
         selected_y = torch.from_numpy(self.y[index])
         return selected_x, selected_y
 
-    def __len(self):
+    def __len__(self):
         return len(self.x)
