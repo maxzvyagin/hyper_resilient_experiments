@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader
 from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
 from ray.tune.integration.wandb import wandb_mixin
-
+import wandb
 
 # Default constants
 PT_MODEL = pt_mnist.mnist_pt_objective
@@ -220,6 +220,7 @@ def multi_train(config):
         average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
+    wandb.log(tf_training_history=tf_training_history)
     try:
         tune.report(**search_results)
     except:
