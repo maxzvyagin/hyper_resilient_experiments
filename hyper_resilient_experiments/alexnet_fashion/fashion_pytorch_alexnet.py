@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader
 import statistics
 import os
 import argparse
+import pickle
+from hyper_resilient_experiments.utilities.torch_data_utils import NP_Dataset
 
 
 class Fashion_PyTorch_AlexNet(pl.LightningModule):
@@ -38,18 +40,22 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         self.test_loss = None
         self.test_accuracy = None
         self.accuracy = pl.metrics.Accuracy()
+        ### load in pickled dataset
+        f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
+        data = pickle.load(f)
+        (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
 
     def train_dataloader(self):
-        return DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=True,
-                                                        transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']), num_workers=4)
+        return DataLoader(NP_Dataset(self.x_train, self.y_train),
+                          batch_size=int(self.config['batch_size']), shuffle=False)
+
+    def val_dataloader(self):
+        return DataLoader(NP_Dataset(self.x_val, self.y_val),
+                          batch_size=int(self.config['batch_size']), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=False,
-                                                        transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=int(self.config['batch_size']), num_workers=4)
+        return DataLoader(NP_Dataset(self.x_test, self.y_test),
+                          batch_size=int(self.config['batch_size']), shuffle=False)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.config['learning_rate'], eps=self.config['adam_epsilon'])
@@ -67,6 +73,16 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
         return {'loss': loss, 'logs': logs}
+
+    def validation_step(self, val_batch, batch_idx):
+        x, y = val_batch
+        return {'forward': self.forward(x), 'expected': y}
+
+    def validation_step_end(self, outputs):
+        loss = self.criterion(outputs['forward'], outputs['expected'])
+        accuracy = self.accuracy(outputs['forward'], outputs['expected'])
+        logs = {'validation_loss': loss, 'validation_accuracy': accuracy}
+        return {'validation_loss': loss, 'logs': logs, 'validation_accuracy': accuracy}
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
