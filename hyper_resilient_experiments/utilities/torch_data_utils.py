@@ -12,7 +12,7 @@ class NP_Dataset(Dataset):
         # selected_x = torch.from_numpy(selected_x).float()
         # selected_y = torch.from_numpy(self.y[index])
         selected_x = torch.from_numpy(self.x[index]).float()
-        selected_y = float(self.y[index])
+        selected_y = torch.from_numpy(self.y[index]).long()
         return selected_x, selected_y
 
     def __len__(self):
