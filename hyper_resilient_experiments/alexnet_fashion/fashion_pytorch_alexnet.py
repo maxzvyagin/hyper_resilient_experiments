@@ -115,14 +115,17 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         return {'validation_loss': loss, 'logs': logs, 'validation_accuracy': accuracy}
 
     def validation_epoch_end(self, outputs):
-        # average validation loss
-        ave = statistics.mean(self.validation_loss_history)
-        self.calculated_validation_loss.append(ave)
-        self.validation_loss_history = []
-        # average validation accuracy
-        ave = statistics.mean(self.validation_acc_history)
-        self.calculated_validation_acc.append(ave)
-        self.validation_acc_history = []
+        try:
+            # average validation loss
+            ave = statistics.mean(self.validation_loss_history)
+            self.calculated_validation_loss.append(ave)
+            self.validation_loss_history = []
+            # average validation accuracy
+            ave = statistics.mean(self.validation_acc_history)
+            self.calculated_validation_acc.append(ave)
+            self.validation_acc_history = []
+        except:
+            print("Was not able to calculate validation metrics, continuing.")
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
