@@ -222,11 +222,23 @@ def multi_train(config):
         average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
+    for x in pt_training_history:
+        wandb.log({'PT_Training_Loss': x})
+    for x in pt_val_loss:
+        wandb.log({'PT_Validation_Loss': x})
+    for x in pt_val_acc:
+        wandb.log({'PT_Validation_Acc': x})
+    for x in tf_training_history:
+        wandb.log({'TF_Training_Loss': x})
+    for x in tf_val_loss:
+        wandb.log({'TF_Validation_Loss': x})
+    for x in tf_val_acc:
+        wandb.log({'TF_Validation_Acc': x})
     ###
-    history_dict = {'PT_Training_Loss': pt_training_history, 'PT_Validation_Loss': pt_val_loss,
-                    'PT_Val_Acc': pt_val_acc, 'TF_Training_Loss': tf_training_history,
-                    'TF_Validation_Loss': tf_val_loss, 'TF_Val_Acc': tf_val_acc}
-    wandb.log(history_dict)
+    # history_dict = {'PT_Training_Loss': pt_training_history, 'PT_Validation_Loss': pt_val_loss,
+    #                 'PT_Val_Acc': pt_val_acc, 'TF_Training_Loss': tf_training_history,
+    #                 'TF_Validation_Loss': tf_val_loss, 'TF_Val_Acc': tf_val_acc}
+    # wandb.log(history_dict)
     # data = [[x, y] for (x, y) in zip(pt_training_history, list(range(len(pt_training_history))))]
     # table = wandb.Table(data=data, columns=["epochs", "training_loss"])
     # wandb.log({"PT Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="PT Training Loss")})
