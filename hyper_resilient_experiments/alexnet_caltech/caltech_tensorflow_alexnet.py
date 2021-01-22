@@ -9,9 +9,9 @@ import pickle
 class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
         # tf.debugging.enable_check_numerics()
-        tf.keras.backend.set_image_data_format('channels_last')
+        # tf.keras.backend.set_image_data_format('channels_last')
         ### DIFFERENT RANDOM SEED###
-        tf.random.set_seed(100)
+        tf.random.set_seed(0)
         b = int(config['batch_size'])
         # (self.x_train, self.y_train), (self.x_test, self.y_test) = get_caltech()
         # self.train, self.test = tfds.load('caltech101', split=['train', 'test'], shuffle_files=False)
@@ -23,7 +23,7 @@ class Caltech_TensorFlow_AlexNet:
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         classes = 102
         self.model = keras.models.Sequential([
-            keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(300, 200, 3),
+            keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(3, 300, 200),
                                 kernel_initializer='he_uniform', padding="same"),
             keras.layers.MaxPool2D(pool_size=(3, 3), strides=(2, 2), padding="same"),
             keras.layers.Conv2D(filters=256, kernel_size=(5, 5), strides=1, activation='relu', padding="same",

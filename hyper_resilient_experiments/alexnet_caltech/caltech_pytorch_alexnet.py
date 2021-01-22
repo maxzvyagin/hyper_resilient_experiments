@@ -12,11 +12,11 @@ from hyper_resilient_experiments.utilities.torch_data_utils import NP_Dataset
 
 
 class Caltech_PyTorch_AlexNet(pl.LightningModule):
-    def __init__(self, config, classes=10):
+    def __init__(self, config, classes=102):
         super(Caltech_PyTorch_AlexNet, self).__init__()
         self.config = config
         self.model = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=(1,1)),
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=5),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
             nn.Conv2d(64, 256, kernel_size=5, padding=2),

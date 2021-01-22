@@ -8,9 +8,6 @@ class NP_Dataset(Dataset):
         self.y = y
 
     def __getitem__(self, index):
-        # selected_x = np.moveaxis(self.x[index], -1, 0)
-        # selected_x = torch.from_numpy(selected_x).float()
-        # selected_y = torch.from_numpy(self.y[index])
         selected_x = torch.from_numpy(self.x[index]).float()
         selected_y = torch.from_numpy(self.y[index]).long()
         return selected_x, selected_y

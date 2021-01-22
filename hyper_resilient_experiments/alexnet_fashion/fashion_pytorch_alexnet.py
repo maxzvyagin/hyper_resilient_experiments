@@ -23,9 +23,9 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
             nn.Conv2d(256, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.Conv2d(384, 384, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
             nn.Flatten(),
@@ -93,7 +93,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        return {'forward': self.forward(x), 'expected': y}
+        return {'forward': self.forward(x), 'expected': y.long()}
 
     def test_step_end(self, outputs):
         loss = self.criterion(outputs['forward'], outputs['expected'])
