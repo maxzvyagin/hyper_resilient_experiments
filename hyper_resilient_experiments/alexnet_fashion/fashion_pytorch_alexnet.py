@@ -95,6 +95,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         # only use when  on dp
         loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
+        print(type(loss))
         self.training_loss_history.append(loss)
         return {'loss': loss, 'logs': logs}
 
@@ -111,6 +112,8 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         loss = self.criterion(outputs['forward'], outputs['expected'])
         accuracy = self.accuracy(outputs['forward'], outputs['expected'])
         logs = {'validation_loss': loss, 'validation_accuracy': accuracy}
+        print(type(loss))
+        print(type(accuracy))
         self.validation_loss_history.append(loss)
         self.validation_acc_history.append(accuracy)
         return {'validation_loss': loss, 'logs': logs, 'validation_accuracy': accuracy}
