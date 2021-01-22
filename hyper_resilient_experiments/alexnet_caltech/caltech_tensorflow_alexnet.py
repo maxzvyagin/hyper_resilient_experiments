@@ -9,7 +9,7 @@ import pickle
 class Caltech_TensorFlow_AlexNet:
     def __init__(self, config):
         # tf.debugging.enable_check_numerics()
-        # tf.keras.backend.set_image_data_format('channels_last')
+        tf.keras.backend.set_image_data_format('channels_first')
         ### DIFFERENT RANDOM SEED###
         tf.random.set_seed(0)
         b = int(config['batch_size'])
