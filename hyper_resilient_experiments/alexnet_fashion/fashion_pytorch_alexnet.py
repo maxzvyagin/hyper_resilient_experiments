@@ -139,7 +139,7 @@ def fashion_pt_objective(config, ten=False):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
     trainer.fit(model)
     trainer.test(model)
-    print(len(model.training_loss_historyin), len(model.validation_loss_history), len(model.validation_acc_history))
+    print(len(model.training_loss_history), len(model.validation_loss_history), len(model.validation_acc_history))
     return (model.test_accuracy, model.model, model.training_loss_history, model.validation_loss_history,
             model.validation_acc_history)
 
@@ -152,5 +152,5 @@ if __name__ == "__main__":
         batch = args.batch
     else:
         batch = 64
-    test_config = {'batch_size': batch, 'learning_rate': .0001, 'epochs': 25, 'dropout': 0.5, 'adam_epsilon': 10**-9}
+    test_config = {'batch_size': batch, 'learning_rate': .0001, 'epochs': 5, 'dropout': 0.5, 'adam_epsilon': 10**-9}
     res = fashion_pt_objective(test_config)
