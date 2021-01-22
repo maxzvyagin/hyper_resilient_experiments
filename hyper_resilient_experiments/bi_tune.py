@@ -161,7 +161,7 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
 def multi_train(config):
     """Definition of side by side training of pytorch and tensorflow models, plus optional resiliency testing."""
     global NUM_CLASSES, MIN_RESILIENCY, MAX_DIFF, ONLY_CPU
-    print(NUM_CLASSES)
+    # print(NUM_CLASSES)
     if ONLY_CPU:
         try:
             pt_test_acc, pt_model, pt_training_history, pt_val_loss, pt_val_acc = PT_MODEL(config, only_cpu=ONLY_CPU)
@@ -223,24 +223,24 @@ def multi_train(config):
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
     ###
-    data = [[x, y] for (x, y) in zip(pt_training_history, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(pt_training_history, list(range(len(pt_training_history))))]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])
     wandb.log({"PT Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="PT Training Loss")})
-    data = [[x, y] for (x, y) in zip(pt_val_loss, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(pt_val_loss, list(range(len(pt_val_loss))))]
     table = wandb.Table(data=data, columns=["epochs", "validation loss"])
     wandb.log({"PT Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="PT Validation Loss")})
-    data = [[x, y] for (x, y) in zip(pt_val_acc, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(pt_val_acc, list(range(len(pt_val_acc))))]
     table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
     wandb.log({"PT Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy",
                                                          title="PT Validation Accuracy")})
     # wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
-    data = [[x, y] for (x, y) in zip(tf_training_history, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(tf_training_history, list(range(len(tf_training_history))))]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])
     wandb.log({"TF Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="TF Training Loss")})
-    data = [[x, y] for (x, y) in zip(tf_val_loss, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(tf_val_loss, list(range(len(tf_val_loss))))]
     table = wandb.Table(data=data, columns=["epochs", "validation loss"])
     wandb.log({"TF Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="TF Validation Loss")})
-    data = [[x, y] for (x, y) in zip(tf_val_acc, list(range(config['epochs'])))]
+    data = [[x, y] for (x, y) in zip(tf_val_acc, list(range(len(tf_val_acc))))]
     table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
     wandb.log({"TF Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy", title="TF Validation Accuracy")})
     # for x in tf_training_history:
