@@ -62,8 +62,11 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         # tracking metrics
         self.training_loss_history = []
+        self.calculated_training_loss = []
         self.validation_loss_history = []
+        self.calculated_validation_loss = []
         self.validation_acc_history = []
+        self.calculated_validation_acc = []
 
     def train_dataloader(self):
         return DataLoader(Fashion_NP_Dataset(self.x_train, self.y_train),
@@ -92,8 +95,12 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         # only use when  on dp
         loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
-        self.training_loss_history.append(loss)
         return {'loss': loss, 'logs': logs}
+
+    def training_epoch_end(self, outputs):
+        ave = statistics.mean(self.training_loss_history)
+        self.training_loss_history = []
+        self.calculated_training_loss.append(ave)
 
     def validation_step(self, val_batch, batch_idx):
         x, y = val_batch
@@ -106,6 +113,16 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         self.validation_loss_history.append(loss)
         self.validation_acc_history.append(accuracy)
         return {'validation_loss': loss, 'logs': logs, 'validation_accuracy': accuracy}
+
+    def validation_epoch_end(self, outputs):
+        # average validation loss
+        ave = statistics.mean(self.validation_loss_history)
+        self.calculated_validation_loss.append(ave)
+        self.validation_loss_history = []
+        # average validation accuracy
+        ave = statistics.mean(self.validation_acc_history)
+        self.calculated_validation_acc.append(ave)
+        self.validation_acc_history = []
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
@@ -140,8 +157,8 @@ def fashion_pt_objective(config, ten=False):
     trainer.fit(model)
     trainer.test(model)
     print(len(model.training_loss_history), len(model.validation_loss_history), len(model.validation_acc_history))
-    return (model.test_accuracy, model.model, model.training_loss_history, model.validation_loss_history,
-            model.validation_acc_history)
+    return (model.test_accuracy, model.model, model.calculated_training_loss, model.calculated_validation_loss,
+            model.calculated_validation_acc)
 
 
 if __name__ == "__main__":
