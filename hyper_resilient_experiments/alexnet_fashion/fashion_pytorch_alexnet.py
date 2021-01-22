@@ -70,7 +70,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         x, y = train_batch
-        return {'forward': self.forward(x), 'expected': y.double()}
+        return {'forward': self.forward(x), 'expected': y.long()}
 
     def training_step_end(self, outputs):
         # only use when  on dp
@@ -81,7 +81,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
 
     def validation_step(self, val_batch, batch_idx):
         x, y = val_batch
-        return {'forward': self.forward(x), 'expected': y.double()}
+        return {'forward': self.forward(x), 'expected': y.long()}
 
     def validation_step_end(self, outputs):
         loss = self.criterion(outputs['forward'], outputs['expected'])
