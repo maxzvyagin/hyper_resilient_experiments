@@ -42,6 +42,7 @@ class Caltech_PyTorch_AlexNet(pl.LightningModule):
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
             nn.Flatten(),
+            #nn.Linear(17920, 4096),
             nn.Linear(256, 4096),
             nn.ReLU(inplace=True),
             nn.Dropout(config['dropout']),
