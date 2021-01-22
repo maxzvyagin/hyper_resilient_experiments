@@ -8,8 +8,20 @@ import os
 import argparse
 from hyper_resilient_experiments.alexnet_caltech.caltech_tensorflow_alexnet import get_caltech
 import pickle
-from hyper_resilient_experiments.utilities.torch_data_utils import NP_Dataset
+from torch.utils.data import Dataset
 
+class Caltech_NP_Dataset(Dataset):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __getitem__(self, index):
+        selected_x = torch.from_numpy(self.x[index]).float()
+        selected_y = float(self.y[index])
+        return selected_x, selected_y
+
+    def __len__(self):
+        return len(self.x)
 
 class Caltech_PyTorch_AlexNet(pl.LightningModule):
     def __init__(self, config, classes=102):
@@ -51,15 +63,15 @@ class Caltech_PyTorch_AlexNet(pl.LightningModule):
         self.validation_acc_history = []
 
     def train_dataloader(self):
-        return DataLoader(NP_Dataset(self.x_train, self.y_train),
+        return DataLoader(Caltech_NP_Dataset(self.x_train, self.y_train),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def val_dataloader(self):
-        return DataLoader(NP_Dataset(self.x_val, self.y_val),
+        return DataLoader(Caltech_NP_Dataset(self.x_val, self.y_val),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(NP_Dataset(self.x_test, self.y_test),
+        return DataLoader(Caltech_NP_Dataset(self.x_test, self.y_test),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def configure_optimizers(self):
