@@ -95,6 +95,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         # only use when  on dp
         loss = self.criterion(outputs['forward'], outputs['expected'])
         logs = {'train_loss': loss}
+        self.training_loss_history.append(loss)
         return {'loss': loss, 'logs': logs}
 
     def training_epoch_end(self, outputs):
