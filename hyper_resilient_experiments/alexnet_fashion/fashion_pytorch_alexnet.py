@@ -139,6 +139,7 @@ def fashion_pt_objective(config, ten=False):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
     trainer.fit(model)
     trainer.test(model)
+    print(len(model.training_loss_historyin), len(model.validation_loss_history), len(model.validation_acc_history))
     return (model.test_accuracy, model.model, model.training_loss_history, model.validation_loss_history,
             model.validation_acc_history)
 
