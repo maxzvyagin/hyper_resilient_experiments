@@ -175,8 +175,8 @@ def multi_train(config):
             pt_acc = model_attack(pt_model, "pt", attack_type, config, num_classes=NUM_CLASSES)
             search_results["pt" + "_" + attack_type + "_" + "accuracy"] = pt_acc
     # to avoid weird CUDA OOM errors
-    # del pt_model
-    # torch.cuda.empty_cache()
+    del pt_model
+    torch.cuda.empty_cache()
     if ONLY_CPU:
         try:
             tf_test_acc, tf_model, tf_training_history, tf_val_loss, tf_val_acc = TF_MODEL(config, only_cpu=ONLY_CPU)
