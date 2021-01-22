@@ -93,7 +93,7 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
 
     def test_step(self, test_batch, batch_idx):
         x, y = test_batch
-        return {'forward': self.forward(x), 'expected': y}
+        return {'forward': self.forward(x), 'expected': y.double()}
 
     def test_step_end(self, outputs):
         loss = self.criterion(outputs['forward'], outputs['expected'])
