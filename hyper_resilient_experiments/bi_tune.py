@@ -332,7 +332,7 @@ if __name__ == "__main__":
     parser.add_argument('-l', '--on_lambda', action="store_true")
     parser.add_argument('-n', '--start_space')
     parser.add_argument('-c', '--only_cpu', action='store_true')
-    parser.add_argument('-p', '--project_name', argument_default="hyper_sensitive")
+    parser.add_argument('-p', '--project_name', default="hyper_sensitive")
     parser.add_argument('--minimize_mode', action="store_true")
     args = parser.parse_args()
     bitune_parse_arguments(args)
