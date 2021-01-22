@@ -164,12 +164,12 @@ def multi_train(config):
     print(NUM_CLASSES)
     if ONLY_CPU:
         try:
-            pt_test_acc, pt_model = PT_MODEL(config, only_cpu=ONLY_CPU)
+            pt_test_acc, pt_model, pt_training_history, pt_val_loss, pt_val_acc = PT_MODEL(config, only_cpu=ONLY_CPU)
         except:
             print("WARNING: implementation not completed for using only CPU. Using GPU.")
-            pt_test_acc, pt_model = PT_MODEL(config)
+            pt_test_acc, pt_model, pt_training_history, pt_val_loss, pt_val_acc = PT_MODEL(config)
     else:
-        pt_test_acc, pt_model = PT_MODEL(config)
+        pt_test_acc, pt_model, pt_training_history, pt_val_loss, pt_val_acc = PT_MODEL(config)
     pt_model.eval()
     search_results = {'pt_test_acc': pt_test_acc}
     if not NO_FOOL:
@@ -222,6 +222,17 @@ def multi_train(config):
         average_res = abs(pt_ave-tf_ave)
     search_results['average_res'] = average_res
     search_results['tf_training_history'] = tf_training_history
+    ###
+    data = [[x, y] for (x, y) in zip(pt_training_history, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "training_loss"])
+    wandb.log({"PT Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="PT Training Loss")})
+    data = [[x, y] for (x, y) in zip(pt_val_loss, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "validation loss"])
+    wandb.log({"PT Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="PT Validation Loss")})
+    data = [[x, y] for (x, y) in zip(pt_val_acc, list(range(config['epochs'])))]
+    table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
+    wandb.log({"PT Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy",
+                                                         title="PT Validation Accuracy")})
     # wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
     data = [[x, y] for (x, y) in zip(tf_training_history, list(range(config['epochs'])))]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])

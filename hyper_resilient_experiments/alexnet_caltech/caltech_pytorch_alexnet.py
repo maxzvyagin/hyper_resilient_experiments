@@ -124,7 +124,8 @@ def caltech_pt_objective(config):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0])
     trainer.fit(model)
     trainer.test(model)
-    return model.test_accuracy, model.model
+    return (model.test_accuracy, model.model, model.training_loss_history,
+            model.validation_loss_history, model.validation_acc_history)
 
 
 if __name__ == "__main__":
