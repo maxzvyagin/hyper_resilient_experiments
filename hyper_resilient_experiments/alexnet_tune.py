@@ -242,24 +242,24 @@ def multi_train(config):
     #                 'PT_Val_Acc': pt_val_acc, 'TF_Training_Loss': tf_training_history,
     #                 'TF_Validation_Loss': tf_val_loss, 'TF_Val_Acc': tf_val_acc}
     # wandb.log(history_dict)
-    data = [[x, y] for (x, y) in zip(pt_training_history, list(range(len(pt_training_history))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(pt_training_history))), pt_training_history)]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])
     wandb.log({"PT Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="PT Training Loss")})
-    data = [[x, y] for (x, y) in zip(pt_val_loss, list(range(len(pt_val_loss))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(pt_val_loss))), pt_val_loss)]
     table = wandb.Table(data=data, columns=["epochs", "validation loss"])
     wandb.log({"PT Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="PT Validation Loss")})
-    data = [[x, y] for (x, y) in zip(pt_val_acc, list(range(len(pt_val_acc))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(pt_val_acc))), pt_val_acc)]
     table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
     wandb.log({"PT Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy",
                                                          title="PT Validation Accuracy")})
     # wandb.log({'tf_training_history': tf_training_history, 'separate_log_test': True})
-    data = [[x, y] for (x, y) in zip(tf_training_history, list(range(len(tf_training_history))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(tf_training_history))), tf_training_history)]
     table = wandb.Table(data=data, columns=["epochs", "training_loss"])
     wandb.log({"TF Training Loss": wandb.plot.line(table, "epochs", "training_loss", title="TF Training Loss")})
-    data = [[x, y] for (x, y) in zip(tf_val_loss, list(range(len(tf_val_loss))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(tf_val_loss))), tf_val_loss)]
     table = wandb.Table(data=data, columns=["epochs", "validation loss"])
     wandb.log({"TF Validation Loss": wandb.plot.line(table, "epochs", "validation loss", title="TF Validation Loss")})
-    data = [[x, y] for (x, y) in zip(tf_val_acc, list(range(len(tf_val_acc))))]
+    data = [[x, y] for (x, y) in zip(list(range(len(tf_val_acc))), tf_val_acc)]
     table = wandb.Table(data=data, columns=["epochs", "validation accuracy"])
     wandb.log({"TF Validation Accuracy": wandb.plot.line(table, "epochs", "validation accuracy", title="TF Validation Accuracy")})
     try:
