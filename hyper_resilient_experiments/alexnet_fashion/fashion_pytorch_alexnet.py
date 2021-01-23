@@ -163,8 +163,8 @@ def fashion_pt_objective(config, ten=False):
     trainer = pl.Trainer(max_epochs=config['epochs'], gpus=[0], num_sanity_val_steps=0)
     trainer.fit(model)
     trainer.test(model)
-    print(len(model.calculated_training_loss), len(model.calculated_validation_loss),
-          len(model.calculated_validation_acc))
+    # print(len(model.calculated_training_loss), len(model.calculated_validation_loss),
+    #       len(model.calculated_validation_acc))
     return (model.test_accuracy, model.model, model.calculated_training_loss, model.calculated_validation_loss,
             model.calculated_validation_acc)
 
