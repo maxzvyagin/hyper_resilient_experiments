@@ -69,15 +69,15 @@ class Fashion_PyTorch_AlexNet(pl.LightningModule):
         self.calculated_validation_acc = []
 
     def train_dataloader(self):
-        return DataLoader(Fashion_NP_Dataset(self.x_train, self.y_train),
+        return DataLoader(Fashion_NP_Dataset(self.x_train.astype(np.float32), self.y_train.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def val_dataloader(self):
-        return DataLoader(Fashion_NP_Dataset(self.x_val, self.y_val),
+        return DataLoader(Fashion_NP_Dataset(self.x_val.astype(np.float32), self.y_val.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(Fashion_NP_Dataset(self.x_test, self.y_test),
+        return DataLoader(Fashion_NP_Dataset(self.x_test.astype(np.float32), self.y_test.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def configure_optimizers(self):
