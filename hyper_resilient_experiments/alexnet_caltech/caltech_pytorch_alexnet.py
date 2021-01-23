@@ -18,7 +18,7 @@ class Caltech_NP_Dataset(Dataset):
 
     def __getitem__(self, index):
         selected_x = torch.from_numpy(self.x[index]).float()
-        selected_y = int(self.y[index])
+        selected_y = float(self.y[index])
         return selected_x, selected_y
 
     def __len__(self):
@@ -65,15 +65,15 @@ class Caltech_PyTorch_AlexNet(pl.LightningModule):
         self.validation_acc_history = []
 
     def train_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_train.astype(np.float32), self.y_train.astype(np.float32)),
+        return DataLoader(Caltech_NP_Dataset(self.x_train, self.y_train),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def val_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_val.astype(np.float32), self.y_val.astype(np.float32)),
+        return DataLoader(Caltech_NP_Dataset(self.x_val, self.y_val),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_test.astype(np.float32), self.y_test.astype(np.float32)),
+        return DataLoader(Caltech_NP_Dataset(self.x_test, self.y_test),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def configure_optimizers(self):
