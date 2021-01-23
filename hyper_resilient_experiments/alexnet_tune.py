@@ -2,6 +2,8 @@ from hyper_resilient_experiments.segmentation.gis_preprocess import pt_gis_train
 import sys
 from hyper_resilient_experiments.alexnet_fashion import fashion_pytorch_alexnet, fashion_tensorflow_alexnet
 from hyper_resilient_experiments.alexnet_caltech import caltech_pytorch_alexnet, caltech_tensorflow_alexnet
+from hyper_resilient_experiments.alexnet_caltech.caltech_pytorch_alexnet import Caltech_NP_Dataset
+from hyper_resilient_experiments.alexnet_fashion.fashion_pytorch_alexnet import Fashion_NP_Dataset
 import argparse
 import ray
 from ray import tune
@@ -14,18 +16,19 @@ import tensorflow_datasets as tfds
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from hyper_resilient_experiments.segmentation.tensorflow_unet import get_cityscapes
 import spaceray
 from ray.tune.integration.wandb import wandb_mixin
 import wandb
 from ray.tune.integration.wandb import wandb_mixin
+import pickle
 
 # Default constants
 PT_MODEL = fashion_pytorch_alexnet.fashion_pt_objective
 TF_MODEL = fashion_tensorflow_alexnet.fashion_tf_objective
+MODEL_TYPE = "fashion"
 NUM_CLASSES = 10
 TRIALS = 25
-NO_FOOL = True
+NO_FOOL = False
 MNIST = True
 MAX_DIFF = False
 FASHION = False
@@ -35,46 +38,29 @@ OPTIMIZE_MODE = "max"
 
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
-    global FASHION, ONLY_CPU
-    print(FASHION)
+    global ONLY_CPU, MODEL_TYPE
     if model_type == "pt":
         if ONLY_CPU:
             device = torch.device("cpu")
         else:
             device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         fmodel = fb.models.PyTorchModel(model, bounds=(0, 1))
-        # cifar
-        if num_classes == 100:
-            data = DataLoader(torchvision.datasets.CIFAR100("~/datasets/", train=False,
-                                                            transform=torchvision.transforms.ToTensor(),
-                                                            target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
-        elif FASHION:
-            data = DataLoader(torchvision.datasets.FashionMNIST("~/datasets/", train=False,
-                                                        transform=torchvision.transforms.ToTensor(),
-                                                        target_transform=None, download=True),
-                          batch_size=int(config['batch_size']))
-        elif num_classes == 10 and not MNIST:
-            data = DataLoader(torchvision.datasets.CIFAR10("~/datasets/", train=False,
-                                                           transform=torchvision.transforms.ToTensor(),
-                                                           target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
-        # cityscapes
-        elif num_classes == 30:
-            data = DataLoader(torchvision.datasets.Cityscapes(
-                "/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/", split='train', mode='fine', target_type='semantic',
-                transform=torchvision.transforms.ToTensor(),
-                target_transform=torchvision.transforms.ToTensor()),
-                batch_size=int(config['batch_size']))
-        # gis
-        elif num_classes == 1:
-            train_set, test_set = pt_gis_train_test_split()
-            data = DataLoader(test_set, batch_size=int(config['batch_size']))
+        # fashion
+        if MODEL_TYPE == "fashion":
+            f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
+            data = pickle.load(f)
+            (x_train, y_train), (x_val, y_val), (x_test, y_test) = data
+            data = DataLoader(Fashion_NP_Dataset(x_test, y_test),
+                          batch_size=int(config['batch_size']), shuffle=False)
+        elif MODEL_TYPE == "caltech":
+            f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/caltech_splits.pkl', 'rb')
+            data = pickle.load(f)
+            (x_train, y_train), (x_val, y_val), (x_test, y_test) = data
+            data = DataLoader(Caltech_NP_Dataset(x_test, y_test),
+                              batch_size=int(config['batch_size']), shuffle=False)
         else:
-            data = DataLoader(torchvision.datasets.MNIST("~/datasets/", train=False,
-                                                         transform=torchvision.transforms.ToTensor(),
-                                                         target_transform=None, download=True),
-                              batch_size=int(config['batch_size']))
+            print("NOT IMPLEMENTED")
+            sys.exit()
         images, labels = [], []
         for sample in data:
             images.append(sample[0].to(device))
@@ -82,34 +68,22 @@ def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES
         # images, labels = (torch.from_numpy(images).to(device), torch.from_numpy(labels).to(device))
     elif model_type == "tf":
         fmodel = fb.models.TensorFlowModel(model, bounds=(0, 1))
-        # cifar
-        if num_classes == 100:
-            train, test = tfds.load('cifar100', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(int(config['batch_size'])))
-        elif FASHION:
-            (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
-            f = lambda i: tf.expand_dims(i, -1)
-            x_test = f(x_test)
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
-        elif num_classes == 10 and not MNIST:
-            train, test = tfds.load('cifar10', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(int(config['batch_size'])))
-        # cityscapes
-        elif num_classes == 30:
-            (x_train, y_train), (x_test, y_test) = get_cityscapes()
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
-        # gis
-        elif num_classes == 1:
-            (x_train, y_train), (x_test, y_test) = tf_gis_test_train_split()
-            data = list(tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(int(config['batch_size'])))
-        # mnist
+        if MODEL_TYPE == "fashion":
+            f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/fashion_splits.pkl', 'rb')
+            data = pickle.load(f)
+            (x_train, y_train), (x_val, y_val), (x_test, y_test) = data
+            data = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size'])
+        elif MODEL_TYPE == "caltech":
+            f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/caltech_splits.pkl', 'rb')
+            data = pickle.load(f)
+            (x_train, y_train), (x_val, y_val), (x_test, y_test) = data
+            data = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(config['batch_size'])
         else:
-            train, test = tfds.load('mnist', split=['train', 'test'], shuffle_files=False, as_supervised=True)
-            data = list(test.batch(int(config['batch_size'])))
+            print("NOT IMPLEMENTED")
+            sys.exit()
         images, labels = [], []
         for sample in data:
-            fixed_image = (np.array(sample[0]) / 255.0).astype('float32')
-            images.append(tf.convert_to_tensor(fixed_image))
+            images.append(sample[0])
             labels.append(sample[1])
     else:
         print("Incorrect model type in model attack. Please try again. Must be either PyTorch or TensorFlow.")
@@ -271,19 +245,25 @@ def multi_train(config):
 
 def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
-    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, ONLY_CPU, OPTIMIZE_MODE
+    global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY
+    global ONLY_CPU, OPTIMIZE_MODE, MODEL_TYPE
     if not args.model:
         print("NOTE: Defaulting to fashion dataset model training...")
         args.model = "fashion"
+        NUM_CLASSES = 10
     else:
         if args.model == "caltech":
             PT_MODEL = caltech_pytorch_alexnet.caltech_pt_objective
             TF_MODEL = caltech_tensorflow_alexnet.fashion_tf_objective
             NUM_CLASSES = 102
+            MODEL_TYPE = "caltech"
         elif args.model == "cinic":
+            print("NOT YET IMPLEMENTED")
+            sys.exit()
             PT_MODEL = fashion_pytorch_alexnet.fashion_pt_objective
             TF_MODEL = fashion_tensorflow_alexnet.fashion_tf_objective
             NUM_CLASSES = 10
+            MODEL_TYPE = "cinic"
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
