@@ -9,6 +9,7 @@ import argparse
 from hyper_resilient_experiments.alexnet_caltech.caltech_tensorflow_alexnet import get_caltech
 import pickle
 from torch.utils.data import Dataset
+import numpy as np
 
 class Caltech_NP_Dataset(Dataset):
     def __init__(self, x, y):
@@ -64,15 +65,15 @@ class Caltech_PyTorch_AlexNet(pl.LightningModule):
         self.validation_acc_history = []
 
     def train_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_train, self.y_train),
+        return DataLoader(Caltech_NP_Dataset(self.x_train.astype(np.float32), self.y_train.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def val_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_val, self.y_val),
+        return DataLoader(Caltech_NP_Dataset(self.x_val.astype(np.float32), self.y_val.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def test_dataloader(self):
-        return DataLoader(Caltech_NP_Dataset(self.x_test, self.y_test),
+        return DataLoader(Caltech_NP_Dataset(self.x_test.astype(np.float32), self.y_test.astype(np.float32)),
                           batch_size=int(self.config['batch_size']), shuffle=False)
 
     def configure_optimizers(self):
