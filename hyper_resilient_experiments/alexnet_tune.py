@@ -270,47 +270,17 @@ def bitune_parse_arguments(args):
     """Parsing arguments specifically for bi tune experiments"""
     global PT_MODEL, TF_MODEL, NUM_CLASSES, NO_FOOL, MNIST, TRIALS, MAX_DIFF, FASHION, MIN_RESILIENCY, ONLY_CPU, OPTIMIZE_MODE
     if not args.model:
-        print("NOTE: Defaulting to MNIST model training...")
-        args.model = "mnist"
+        print("NOTE: Defaulting to fashion dataset model training...")
+        args.model = "fashion"
     else:
-        if args.model == "alexnet_cifar100":
-            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "gan":
-            print("Error: GAN not implemented.")
-            sys.exit()
-        elif args.model == "segmentation_cityscapes":
-            PT_MODEL = pytorch_unet.cityscapes_pt_objective
-            TF_MODEL = tensorflow_unet.cityscapes_tf_objective
-            NUM_CLASSES = 30
-        elif args.model == "segmentation_gis":
-            PT_MODEL = pytorch_unet.gis_pt_objective
-            TF_MODEL = tensorflow_unet.gis_tf_objective
-            NUM_CLASSES = 1
-        elif args.model == "mnist_nofool":
-            NO_FOOL = True
-        elif args.model == "cifar100_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar100_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar100_tf_objective
-            NUM_CLASSES = 100
-        elif args.model == "alexnet_cifar10":
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "cifar10_nofool":
-            NO_FOOL = True
-            PT_MODEL = pytorch_alexnet.cifar10_pt_objective
-            TF_MODEL = tensorflow_alexnet.cifar10_tf_objective
-            NUM_CLASSES = 10
-            MNIST = False
-        elif args.model == "fashion":
+        if args.model == "caltech":
+            PT_MODEL = caltech_pytorch_alexnet.caltech_pt_objective
+            TF_MODEL = caltech_tensorflow_alexnet.fashion_tf_objective
+            NUM_CLASSES = 102
+        elif args.model == "cinic":
             PT_MODEL = fashion_pytorch_alexnet.fashion_pt_objective
             TF_MODEL = fashion_tensorflow_alexnet.fashion_tf_objective
-            MNIST = False
-            FASHION = True
+            NUM_CLASSES = 10
         else:
             print("\n ERROR: Unknown model type. Please try again. "
                   "Must be one of: mnist, alexnet_cifar100, segmentation_cityscapes, or segmentation_gis.\n")
