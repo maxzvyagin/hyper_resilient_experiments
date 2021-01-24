@@ -25,9 +25,9 @@ class Caltech_TensorFlow_AlexNet:
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         f.close()
-        train_data = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train))
-        val_data = tf.data.Dataset.from_tensor_slices((self.x_val, self.y_val))
-        test_data = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test))
+        self.train_data = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train))
+        self.val_data = tf.data.Dataset.from_tensor_slices((self.x_val, self.y_val))
+        self.test_data = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test))
         # self.x_train = list(map(transform, self.x_train))
         # self.x_val = list(map(transform, self.x_val))
         # self.x_test = list(map(transform, self.x_test))
@@ -61,8 +61,8 @@ class Caltech_TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(self.x_train, list(self.y_train), epochs=self.config['epochs'],
-                             batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val),
+        res = self.model.fit(self.train_data, epochs=self.config['epochs'],
+                             batch_size=int(self.config['batch_size']), validation_data=self.val_data,
                              shuffle=False)
         self.training_loss_history = res.history['loss']
         self.val_loss_history = res.history['val_loss']
@@ -70,7 +70,7 @@ class Caltech_TensorFlow_AlexNet:
         return res
 
     def test(self):
-        res_test = self.model.evaluate(self.x_test, self.y_test)
+        res_test = self.model.evaluate(self.test_data)
         # res_test = self.model.evaluate(self.test)
         return res_test[1]
 
