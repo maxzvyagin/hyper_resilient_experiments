@@ -24,6 +24,7 @@ class Caltech_TensorFlow_AlexNet:
         f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/caltech_splits.pkl', 'rb')
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
+        f.close()
         # self.x_train = list(map(transform, self.x_train))
         # self.x_val = list(map(transform, self.x_val))
         # self.x_test = list(map(transform, self.x_test))
