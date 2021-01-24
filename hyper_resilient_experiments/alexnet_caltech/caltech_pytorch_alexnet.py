@@ -17,7 +17,7 @@ class Caltech_NP_Dataset(Dataset):
         self.y = y
 
     def __getitem__(self, index):
-        selected_x = torch.from_numpy(self.x[index])
+        selected_x = torch.from_numpy(self.x[index]).float()
         selected_y = self.y[index].item()
         return selected_x, selected_y
 
