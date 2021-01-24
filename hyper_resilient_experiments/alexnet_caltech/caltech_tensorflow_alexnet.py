@@ -58,7 +58,7 @@ class Caltech_TensorFlow_AlexNet:
         self.config = config
 
     def fit(self):
-        res = self.model.fit(list(self.x_train), list(self.y_train), epochs=self.config['epochs'],
+        res = self.model.fit(self.x_train, np.array(self.y_train), epochs=self.config['epochs'],
                              batch_size=int(self.config['batch_size']), validation_data=(self.x_val, self.y_val),
                              shuffle=False)
         self.training_loss_history = res.history['loss']
