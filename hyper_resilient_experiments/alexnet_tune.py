@@ -36,6 +36,19 @@ MIN_RESILIENCY = False
 ONLY_CPU = False
 OPTIMIZE_MODE = "max"
 
+def found_convergence(validation_accuracy):
+    """Given validation accuracy, return bool defining if convergence has been reached: <=5% change in last 10 points"""
+    last_ten = validation_accuracy[-10:]
+    diffs = []
+    for x in range(9):
+        d = last_ten[x+1] - last_ten[x]
+        diffs.append(d)
+    ave_diff = statistics.mean(diffs)
+    if ave_diff >= 5:
+        return False, ave_diff
+    else:
+        return True, ave_diff
+
 def model_attack(model, model_type, attack_type, config, num_classes=NUM_CLASSES):
     print(num_classes)
     global ONLY_CPU, MODEL_TYPE
@@ -192,6 +205,13 @@ def multi_train(config):
         pt_ave = float(statistics.mean(pt_results))
         tf_ave = float(statistics.mean(tf_results))
         average_res = abs(pt_ave-tf_ave)
+    ### calculate if converged
+    pt_conv, pt_ave_conv_diff = found_convergence(pt_val_acc)
+    tf_conv, tf_ave_conv_diff = found_convergence(tf_val_acc)
+    search_results['pt_converged'] = pt_conv
+    search_results['pt_converged_average'] = pt_ave_conv_diff
+    search_results['tf_converged'] = tf_conv
+    search_results['tf_converged_average'] = tf_ave_conv_diff
     search_results['average_res'] = average_res
     search_results['tf_training_loss'] = tf_training_history
     search_results['tf_validation_loss'] = tf_val_loss
