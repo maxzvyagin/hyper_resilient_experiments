@@ -17,9 +17,9 @@ class Fashion_TensorFlow_AlexNet:
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         f.close()
         transform = lambda i: i.astype(float)
-        self.x_train = map(transform, self.x_train)
-        self.x_val = map(transform, self.x_val)
-        self.x_test = map(transform, self.x_test)
+        self.x_train = list(map(transform, self.x_train))
+        self.x_val = list(map(transform, self.x_val))
+        self.x_test = list(map(transform, self.x_test))
         self.training_loss_history = None
         self.val_loss_history = None
         self.val_acc_history = None

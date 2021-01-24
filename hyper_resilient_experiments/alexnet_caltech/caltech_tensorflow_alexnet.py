@@ -24,9 +24,9 @@ class Caltech_TensorFlow_AlexNet:
         f = open('/lus/theta-fs0/projects/CVD-Mol-AI/mzvyagin/alexnet_datasets/caltech_splits.pkl', 'rb')
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
-        self.x_train = map(transform, self.x_train)
-        self.x_val = map(transform, self.x_val)
-        self.x_test = map(transform, self.x_test)
+        self.x_train = list(map(transform, self.x_train))
+        self.x_val = list(map(transform, self.x_val))
+        self.x_test = list(map(transform, self.x_test))
         classes = 102
         self.model = keras.models.Sequential([
             keras.layers.Conv2D(filters=64, kernel_size=(11, 11), strides=4, activation='relu', input_shape=(3, 300, 200),
