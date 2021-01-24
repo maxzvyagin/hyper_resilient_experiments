@@ -25,6 +25,9 @@ class Caltech_TensorFlow_AlexNet:
         data = pickle.load(f)
         (self.x_train, self.y_train), (self.x_val, self.y_val), (self.x_test, self.y_test) = data
         f.close()
+        train_data = tf.data.Dataset.from_tensor_slices((self.x_train, self.y_train))
+        val_data = tf.data.Dataset.from_tensor_slices((self.x_val, self.y_val))
+        test_data = tf.data.Dataset.from_tensor_slices((self.x_test, self.y_test))
         # self.x_train = list(map(transform, self.x_train))
         # self.x_val = list(map(transform, self.x_val))
         # self.x_test = list(map(transform, self.x_test))
