@@ -32,7 +32,7 @@ def mnist_tf_objective(config):
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
 
-    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b)
+    res = model.fit(x_train, y_train, epochs=config['epochs'], batch_size=b, shuffle=False)
     res_test = model.evaluate(x_test, y_test)
     return (res_test[1], model)
 
